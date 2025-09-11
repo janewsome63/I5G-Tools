@@ -29,12 +29,12 @@ from PyQt5.QtWidgets import (
 lang = {
     "title": "I5G Tools",
     "version": "v0.1",
-    "wj_up": "Increase: ",
-    "wj_down": "Decrease: ",
-    "wj_switch": "Switch: ",
-    "wj_step": "Step: ",
-    "wj_toggle": "Toggle: ",
-    "wj_continuous": "Continuous: ",
+    "wj_up": " Increase: ",
+    "wj_down": " Decrease: ",
+    "wj_switch": " Switch: ",
+    "wj_step": " Step: ",
+    "wj_toggle": " Toggle: ",
+    "wj_continuous": " " * 17 + " Continuous: ",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "bind": "Bind",
@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle(lang['title'] + " " + lang['version'])
-        self.setFixedSize(QSize(433, 300))
+        self.setFixedSize(QSize(433, 250))
         layout = QVBoxLayout()
 
         tabs = QTabWidget()
