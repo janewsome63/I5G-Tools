@@ -5,7 +5,6 @@ import os
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
     QApplication,
-    QCheckBox,
     QComboBox,
     QLabel,
     QLCDNumber,
@@ -29,14 +28,17 @@ from PyQt5.QtWidgets import (
 lang = {
     "title": "I5G Tools",
     "version": "v0.1",
-    "wj_up": " Increase: ",
-    "wj_down": " Decrease: ",
-    "wj_switch": " Switch: ",
-    "wj_step": " Step: ",
-    "wj_toggle": " Toggle: ",
-    "wj_continuous": " " * 17 + " Continuous: ",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
+    "up": "Increase:",
+    "down": "Decrease:",
+    "switch": "Switch:",
+    "increment": "Increment:",
+    "switch_value": "Switch Value:",
+    "switch_mode": "Switch Mode:",
+    "hold": "Hold",
+    "toggle": "Toggle",
+    "increment_mode": "Increment Mode:",
+    "continuous": "Continuous",
+    "single": "Single",
     "bind": "Bind",
     "calibrate": "Calibrate",
 }
@@ -57,13 +59,14 @@ def init_vars():
     wj_values['percent'] = 50
     wj_values['raw'] = 12345
     wj_values['value'] = -20
-    wj_values['step'] = 1
-    wj_values['toggle'] = True
-    wj_values['continuous'] = True
+    wj_values['increment'] = 1
+    wj_values['switch_value'] = -20
+    wj_values['switch_mode'] = 1
+    wj_values['increment_mode'] = 1
 
 init_vars()
 
-os.environ["QT_SCALE_FACTOR"] = "1.5"  # Set scale to 130%
+os.environ["QT_SCALE_FACTOR"] = "1.25"  # Set scale to 130%
 
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
@@ -105,79 +108,97 @@ class MainWindow(QMainWindow):
         wj_calibrate.setText(lang['calibrate'])
         wj.layout.addWidget(wj_calibrate, 0, 2)
 
-        wj_step_label = QLabel()
-        wj_step_label.setAlignment(Qt.AlignLeft)
-        wj_step_label.setText(lang['wj_step'])
-        wj.layout.addWidget(wj_step_label, 1, 0)
+        wj_increment_label = QLabel()
+        wj_increment_label.setAlignment(Qt.AlignLeft)
+        wj_increment_label.setText(lang['increment'])
+        wj.layout.addWidget(wj_increment_label, 1, 0)
 
-        wj_step = QSpinBox()
-        wj_step.setFixedSize(38, 20)
-        wj_step.setRange(1, 20)
-        wj_step.setValue(wj_values['step'])
-        wj.layout.addWidget(wj_step, 1, 1)
-        
-        wj_continuous_label = QLabel()
-        wj_continuous_label.setAlignment(Qt.AlignCenter)
-        wj_continuous_label.setText(lang['wj_continuous'])
-        wj.layout.addWidget(wj_continuous_label, 1, 1)
-        
-        wj_continuous = QCheckBox()
-        wj_continuous.setChecked(wj_values['continuous'])
-        wj.layout.addWidget(wj_continuous, 1, 1, alignment=Qt.AlignmentFlag.AlignRight)
+        wj_switch_value_label = QLabel()
+        wj_switch_value_label.setAlignment(Qt.AlignRight)
+        wj_switch_value_label.setText(lang['switch_value'])
+        wj.layout.addWidget(wj_switch_value_label, 1, 1)
 
-        wj_toggle_label = QLabel()
-        wj_toggle_label.setAlignment(Qt.AlignLeft)
-        wj_toggle_label.setText(lang['wj_toggle'])
-        wj.layout.addWidget(wj_toggle_label, 1, 2)
+        wj_increment = QSpinBox()
+        wj_increment.setFixedSize(38, 20)
+        wj_increment.setRange(1, 20)
+        wj_increment.setValue(wj_values['increment'])
+        wj.layout.addWidget(wj_increment, 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
 
-        wj_toggle = QCheckBox()
-        wj_toggle.setChecked(wj_values['toggle'])
-        wj.layout.addWidget(wj_toggle, 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
+        wj_switch_value = QSpinBox()
+        wj_switch_value.setFixedSize(40, 20)
+        wj_switch_value.setRange(-20, 20)
+        wj_switch_value.setValue(wj_values['switch_value'])
+        wj.layout.addWidget(wj_switch_value, 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        wj_increment_mode_label = QLabel()
+        wj_increment_mode_label.setAlignment(Qt.AlignRight)
+        wj_increment_mode_label.setText(lang['increment_mode'])
+        wj.layout.addWidget(wj_increment_mode_label, 2, 0)
+
+        wj_switch_mode_label = QLabel()
+        wj_switch_mode_label.setAlignment(Qt.AlignRight)
+        wj_switch_mode_label.setText(lang['switch_mode'])
+        wj.layout.addWidget(wj_switch_mode_label, 2, 1)
+
+        wj_increment_mode = QComboBox()
+        wj_increment_mode.setFixedSize(93, 22)
+        wj_increment_mode.addItem(lang['continuous'])
+        wj_increment_mode.addItem(lang['single'])
+        wj.layout.addWidget(wj_increment_mode, 2, 1)
+
+        wj_switch_mode = QComboBox()
+        wj_switch_mode.addItem(lang['hold'])
+        wj_switch_mode.addItem(lang['toggle'])
+        wj.layout.addWidget(wj_switch_mode, 2, 2)
+
+
+
+
 
         wj_up = QLabel()
         wj_up.setAlignment(Qt.AlignLeft)
-        wj_up.setText(lang['wj_up'])
-        wj.layout.addWidget(wj_up, 2, 0)
+        wj_up.setText(lang['up'])
+        wj.layout.addWidget(wj_up, 3, 0)
 
         wj_up_current = QLineEdit()
         wj_up_current.setAlignment(Qt.AlignCenter)
         wj_up_current.setText(bindings['wj_up_device'] + " - " + bindings['wj_up_button'])
         wj_up_current.setReadOnly(True)
-        wj.layout.addWidget(wj_up_current, 2, 1)
+        wj.layout.addWidget(wj_up_current, 3, 1)
 
         wj_up_bind = QPushButton()
         wj_up_bind.setText(lang['bind'])
-        wj.layout.addWidget(wj_up_bind, 2, 2)
+        wj.layout.addWidget(wj_up_bind, 3, 2)
 
         wj_down = QLabel()
         wj_down.setAlignment(Qt.AlignLeft)
-        wj_down.setText(lang['wj_down'])
-        wj.layout.addWidget(wj_down, 3, 0)
+        wj_down.setText(lang['down'])
+        wj.layout.addWidget(wj_down, 4, 0)
 
         wj_down_current = QLineEdit()
         wj_down_current.setAlignment(Qt.AlignCenter)
         wj_down_current.setText(bindings['wj_down_device'] + " - " + bindings['wj_down_button'])
         wj_down_current.setReadOnly(True)
-        wj.layout.addWidget(wj_down_current, 3, 1)
+        wj.layout.addWidget(wj_down_current, 4, 1)
 
         wj_down_bind = QPushButton()
         wj_down_bind.setText(lang['bind'])
-        wj.layout.addWidget(wj_down_bind, 3, 2)
+        wj.layout.addWidget(wj_down_bind, 4, 2)
 
         wj_switch = QLabel()
         wj_switch.setAlignment(Qt.AlignLeft)
-        wj_switch.setText(lang['wj_switch'])
-        wj.layout.addWidget(wj_switch, 4, 0)
+        wj_switch.setText(lang['switch'])
+        wj.layout.addWidget(wj_switch, 5, 0)
 
         wj_switch_current = QLineEdit()
         wj_switch_current.setAlignment(Qt.AlignCenter)
         wj_switch_current.setText(bindings['wj_switch_device'] + " - " + bindings['wj_switch_button'])
         wj_switch_current.setReadOnly(True)
-        wj.layout.addWidget(wj_switch_current, 4, 1)
+        wj.layout.addWidget(wj_switch_current, 5, 1)
 
         wj_switch_bind = QPushButton()
         wj_switch_bind.setText(lang['bind'])
-        wj.layout.addWidget(wj_switch_bind, 4, 2)
+        wj.layout.addWidget(wj_switch_bind, 5, 2)
 
         wj.setLayout(wj.layout)
 
