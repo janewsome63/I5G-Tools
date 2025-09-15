@@ -1,91 +1,81 @@
-import functions as fn
-import variables as var
+import pygame as p
+import os
 
-from pyglet import input, app
-from warnings import catch_warnings, filterwarnings
+devices = []
+device_info = {}
 
-with catch_warnings():
-    filterwarnings("ignore", category=UserWarning)
-    controllers = input.get_controllers()
-    joysticks = input.get_joysticks()
-
-for controller in controllers:
-    controller.open()
-    var.devices[controller.device.name] = {
-        "guid": controller.device.get_guid(),
-        "manufacturer": controller.device.manufacturer,
-        "connected": controller.device.connected,
-        "intialized": controller.device.is_open,
-        "display": controller.device.display,
+def add_device(index):
+    device = p.joystick.Joystick(index)
+    instance = device.get_instance_id()
+    devices.append(device)
+    device_info[instance] = {
+        "name": device.get_name(),
+        "guid": device.get_guid(),
+        "index": index,
+        "instance": instance,
+        "initialized": device.get_init(),
     }
+    if device.get_numbuttons():
+        device_info[instance]['buttons'] = {}
+        for i in range(device.get_numbuttons()):
+            device_info[instance]['buttons'][i] = False
+    if device.get_numaxes():
+        device_info[instance]['axes'] = {}
+        for i in range(device.get_numaxes()):
+            device_info[instance]['axes'][i] =  0.0
+    if device.get_numhats():
+        device_info[instance]['hats'] = {}
+        for i in range(device.get_numhats()):
+            device_info[instance]['hats'][i] = (0, 0)
+    if device.get_numballs():
+        device_info[instance]['balls'] = {}
+        for i in range(device.get_numhats()):
+            device_info[instance]['balls'][i] = (0, 0)
+    print(f"Joystick Added: {device_info[instance]['name']} (ID: {device_info[instance]['instance']})")
+    print(device_info[instance])
 
-    @controller.event
-    def on_button_press(controller, button_name):
-        var.devices[controller.device.name][button_name] = {
-            "type": "Button",
-            "pressed": True,
-        }
+def remove_device(instance):
+    for i, device in enumerate(devices):
+        if device.get_instance_id() == instance:
+            print(f"Joystick Removed: {device.get_name()} (ID: {instance})")
+            devices.pop(i)
+            break
+    del device_info[instance]
 
-        print(controller.device.name, button_name + " " + str(var.devices[controller.device.name][button_name]['pressed']))
+def device_detection():
+    os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
+    p.init()
 
-    @controller.event
-    def on_button_release(controller, button_name):
-        var.devices[controller.device.name][button_name] = {
-            "type": "Button",
-            "pressed": False,
-        }
+    p.joystick.init()
 
-        print(controller.device.name, button_name + " " + str(var.devices[controller.device.name][button_name]['pressed']))
+    #screen = p.display.set_mode((0, 0), flags=p.HIDDEN)
 
-    @controller.event
-    def on_stick_motion(controller, axis_name, vector):
-        position = fn.separate_vector(vector)
+    for i in range(p.joystick.get_count()):
+        add_device(i)
 
-        var.devices[controller.device.name][axis_name] = {
-            "type": "Stick",
-            "x": position['x'],
-            "y": position['y'],
-        }
+    running = True
+    while running:
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                running = False
+            if event.type == p.JOYBUTTONDOWN:
+                device_info[event.instance_id]['buttons'][event.button] = True
+                print(device_info[event.instance_id]['buttons'])
+            elif event.type == p.JOYBUTTONUP:
+                device_info[event.instance_id]['buttons'][event.button] = False
+                print(device_info[event.instance_id]['buttons'])
+            elif event.type == p.JOYAXISMOTION:
+                device_info[event.instance_id]['axes'][event.axis] = round((event.value + 1) / 2, 2)
+                print(device_info[event.instance_id]['axes'])
+            elif event.type == p.JOYHATMOTION:
+                device_info[event.instance_id]['hats'][event.hat] = event.value
+                print(device_info[event.instance_id]['hats'])
+            elif event.type == p.JOYBALLMOTION:
+                device_info[event.instance_id]['balls'][event.ball] = event.value
+                print(device_info[event.instance_id]['balls'])
+            elif event.type == p.JOYDEVICEADDED:
+                add_device(event.device_index)
+            elif event.type == p.JOYDEVICEREMOVED:
+                remove_device(event.instance_id)
 
-        print(controller.device.name, axis_name + " " + str(var.devices[controller.device.name][axis_name]['x']) + " " + str(var.devices[controller.device.name][axis_name]['y']))
-
-    @controller.event
-    def on_trigger_motion(controller, axis_name, vector):
-        var.devices[controller.device.name][axis_name] = {
-            "type": "Stick",
-            "x": vector,
-        }
-
-        print(controller.device.name, axis_name + " " + str(var.devices[controller.device.name][axis_name]['x']))
-
-    @controller.event
-    def on_dpad_motion(controller, vector):
-        position = fn.separate_vector(vector)
-
-        var.devices[controller.device.name]['dpad'] = {
-            "type": "D-pad",
-            "x": position['x'],
-            "y": position['y'],
-        }
-
-        print(controller.device.name, 'dpad' + " " + str(var.devices[controller.device.name]['dpad']['x']) + " " + str(var.devices[controller.device.name]['dpad']['y']))
-
-for joystick in joysticks:
-    joystick.open()
-    @joystick.event
-    def on_joybutton_press(joy, button):
-        print(joy.device.name, button + " pressed")
-
-    @joystick.event
-    def on_joybutton_release(joy, button):
-        print(joy.device.name, button + " released")
-
-    @joystick.event
-    def on_joyaxis_motion(joy, axis, value):
-        print(joy.device.name, axis, value)
-
-    @joystick.event
-    def on_joyhat_motion(joy, hat_x, hat_y):
-        print(joy.device.name, hat_x, hat_y)
-
-app.run()
+    p.quit()

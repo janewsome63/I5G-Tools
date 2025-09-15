@@ -1,3 +1,4 @@
+# Interface Variables
 # Static dictionaries
 lang = {
     "title": "I5G Tools",
@@ -18,6 +19,8 @@ lang = {
 }
 
 # Malleable dictionaries
-devices = {}
 bindings = {}
 wj_values = {}
+
+# Input Device Variables
+# Malleable dictionaries

@@ -1,5 +1,7 @@
 import variables as var
 
+import pygame as p
+
 def init_vars():
     var.bindings['wj_up_device'] = "Placeholder Device"
     var.bindings['wj_up_button'] = "1"
@@ -16,16 +18,47 @@ def init_vars():
     var.wj_values['switch_mode'] = 1
     var.wj_values['increment_mode'] = 1
 
-def format_vector(vector):
-    string = str(vector).replace("(", " ")
-    string = string.replace(")", "")
-    string = string.replace("=", " ")
-    string = string.replace(",", "")
-    string = string.split()
+# Input Device Functions
 
-    pos = {
-        "x": string[2],
-        "y": string[4],
-    }
 
-    return pos
+
+
+# def format_vector(type, vector):
+#     digits = 3
+#     string = str(vector)
+#     if type == "stick" or type == "dpad":
+#         string = string.replace("(", " ")
+#         string = string.replace(")", "")
+#         string = string.replace("=", " ")
+#         string = string.replace(",", "")
+#         string = string.split()
+#
+#         if type == "dpad":
+#             if "0.0" in string[2]:
+#                 string[2] = string[2].replace("-", "")
+#             pos_x = round(float(string[2]), digits)
+#             if "0.0" in string[4]:
+#                 string[4] = string[4].replace("-", "")
+#             pos_y = round(float(string[4]), digits)
+#         else:
+#             pos_x = round((float(string[2]) + 1) / 2, digits)
+#             pos_y = round((float(string[4]) + 1) / 2, digits)
+#
+#         position = {
+#             "pos_x": pos_x,
+#             "pos_y": pos_y,
+#         }
+#     elif type == "axis":
+#         pos = round((float(string) + 1) / 2, digits)
+#
+#         position = {
+#             "pos": pos,
+#         }
+#     elif type == "trigger":
+#         pos = round(float(string), digits)
+#
+#         position = {
+#             "pos": pos,
+#         }
+#
+#     return position
