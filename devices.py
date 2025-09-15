@@ -31,13 +31,12 @@ def add_device(index):
         device_info[instance]['balls'] = {}
         for i in range(device.get_numhats()):
             device_info[instance]['balls'][i] = (0, 0)
-    print(f"Joystick Added: {device_info[instance]['name']} (ID: {device_info[instance]['instance']})")
-    print(device_info[instance])
+    # print(device_info[instance])
 
 def remove_device(instance):
     for i, device in enumerate(devices):
         if device.get_instance_id() == instance:
-            print(f"Joystick Removed: {device.get_name()} (ID: {instance})")
+            # print(f"Joystick Removed: {device.get_name()} (ID: {instance})")
             devices.pop(i)
             break
     del device_info[instance]
@@ -60,19 +59,19 @@ def device_detection():
                 running = False
             if event.type == p.JOYBUTTONDOWN:
                 device_info[event.instance_id]['buttons'][event.button] = True
-                print(device_info[event.instance_id]['buttons'])
+                # print(device_info[event.instance_id]['buttons'])
             elif event.type == p.JOYBUTTONUP:
                 device_info[event.instance_id]['buttons'][event.button] = False
-                print(device_info[event.instance_id]['buttons'])
+                # print(device_info[event.instance_id]['buttons'])
             elif event.type == p.JOYAXISMOTION:
                 device_info[event.instance_id]['axes'][event.axis] = round((event.value + 1) / 2, 2)
-                print(device_info[event.instance_id]['axes'])
+                # print(device_info[event.instance_id]['axes'])
             elif event.type == p.JOYHATMOTION:
                 device_info[event.instance_id]['hats'][event.hat] = event.value
-                print(device_info[event.instance_id]['hats'])
+                # print(device_info[event.instance_id]['hats'])
             elif event.type == p.JOYBALLMOTION:
                 device_info[event.instance_id]['balls'][event.ball] = event.value
-                print(device_info[event.instance_id]['balls'])
+                # print(device_info[event.instance_id]['balls'])
             elif event.type == p.JOYDEVICEADDED:
                 add_device(event.device_index)
             elif event.type == p.JOYDEVICEREMOVED:
