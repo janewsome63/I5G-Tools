@@ -2,20 +2,17 @@ import devices as dev
 import functions as fn
 import interface as ui
 import variables as var
+import vjoy
 import threading
 from PyQt5.QtCore import pyqtSignal
 from time import sleep
 
-import vjoy
+from devices import device_info
 
 
 def main():
-    pct = 0.0
-    sleep(5)
-    vjoy.calibrate_axis("x")
+    vjoy.intialize()
     while True:
-        #vjoy.set_wj(pct)
-        #pct = pct + 0.01
         sleep(0.25)
 
 if __name__ == '__main__':
@@ -27,4 +24,4 @@ if __name__ == '__main__':
     fn.init_vars()
 
     sleep(0.0)
-    ui.ui()
+    ui.main()

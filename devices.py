@@ -1,8 +1,11 @@
 import pygame as p
 import os
 
+import vjoy
+
 devices = []
 device_info = {}
+
 
 def add_device(index):
     device = p.joystick.Joystick(index)
@@ -18,20 +21,21 @@ def add_device(index):
     if device.get_numbuttons():
         device_info[instance]['buttons'] = {}
         for i in range(device.get_numbuttons()):
-            device_info[instance]['buttons'][i] = False
+            device_info[instance]['buttons'][i] = device.get_button(i)
     if device.get_numaxes():
         device_info[instance]['axes'] = {}
         for i in range(device.get_numaxes()):
-            device_info[instance]['axes'][i] =  0.0
+            device_info[instance]['axes'][i] = device.get_axis(i)
     if device.get_numhats():
         device_info[instance]['hats'] = {}
         for i in range(device.get_numhats()):
-            device_info[instance]['hats'][i] = (0, 0)
+            device_info[instance]['hats'][i] = device.get_hat(i)
     if device.get_numballs():
         device_info[instance]['balls'] = {}
         for i in range(device.get_numhats()):
-            device_info[instance]['balls'][i] = (0, 0)
+            device_info[instance]['balls'][i] = device.get_ball(i)
     # print(device_info[instance])
+
 
 def remove_device(instance):
     for i, device in enumerate(devices):
@@ -40,6 +44,7 @@ def remove_device(instance):
             devices.pop(i)
             break
     del device_info[instance]
+
 
 def device_detection():
     os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
@@ -51,6 +56,8 @@ def device_detection():
 
     for i in range(p.joystick.get_count()):
         add_device(i)
+
+    vjoy.find_instance()
 
     running = True
     while running:
@@ -65,7 +72,7 @@ def device_detection():
                 # print(device_info[event.instance_id]['buttons'])
             elif event.type == p.JOYAXISMOTION:
                 device_info[event.instance_id]['axes'][event.axis] = round((event.value + 1) / 2, 2)
-                # print(device_info[event.instance_id]['axes'])
+                #print(device_info[event.instance_id]['axes'])
             elif event.type == p.JOYHATMOTION:
                 device_info[event.instance_id]['hats'][event.hat] = event.value
                 # print(device_info[event.instance_id]['hats'])
