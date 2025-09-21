@@ -9,7 +9,6 @@ from time import sleep
 
 from devices import device_info
 
-
 def main():
     vjoy.intialize()
     while True:

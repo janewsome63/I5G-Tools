@@ -1,6 +1,21 @@
 import variables as var
+import devices as dev
 
 import pygame as p
+
+def bind(function, control):
+    var.bindings['active'] = True
+    start = dev.device_info
+    bound = None
+    while not bound and var.bindings['active']:
+        for device in dev.device_info:
+            for input in dev.device_info[device]:
+                if input == "buttons":
+                    for button in dev.device_info[device][input]:
+                        if dev.device_info[device][input][button] != start[device][input][button]:
+                            bound = dev.device_info[device][input][button]
+    var.bindings[function][control] = bound
+    var.bindings['active'] = False
 
 def init_vars():
     var.bindings['wj_up_device'] = "Placeholder Device"
