@@ -3,6 +3,7 @@ import vjoy
 
 import pygame as p
 import os
+from time import sleep
 
 devices = []
 device_info = {}
@@ -47,18 +48,32 @@ def remove_device(instance):
     del device_info[instance]
 
 def publish_event(id, type, input, value):
-    var.current_event = {
-        "name": device_info[id]['name'],
-        "guid": device_info[id]['guid'],
-        "index": device_info[id]['index'],
-        "instance": device_info[id]['instance'],
-        "initialized": device_info[id]['initialized'],
-        "event": {
-            "type": type,
-            "input": input,
-            "value": value,
-        },
-    }
+    if value == "released":
+        var.current_event = {
+            "name": "",
+            "guid": "",
+            "index": "",
+            "instance": "",
+            "initialized": "",
+            "event": {
+                "type": "",
+                "input": "",
+                "value": "",
+            },
+        }
+    else:
+        var.current_event = {
+            "name": device_info[id]['name'],
+            "guid": device_info[id]['guid'],
+            "index": device_info[id]['index'],
+            "instance": device_info[id]['instance'],
+            "initialized": device_info[id]['initialized'],
+            "event": {
+                "type": type,
+                "input": input,
+                "value": value,
+            },
+        }
     print(var.current_event)
 
 def device_detection():
@@ -75,19 +90,25 @@ def device_detection():
     vjoy.find_instance()
 
     running = True
+    p.event.wait(1000)
+    p.event.clear()
     while running:
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
             if event.type == p.JOYBUTTONDOWN:
                 #device_info[event.instance_id]['buttons'][event.button] = True
-                publish_event(event.instance_id, "button", event.button, True)
+                publish_event(event.instance_id, "button", event.button, "pressed")
             elif event.type == p.JOYBUTTONUP:
                 #device_info[event.instance_id]['buttons'][event.button] = False
-                publish_event(event.instance_id, "button", event.button, False)
+                publish_event(event.instance_id, "button", event.button, "released")
             elif event.type == p.JOYAXISMOTION:
                 #device_info[event.instance_id]['axes'][event.axis] = round((event.value + 1) / 2, 2)
-                publish_event(event.instance_id, "axis", event.axis, round((event.value + 1) / 2, 2))
+                value = round((event.value + 1) / 2, 2)
+                if value >= var.settings['axis_threshold']:
+                    publish_event(event.instance_id, "axis", event.axis, "pressed")
+                else:
+                    publish_event(event.instance_id, "axis", event.axis, "released")
             elif event.type == p.JOYHATMOTION:
                 #device_info[event.instance_id]['hats'][event.hat] = event.value
                 if event.value[1] == 1:
@@ -109,9 +130,8 @@ def device_detection():
                 elif h:
                     value = h
                 else:
-                    value = None
-                if value:
-                    publish_event(event.instance_id, "hat", event.hat, value)
+                    value = "released"
+                publish_event(event.instance_id, "hat", event.hat, value)
             # elif event.type == p.JOYBALLMOTION:
             #     #device_info[event.instance_id]['balls'][event.ball] = event.value
             #     publish_event(event.instance_id, "ball", event.ball, event.value)

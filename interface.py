@@ -1,7 +1,10 @@
+import math
 import sys
 import os
 import time
 import threading
+from string import capwords
+
 import devices as dev
 import functions as fn
 import variables as var
@@ -62,7 +65,11 @@ var.settings = {
     "update_frequency": 10,
     "scale_factor": "1.25",
     "vjoy_device": 1,
-    "axis_threshold": 0.9,
+    "axis_threshold": 0.90,
+    "wj_continuous": True,
+    "wj_toggle": False,
+    "wj_increment": 1,
+    "wj_switch": -20,
 }
 
 class MainWindow(QMainWindow):
@@ -122,13 +129,13 @@ class MainWindow(QMainWindow):
         self.weight_jacker_content['increment'] = QSpinBox()
         self.weight_jacker_content['increment'].setFixedSize(38, 20)
         self.weight_jacker_content['increment'].setRange(1, 20)
-        self.weight_jacker_content['increment'].setValue(var.wj_values['increment'])
+        self.weight_jacker_content['increment'].setValue(var.settings['wj_increment'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.weight_jacker_content['switch'] = QSpinBox()
         self.weight_jacker_content['switch'].setFixedSize(40, 20)
         self.weight_jacker_content['switch'].setRange(-20, 20)
-        self.weight_jacker_content['switch'].setValue(var.wj_values['switch_value'])
+        self.weight_jacker_content['switch'].setValue(var.settings['wj_switch'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
 
         self.weight_jacker_content['increment_mode_label'] = QLabel()
@@ -159,7 +166,7 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker_content['up_device'] = QLineEdit()
         self.weight_jacker_content['up_device'].setAlignment(Qt.AlignCenter)
-        self.weight_jacker_content['up_device'].setText(var.bindings['wj_up_device'] + " - " + var.bindings['wj_up_button'])
+        self.weight_jacker_content['up_device'].setText(str(var.bindings['weight_jacker']['up']))
         self.weight_jacker_content['up_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['up_device'], 3, 1)
 
@@ -175,7 +182,7 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker_content['down_device'] = QLineEdit()
         self.weight_jacker_content['down_device'].setAlignment(Qt.AlignCenter)
-        self.weight_jacker_content['down_device'].setText(var.bindings['wj_down_device'] + " - " + var.bindings['wj_down_button'])
+        self.weight_jacker_content['down_device'].setText(str(var.bindings['weight_jacker']['down']))
         self.weight_jacker_content['down_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['down_device'], 4, 1)
 
@@ -191,7 +198,7 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker_content['switch_device'] = QLineEdit()
         self.weight_jacker_content['switch_device'].setAlignment(Qt.AlignCenter)
-        self.weight_jacker_content['switch_device'].setText(var.bindings['wj_switch_device'] + " - " + var.bindings['wj_switch_button'])
+        self.weight_jacker_content['switch_device'].setText(str(var.bindings['weight_jacker']['switch']))
         self.weight_jacker_content['switch_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_device'], 5, 1)
 
@@ -234,16 +241,36 @@ class MainWindow(QMainWindow):
         ui['timer'].timeout.connect(self.updater)
         ui['timer'].start(var.settings['update_frequency'])
 
+        self.index = {
+            "weight_jacker": {
+                "up": {
+                    "bind": self.weight_jacker_content['up_bind'],
+                    "device": self.weight_jacker_content['up_device'],
+                    "label": self.weight_jacker_content['up_label'],
+                },
+                "down": {
+                    "bind": self.weight_jacker_content['down_bind'],
+                    "device": self.weight_jacker_content['down_device'],
+                    "label": self.weight_jacker_content['down_label'],
+                },
+                "switch": {
+                    "bind": self.weight_jacker_content['switch_bind'],
+                    "device": self.weight_jacker_content['switch_device'],
+                    "label": self.weight_jacker_content['switch_label'],
+                }
+            }
+        }
+
     def updater(self):
         self.wj_display()
 
     def wj_display(self):
-        pct = vjoy.axis_values["wj"]
+        pct = vjoy.axis_values["weight_jacker"]
         self.weight_jacker_content['axis'].setValue(int(pct * 100))
         self.weight_jacker_content['axis'].update()
 
         pct = pct - 0.5
-        self.weight_jacker_content['lcd'].display(int(pct / 0.025))
+        self.weight_jacker_content['lcd'].display(round(pct / 0.025))
         self.weight_jacker_content['lcd'].update()
 
     @pyqtSlot()
@@ -254,21 +281,36 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def wj_calibrate(self):
-        self.axis = "wj"
+        self.axis = "weight_jacker"
         self.pct = 0.5
         if not self.is_running:
             ui['thread_pool'].start(self.calibrate)
 
     @pyqtSlot()
     def bind(self):
+        var.bindings['status']['active'] = True
         self.is_running = True
-        fn.bind(var.bindings['status']['function'], var.bindings['status']['control'])
-        self.weight_jacker_content['up_bind'].setText(lang['bind'])
-        var.bindings['status'] = {
-            "function": "",
-            "control": "",
-        }
+        function = var.bindings['status']['function']
+        control = var.bindings['status']['control']
+        self.index[function][control]['bind'].setText(lang['binding'])
+        fn.bind(function, control)
+        self.index[function][control]['bind'].setText(lang['bind'])
+        if var.bindings[function][control][1] != "hat":
+            device = var.bindings[function][control][0]
+            type = capwords(var.bindings[function][control][1])
+            id = str(var.bindings[function][control][2])
+            dev_pretty = device + " - " + type + " " + id
+        else:
+            device = var.bindings[function][control][0]
+            type = capwords(var.bindings[function][control][1])
+            id = str(var.bindings[function][control][2])
+            direction = capwords(var.bindings[function][control][3])
+            dev_pretty = device + " - " + type + " " + id + " " + direction
+        self.index[function][control]['device'].setText(dev_pretty)
+        var.bindings['status']['function'] = ""
+        var.bindings['status']['control'] = ""
         self.is_running = False
+        var.bindings['status']['active'] = False
 
     @pyqtSlot()
     def wj_up_bind(self):
@@ -278,26 +320,38 @@ class MainWindow(QMainWindow):
         }
         if not self.is_running:
             ui['thread_pool'].start(self.bind)
-            self.weight_jacker_content['up_bind'].setText(lang['binding'])
         else:
-            var.bindings['active'] = False
-        self.weight_jacker_content['up_bind'].update()
+            var.bindings['status']['active'] = False
 
     @pyqtSlot()
     def wj_down_bind(self):
-        self.type = "wj"
-        self.weight_jacker_content['up_bind'].setText(lang['binding'])
+        function = "weight_jacker"
+        control = "down"
+        var.bindings['status'] = {
+            "function": function,
+            "control": control,
+        }
         if not self.is_running:
             ui['thread_pool'].start(self.bind)
-        self.weight_jacker_content['up_bind'].setText(lang['bind'])
+            self.index[function][control]['bind'].setText(lang['binding'])
+        else:
+            var.bindings['status']['active'] = False
+        self.index[function][control]['bind'].update()
 
     @pyqtSlot()
     def wj_switch_bind(self):
-        self.type = "wj"
-        self.weight_jacker_content['up_bind'].setText(lang['binding'])
+        function = "weight_jacker"
+        control = "switch"
+        var.bindings['status'] = {
+            "function": function,
+            "control": control,
+        }
         if not self.is_running:
             ui['thread_pool'].start(self.bind)
-        self.weight_jacker_content['up_bind'].setText(lang['bind'])
+            self.index[function][control]['bind'].setText(lang['binding'])
+        else:
+            var.bindings['status']['active'] = False
+        self.index[function][control]['bind'].update()
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = var.settings['scale_factor']

@@ -4,23 +4,23 @@ import variables as var
 from time import sleep
 
 axis_ref = {
-    "wj": vjoy.HID_USAGE_X,
-    "farb": vjoy.HID_USAGE_Y,
-    "rarb": vjoy.HID_USAGE_Z,
-    "fuel": vjoy.HID_USAGE_RX,
-    "throttle": vjoy.HID_USAGE_RY,
-    "clutch": vjoy.HID_USAGE_RZ,
+    "weight_jacker": vjoy.HID_USAGE_X,
+    "front_roll_bar": vjoy.HID_USAGE_Y,
+    "rear_roll_bar": vjoy.HID_USAGE_Z,
+    "fuel_map": vjoy.HID_USAGE_RX,
+    "bite_point": vjoy.HID_USAGE_RY,
+    "engine_warming": vjoy.HID_USAGE_RZ,
     "brake": vjoy.HID_USAGE_SL0,
     "other": vjoy.HID_USAGE_SL1,
 }
 
 axis_values = {
-    "wj": 0.5,
-    "farb": 1.0,
-    "rarb": 0.0,
-    "fuel": 0.0,
-    "throttle": 0.0,
-    "clutch": 0.0,
+    "weight_jacker": 0.5,
+    "front_roll_bar": 1.0,
+    "rear_roll_bar": 0.0,
+    "fuel_map": 0.0,
+    "bite_point": 0.0,
+    "engine_warming": 0.0,
     "brake": 0.0,
     "other": 0.0,
 }
@@ -32,7 +32,11 @@ def set(axis, pct):
     elif raw > 32768:
         raw = 32768
     vjoy.VJoyDevice(var.settings['vjoy_device']).set_axis(axis_ref[axis], raw)
-    axis_values[axis] = raw / 32768
+    axis_values[axis] = round(raw / 32768, 3)
+    if var.status[axis]['switched']:
+        var.status[axis]['secondary'] = axis_values[axis]
+    elif not var.status[axis]['switched']:
+        var.status[axis]['primary'] = axis_values[axis]
 
 def calibrate(axis, pct_end):
     step = 0.05
@@ -50,12 +54,12 @@ def calibrate(axis, pct_end):
 def intialize():
     sleep(1.0)
     vjoy.VJoyDevice(var.settings['vjoy_device']).update()
-    set("wj", 0.5)
-    set("farb", 1.0)
-    set("rarb", 0.0)
-    set("fuel", 0.0)
-    set("throttle", 0.0)
-    set("clutch", 0.0)
+    set("weight_jacker", 0.5)
+    set("front_roll_bar", 1.0)
+    set("rear_roll_bar", 0.0)
+    set("fuel_map", 0.0)
+    set("bite_point", 0.0)
+    set("engine_warming", 0.0)
     set("brake", 0.0)
     set("other", 0.0)
 
