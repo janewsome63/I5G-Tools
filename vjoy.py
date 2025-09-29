@@ -26,21 +26,31 @@ axis_values = {
 }
 
 def set(axis, pct):
-    raw = round(pct * 32768)
-    if raw <= 0:
-        raw = 1
-    elif raw > 32768:
-        raw = 32768
-    vjoy.VJoyDevice(var.settings['vjoy_device']).set_axis(axis_ref[axis], raw)
-    axis_values[axis] = round(raw / 32768, 3)
-    if var.status[axis]['switched']:
-        var.status[axis]['secondary'] = axis_values[axis]
-    elif not var.status[axis]['switched']:
-        var.status[axis]['primary'] = axis_values[axis]
+    try:
+        raw = round(pct * 32768)
+        if raw <= 0:
+            raw = 1
+        elif raw > 32768:
+            raw = 32768
+
+        vjoy.VJoyDevice(var.settings['vjoy_device']).set_axis(axis_ref[axis], raw)
+        axis_values[axis] = round(raw / 32768, 3)
+        if var.status[axis]['switched']:
+            var.status[axis]['secondary'] = axis_values[axis]
+        elif not var.status[axis]['switched']:
+            var.status[axis]['primary'] = axis_values[axis]
+    except Exception as e:
+        print(e)
+
 
 def calibrate(axis, pct_end):
+    var.status['calibration'] = True
+    var.status['weight_jacker']['switched'] = False
     step = 0.05
-    pct = 0.0
+    pct = var.status['weight_jacker']['primary']
+    while pct >= 0.0:
+        set(axis, pct)
+        pct = pct - step
     while pct <= 1.0:
         set(axis, pct)
         pct = pct + step
@@ -50,6 +60,10 @@ def calibrate(axis, pct_end):
     while pct <= pct_end:
         set(axis, pct)
         pct = pct + step
+
+    sleep(0.25)
+
+    var.status['calibration'] = False
 
 def intialize():
     sleep(1.0)

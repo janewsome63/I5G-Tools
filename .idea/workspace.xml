@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Starting control binding work">
-      <change afterPath="$PROJECT_DIR$/devices_pyglet.py" afterDir="false" />
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Work on binding and control detection">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
@@ -217,7 +217,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758443515831</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Work on binding and control detection">
+      <option name="closed" value="true" />
+      <created>1758502913891</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1758502913892</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -241,6 +249,7 @@
     <MESSAGE value="Started vjoy integration" />
     <MESSAGE value="vJoy functions" />
     <MESSAGE value="Starting control binding work" />
-    <option name="LAST_COMMIT_MESSAGE" value="Starting control binding work" />
+    <MESSAGE value="Work on binding and control detection" />
+    <option name="LAST_COMMIT_MESSAGE" value="Work on binding and control detection" />
   </component>
 </project>

@@ -9,73 +9,181 @@ from time import sleep
 
 from devices import device_info
 
-frequency = 0.1
-
 def weight_jacker_increment():
     while True:
-        current = (var.current_event['name'], var.current_event['event']['type'], var.current_event['event']['input'])
-        for function in var.bindings:
-            if function == "weight_jacker":
-                for control in var.bindings[function]:
-                    if var.bindings[function][control] == current:
-                        if var.current_event['event']['value'] == "pressed":
-                            if control == "up":
-                                vjoy.set(function, vjoy.axis_values[function] + 0.025)
-                                if var.settings['wj_continuous'] == True:
-                                    sleep(0.15)
-                                    while var.current_event['event']['value'] == "pressed":
-                                        vjoy.set(function, vjoy.axis_values[function] + 0.025)
-                                        sleep(0.1)
-                                else:
-                                    while var.current_event['event']['value'] == "pressed":
-                                        sleep(0.1)
-                            elif control == "down":
-                                vjoy.set(function, vjoy.axis_values[function] - 0.025)
-                                if var.settings['wj_continuous'] == True:
-                                    sleep(0.15)
-                                    while var.current_event['event']['value'] == "pressed":
-                                        vjoy.set(function, vjoy.axis_values[function] - 0.025)
-                                        sleep(0.1)
-                                else:
-                                    while var.current_event['event']['value'] == "pressed":
-                                        sleep(0.1)
-        sleep(frequency)
+        try:
+            if not var.status['calibration'] and not var.bindings['status']['active']:
+                if var.bindings['weight_jacker']['up']:
+                    up = var.bindings['weight_jacker']['up']
+                else:
+                    up = {
+                        "guid": 0,
+                        "type": "none",
+                        "num": 0,
+                    }
+
+                if var.bindings['weight_jacker']['down']:
+                    down = var.bindings['weight_jacker']['down']
+                else:
+                    down = {
+                        "guid": 0,
+                        "type": "none",
+                        "num": 0,
+                    }
+
+                if not var.status['weight_jacker']['switched']:
+                    current = var.status['weight_jacker']['primary']
+                elif var.status['weight_jacker']['switched']:
+                    current = var.status['weight_jacker']['secondary']
+
+                if up['type'] == "button":
+                    if dev.device_info[up['guid']]['buttons'][up['num']]:
+
+                        vjoy.set("weight_jacker", current + 0.025)
+                        if var.settings['wj_continuous']:
+                            sleep(0.1)
+
+                        while dev.device_info[up['guid']]['buttons'][up['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            if var.settings['wj_continuous']:
+                                vjoy.set("weight_jacker", current + 0.025)
+                                current = current + 0.025
+                            sleep(0.05)
+                elif up['type'] == "axis":
+                    if dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['axis_threshold']:
+                        vjoy.set("weight_jacker", current + 0.025)
+                        if var.settings['wj_continuous']:
+                            sleep(0.1)
+
+                        while dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            if var.settings['wj_continuous']:
+                                vjoy.set("weight_jacker", current + 0.025)
+                                current = current + 0.025
+                            sleep(0.05)
+                elif up['type'] == "hat":
+                    if dev.device_info[up['guid']]['hats'][up['num']] == up['dir']:
+                        vjoy.set("weight_jacker", current + 0.025)
+                        if var.settings['wj_continuous']:
+                            sleep(0.1)
+
+                        while dev.device_info[up['guid']]['hats'][up['num']] == up['dir'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            if var.settings['wj_continuous']:
+                                vjoy.set("weight_jacker", current + 0.025)
+                                current = current + 0.025
+                            sleep(0.05)
+
+                if down['type'] == "button":
+                    if dev.device_info[down['guid']]['buttons'][down['num']]:
+
+                        vjoy.set("weight_jacker", current - 0.025)
+                        if var.settings['wj_continuous']:
+                            sleep(0.1)
+
+                        while dev.device_info[down['guid']]['buttons'][down['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            if var.settings['wj_continuous']:
+                                vjoy.set("weight_jacker", current - 0.025)
+                                current = current - 0.025
+                            sleep(0.05)
+                elif down['type'] == "axis":
+                    if dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['axis_threshold']:
+                        vjoy.set("weight_jacker", current - 0.025)
+                        if var.settings['wj_continuous']:
+                            sleep(0.1)
+
+                        while dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            if var.settings['wj_continuous']:
+                                vjoy.set("weight_jacker", current - 0.025)
+                                current = current - 0.025
+                            sleep(0.05)
+                elif down['type'] == "hat":
+                    if dev.device_info[down['guid']]['hats'][down['num']] == down['dir']:
+                        vjoy.set("weight_jacker", current - 0.025)
+                        if var.settings['wj_continuous']:
+                            sleep(0.1)
+
+                        while dev.device_info[down['guid']]['hats'][down['num']] == down['dir'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            if var.settings['wj_continuous']:
+                                vjoy.set("weight_jacker", current - 0.025)
+                                current = current - 0.025
+                            sleep(0.05)
+        except Exception as e:
+            print(e)
+
+        sleep(var.settings['polling_frequency'])
 
 def weight_jacker_switch():
     while True:
-        current = (var.current_event['name'], var.current_event['event']['type'], var.current_event['event']['input'])
-        for function in var.bindings:
-            if function == "weight_jacker":
-                for control in var.bindings[function]:
-                    if var.bindings[function][control] == current:
-                        if var.current_event['event']['value'] == "pressed":
-                            if control == "switch":
-                                if var.settings['wj_toggle']:
-                                    if var.status['weight_jacker']['switched']:
-                                        var.status['weight_jacker']['switched'] = False
-                                        vjoy.set(function, var.status['weight_jacker']['primary'])
-                                        while var.current_event['event']['value'] == "pressed":
-                                            sleep(0.1)
-                                    elif not var.status['weight_jacker']['switched']:
-                                        var.status['weight_jacker']['switched'] = True
-                                        vjoy.set(function, var.status['weight_jacker']['secondary'])
-                                        while var.current_event['event']['value'] == "pressed":
-                                            sleep(0.1)
-                                elif not var.settings['wj_toggle']:
-                                    if var.status['weight_jacker']['switched']:
-                                        print(True)
-                                        var.status['weight_jacker']['switched'] = False
-                                        vjoy.set(function, var.status['weight_jacker']['primary'])
-                                    elif not var.status['weight_jacker']['switched']:
-                                        var.status['weight_jacker']['switched'] = True
-                                        vjoy.set(function, var.status['weight_jacker']['secondary'])
-                                        print(var.status['weight_jacker']['secondary'])
-                                        while var.current_event['event']['value'] == "pressed":
-                                            sleep(0.1)
-                                        var.status['weight_jacker']['switched'] = False
-                                        vjoy.set(function, var.status['weight_jacker']['primary'])
+        try:
+            if not var.status['calibration'] and not var.bindings['status']['active']:
+                if var.bindings['weight_jacker']['switch']:
+                    switch = var.bindings['weight_jacker']['switch']
+                else:
+                    switch = {
+                        "guid": 0,
+                        "type": "none",
+                        "num": 0,
+                    }
 
-        sleep(frequency)
+                if switch['type'] == "button":
+                    if dev.device_info[switch['guid']]['buttons'][switch['num']]:
+                        if var.status['weight_jacker']['switched']:
+                            var.status['weight_jacker']['switched'] = False
+                            vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
+                        elif not var.status['weight_jacker']['switched']:
+                            var.status['weight_jacker']['switched'] = True
+                            vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+
+                        while dev.device_info[switch['guid']]['buttons'][switch['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            sleep(0.05)
+
+                        if not var.settings['wj_toggle']:
+                            if var.status['weight_jacker']['switched']:
+                                var.status['weight_jacker']['switched'] = False
+                                vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
+                            elif not var.status['weight_jacker']['switched']:
+                                var.status['weight_jacker']['switched'] = True
+                                vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+                elif switch['type'] == "axis":
+                    if dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['axis_threshold']:
+                        if var.status['weight_jacker']['switched']:
+                            var.status['weight_jacker']['switched'] = False
+                            vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
+                        elif not var.status['weight_jacker']['switched']:
+                            var.status['weight_jacker']['switched'] = True
+                            vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+
+                        while dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                            sleep(0.05)
+
+                        if not var.settings['wj_toggle']:
+                            if var.status['weight_jacker']['switched']:
+                                var.status['weight_jacker']['switched'] = False
+                                vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
+                            elif not var.status['weight_jacker']['switched']:
+                                var.status['weight_jacker']['switched'] = True
+                                vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+                elif switch['type'] == "hat":
+                    if dev.device_info[switch['guid']]['hats'][switch['num']] == switch['dir']:
+                        if var.status['weight_jacker']['switched']:
+                            var.status['weight_jacker']['switched'] = False
+                            vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
+                        elif not var.status['weight_jacker']['switched']:
+                            var.status['weight_jacker']['switched'] = True
+                            vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+
+                        while dev.device_info[switch['guid']]['hats'][switch['num']] == switch['dir'] and not var.status['calibration'] and not var.bindings['status'][
+                            'active']:
+                            sleep(0.05)
+
+                        if not var.settings['wj_toggle']:
+                            if var.status['weight_jacker']['switched']:
+                                var.status['weight_jacker']['switched'] = False
+                                vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
+                            elif not var.status['weight_jacker']['switched']:
+                                var.status['weight_jacker']['switched'] = True
+                                vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+        except Exception as e:
+            print(e)
+        sleep(var.settings['polling_frequency'])
 
 if __name__ == '__main__':
     detect = threading.Thread(target=dev.device_detection, daemon=True)

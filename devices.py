@@ -11,118 +11,66 @@ device_info = {}
 def add_device(index):
     device = p.joystick.Joystick(index)
     if "vJoy" not in device.get_name():
-        instance = device.get_instance_id()
+        guid = device.get_guid()
         devices.append(device)
-        device_info[instance] = {
+        device_info[guid] = {
+            "guid": guid,
             "name": device.get_name(),
-            "guid": device.get_guid(),
             "index": index,
-            "instance": instance,
+            "instance": device.get_instance_id(),
             "initialized": device.get_init(),
         }
-    # if device.get_numbuttons():
-    #     device_info[instance]['buttons'] = {}
-    #     for i in range(device.get_numbuttons()):
-    #         device_info[instance]['buttons'][i] = device.get_button(i)
-    # if device.get_numaxes():
-    #     device_info[instance]['axes'] = {}
-    #     for i in range(device.get_numaxes()):
-    #         device_info[instance]['axes'][i] = device.get_axis(i)
-    # if device.get_numhats():
-    #     device_info[instance]['hats'] = {}
-    #     for i in range(device.get_numhats()):
-    #         device_info[instance]['hats'][i] = device.get_hat(i)
-    # if device.get_numballs():
-    #     device_info[instance]['balls'] = {}
-    #     for i in range(device.get_numhats()):
-    #         device_info[instance]['balls'][i] = device.get_ball(i)
-    # print(device_info[instance])
+        if device.get_numbuttons():
+            device_info[guid]['buttons'] = {}
+            for b in range(device.get_numbuttons()):
+                device_info[guid]['buttons'][b] = device.get_button(b)
+        if device.get_numaxes():
+            device_info[guid]['axes'] = {}
+            for a in range(device.get_numaxes()):
+                device_info[guid]['axes'][a] = device.get_axis(a)
+        if device.get_numhats():
+            device_info[guid]['hats'] = {}
+            for h in range(device.get_numhats()):
+                device_info[guid]['hats'][h] = device.get_hat(h)
+        print(device_info[guid])
 
 
 def remove_device(instance):
     for i, device in enumerate(devices):
         if device.get_instance_id() == instance:
-            # print(f"Joystick Removed: {device.get_name()} (ID: {instance})")
             devices.pop(i)
             break
-    del device_info[instance]
+    for i, guid in enumerate(device_info):
+        if device_info[guid]['instance'] == instance:
+            del device_info[guid]
+            break
 
-def publish_event(id, type, input, value):
-    if value == "released":
-        var.current_event = {
-            "name": "",
-            "guid": "",
-            "index": "",
-            "instance": "",
-            "initialized": "",
-            "event": {
-                "type": "",
-                "input": "",
-                "value": "",
-            },
-        }
-    else:
-        var.current_event = {
-            "name": device_info[id]['name'],
-            "guid": device_info[id]['guid'],
-            "index": device_info[id]['index'],
-            "instance": device_info[id]['instance'],
-            "initialized": device_info[id]['initialized'],
-            "event": {
-                "type": type,
-                "input": input,
-                "value": value,
-            },
-        }
-    print(var.current_event)
-
-def device_detection():
-    os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
-    p.init()
-
-    p.joystick.init()
-
-    #screen = p.display.set_mode((0, 0), flags=p.HIDDEN)
-
-    for i in range(p.joystick.get_count()):
-        add_device(i)
-
-    vjoy.find_instance()
-
-    running = True
-    p.event.wait(1000)
-    p.event.clear()
-    while running:
-        for event in p.event.get():
-            if event.type == p.QUIT:
-                running = False
-            if event.type == p.JOYBUTTONDOWN:
-                #device_info[event.instance_id]['buttons'][event.button] = True
-                publish_event(event.instance_id, "button", event.button, "pressed")
-            elif event.type == p.JOYBUTTONUP:
-                #device_info[event.instance_id]['buttons'][event.button] = False
-                publish_event(event.instance_id, "button", event.button, "released")
-            elif event.type == p.JOYAXISMOTION:
-                #device_info[event.instance_id]['axes'][event.axis] = round((event.value + 1) / 2, 2)
-                value = round((event.value + 1) / 2, 2)
-                if value >= var.settings['axis_threshold']:
-                    publish_event(event.instance_id, "axis", event.axis, "pressed")
-                else:
-                    publish_event(event.instance_id, "axis", event.axis, "released")
-            elif event.type == p.JOYHATMOTION:
-                #device_info[event.instance_id]['hats'][event.hat] = event.value
-                if event.value[1] == 1:
+def log_event (index, type, num, value):
+    guid = p.joystick.Joystick(index).get_guid()
+    if guid in device_info:
+        if type == "button":
+            if "buttons" in device_info[guid] and num in device_info[guid]['buttons']:
+                device_info[guid]['buttons'][num] = value
+        elif type == "axis":
+            if guid in device_info and "axes" in device_info[guid] and num in device_info[guid]['axes']:
+                value = round((value + 1) / 2, 2)
+                device_info[guid]['axes'][num] = value
+        elif type == "hat":
+            if guid in device_info and "hats" in device_info[guid] and num in device_info[guid]['hats']:
+                if value[1] == 1:
                     v = "up"
-                elif event.value[1] == -1:
+                elif value[1] == -1:
                     v = "down"
                 else:
                     v = ""
-                if event.value[0] == 1:
+
+                if value[0] == 1:
                     h = "right"
-                elif event.value[0] == -1:
+                elif value[0] == -1:
                     h = "left"
                 else:
                     h = ""
+
                 if v and h:
                     value = v + " " + h
                 elif v:
@@ -130,14 +78,46 @@ def device_detection():
                 elif h:
                     value = h
                 else:
-                    value = "released"
-                publish_event(event.instance_id, "hat", event.hat, value)
-            # elif event.type == p.JOYBALLMOTION:
-            #     #device_info[event.instance_id]['balls'][event.ball] = event.value
-            #     publish_event(event.instance_id, "ball", event.ball, event.value)
-            elif event.type == p.JOYDEVICEADDED:
-                add_device(event.device_index)
-            elif event.type == p.JOYDEVICEREMOVED:
-                remove_device(event.instance_id)
+                    value = "none"
+                device_info[guid]['hats'][num] = value
+
+        var.event = {
+            "guid": guid,
+            "type": type,
+            "num": num,
+            "value": value,
+        }
+        print(var.event)
+
+def device_detection():
+    os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
+    p.init()
+    p.joystick.init()
+    screen = p.display.set_mode((0, 0), flags=p.HIDDEN)
+
+    for i in range(p.joystick.get_count()):
+        add_device(i)
+
+    running = True
+    p.event.wait(1000)
+    p.event.clear()
+    while running:
+        for e in p.event.get():
+            if e.type == p.QUIT:
+                running = False
+
+            if e.type == p.JOYDEVICEADDED:
+                add_device(e.device_index)
+            elif e.type == p.JOYDEVICEREMOVED:
+                remove_device(e.instance_id)
+
+            if e.type == p.JOYBUTTONDOWN:
+                log_event(e.joy, "button", e.button, True)
+            elif e.type == p.JOYBUTTONUP:
+                log_event(e.joy, "button", e.button, False)
+            elif e.type == p.JOYAXISMOTION:
+                log_event(e.joy, "axis", e.axis, e.value)
+            elif e.type == p.JOYHATMOTION:
+                log_event(e.joy, "hat", e.hat, e.value)
 
     p.quit()

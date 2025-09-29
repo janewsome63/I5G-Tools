@@ -1,42 +1,43 @@
 bindings = {
     "status": {
         "active": False,
-        "function": "",
-        "control": "",
+        "function": None,
+        "control": None,
     },
     "weight_jacker": {
-        "up": (),
-        "down": (),
-        "switch": (),
+        "up": None,
+        "down": None,
+        "switch": None,
     },
     "front_roll_bar": {
-        "up": (),
-        "down": (),
-        "switch": (),
+        "up": None,
+        "down": None,
+        "switch": None,
     },
     "rear_roll_bar": {
-        "up": (),
-        "down": (),
-        "switch": (),
+        "up": None,
+        "down": None,
+        "switch": None,
     },
     "fuel_map": {
-        "up": (),
-        "down": (),
-        "switch": (),
+        "up": None,
+        "down": None,
+        "switch": None,
     },
     "bite_point": {
-        "up": (),
-        "down": (),
-        "switch": (),
+        "up": None,
+        "down": None,
+        "switch": None,
     },
     "engine_warming": {
-        "up": (),
-        "down": (),
-        "switch": (),
+        "up": None,
+        "down": None,
+        "switch": None,
     },
 }
 settings = {}
 status = {
+    "calibration": False,
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,
@@ -78,15 +79,9 @@ status = {
         "switched": False,
     }
 }
-current_event = {
-    "name": "",
-    "guid": "",
-    "index": "",
-    "instance": "",
-    "initialized": "",
-    "event": {
-        "type": "",
-        "input": "",
-        "value": "",
-    },
+event = {
+    "guid": 0,
+    "type": "",
+    "num": 0,
+    "value": None,
 }

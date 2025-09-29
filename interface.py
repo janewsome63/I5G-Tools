@@ -35,6 +35,8 @@ from PyQt5.QtWidgets import (
     QLineEdit
 )
 
+from devices import device_info
+
 lang = {
     "title": "I5G Tools",
     "version": "v0.1",
@@ -52,6 +54,7 @@ lang = {
     "bind": "Bind",
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
+    "none": "None",
 }
 
 ui = {
@@ -62,6 +65,7 @@ ui = {
 }
 
 var.settings = {
+    "polling_frequency": 0.1,
     "update_frequency": 10,
     "scale_factor": "1.25",
     "vjoy_device": 1,
@@ -288,29 +292,73 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def bind(self):
-        var.bindings['status']['active'] = True
         self.is_running = True
+        var.bindings['status']['active'] = True
         function = var.bindings['status']['function']
         control = var.bindings['status']['control']
+
         self.index[function][control]['bind'].setText(lang['binding'])
-        fn.bind(function, control)
+
+        var.event = {
+            "guid": 0,
+            "type": "",
+            "num": 0,
+            "value": None,
+        }
+        var.bindings[function][control] = None
+        while not var.bindings[function][control]:
+            if self.is_running == False:
+                break
+
+            if var.event['guid'] != 0:
+                if var.event['type'] == "button":
+                    if var.event['value'] != False:
+                        var.bindings[function][control] = {
+                            "guid": var.event['guid'],
+                            "type": var.event['type'],
+                            "num": var.event['num'],
+                        }
+                elif var.event['type'] == "axis":
+                    if var.event['value'] >= 0.95:
+                        var.bindings[function][control] = {
+                            "guid": var.event['guid'],
+                            "type": var.event['type'],
+                            "num": var.event['num'],
+                        }
+                elif var.event['type'] == "hat":
+                    if var.event['value'] != "none":
+                        var.bindings[function][control] = {
+                            "guid": var.event['guid'],
+                            "type": var.event['type'],
+                            "num": var.event['num'],
+                            "dir": var.event['value'],
+                        }
+
         self.index[function][control]['bind'].setText(lang['bind'])
-        if var.bindings[function][control][1] != "hat":
-            device = var.bindings[function][control][0]
-            type = capwords(var.bindings[function][control][1])
-            id = str(var.bindings[function][control][2])
-            dev_pretty = device + " - " + type + " " + id
+
+        if var.bindings[function][control]:
+            if "dir" in var.bindings[function][control]:
+                name = device_info[var.bindings[function][control]['guid']]['name']
+                type = capwords(var.bindings[function][control]['type'])
+                num = str(var.bindings[function][control]['num'])
+                dir = capwords(var.bindings[function][control]['dir'])
+                dev_pretty = name + " - " + type + " " + num + " " + dir
+            else:
+                name = device_info[var.bindings[function][control]['guid']]['name']
+                type = capwords(var.bindings[function][control]['type'])
+                num = str(var.bindings[function][control]['num'])
+                dev_pretty = name + " - " + type + " " + num
+            self.index[function][control]['device'].setText(dev_pretty)
         else:
-            device = var.bindings[function][control][0]
-            type = capwords(var.bindings[function][control][1])
-            id = str(var.bindings[function][control][2])
-            direction = capwords(var.bindings[function][control][3])
-            dev_pretty = device + " - " + type + " " + id + " " + direction
-        self.index[function][control]['device'].setText(dev_pretty)
-        var.bindings['status']['function'] = ""
-        var.bindings['status']['control'] = ""
+            self.index[function][control]['device'].setText(lang['none'])
+
+
+        var.bindings['status'] = {
+            "active": False,
+            "function": None,
+            "control": None,
+        }
         self.is_running = False
-        var.bindings['status']['active'] = False
 
     @pyqtSlot()
     def wj_up_bind(self):
@@ -321,37 +369,29 @@ class MainWindow(QMainWindow):
         if not self.is_running:
             ui['thread_pool'].start(self.bind)
         else:
-            var.bindings['status']['active'] = False
+            self.is_running = False
 
     @pyqtSlot()
     def wj_down_bind(self):
-        function = "weight_jacker"
-        control = "down"
         var.bindings['status'] = {
-            "function": function,
-            "control": control,
+            "function": "weight_jacker",
+            "control": "down",
         }
         if not self.is_running:
             ui['thread_pool'].start(self.bind)
-            self.index[function][control]['bind'].setText(lang['binding'])
         else:
-            var.bindings['status']['active'] = False
-        self.index[function][control]['bind'].update()
+            self.is_running = False
 
     @pyqtSlot()
     def wj_switch_bind(self):
-        function = "weight_jacker"
-        control = "switch"
         var.bindings['status'] = {
-            "function": function,
-            "control": control,
+            "function": "weight_jacker",
+            "control": "switch",
         }
         if not self.is_running:
             ui['thread_pool'].start(self.bind)
-            self.index[function][control]['bind'].setText(lang['binding'])
         else:
-            var.bindings['status']['active'] = False
-        self.index[function][control]['bind'].update()
+            self.is_running = False
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = var.settings['scale_factor']
