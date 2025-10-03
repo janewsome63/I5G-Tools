@@ -39,7 +39,7 @@ from devices import device_info
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1",
+    "version": "v0.1a",
     "up": "Increase:",
     "down": "Decrease:",
     "switch": "Switch:",
@@ -54,6 +54,7 @@ lang = {
     "bind": "Bind",
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
+    "axis_threshold": "Axis Threshold %",
     "none": "None",
 }
 
@@ -135,12 +136,14 @@ class MainWindow(QMainWindow):
         self.weight_jacker_content['increment'].setRange(1, 20)
         self.weight_jacker_content['increment'].setValue(var.settings['wj_increment'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.weight_jacker_content['increment'].valueChanged.connect(self.wj_increment)
 
         self.weight_jacker_content['switch'] = QSpinBox()
         self.weight_jacker_content['switch'].setFixedSize(40, 20)
         self.weight_jacker_content['switch'].setRange(-20, 20)
         self.weight_jacker_content['switch'].setValue(var.settings['wj_switch'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.weight_jacker_content['switch'].valueChanged.connect(self.wj_switch)
 
         self.weight_jacker_content['increment_mode_label'] = QLabel()
         self.weight_jacker_content['increment_mode_label'].setAlignment(Qt.AlignRight)
@@ -157,11 +160,13 @@ class MainWindow(QMainWindow):
         self.weight_jacker_content['increment_mode'].addItem(lang['continuous'])
         self.weight_jacker_content['increment_mode'].addItem(lang['single'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment_mode'], 2, 1)
+        self.weight_jacker_content['increment_mode'].currentIndexChanged.connect(self.wj_increment_mode)
 
         self.weight_jacker_content['switch_mode'] = QComboBox()
         self.weight_jacker_content['switch_mode'].addItem(lang['hold'])
         self.weight_jacker_content['switch_mode'].addItem(lang['toggle'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_mode'], 2, 2)
+        self.weight_jacker_content['switch_mode'].currentIndexChanged.connect(self.wj_switch_mode)
 
         self.weight_jacker_content['up_label'] = QLabel()
         self.weight_jacker_content['up_label'].setAlignment(Qt.AlignLeft)
@@ -235,7 +240,20 @@ class MainWindow(QMainWindow):
 
         #--------Settings Tab--------#
         self.settings.layout = QGridLayout()
-        self.settings.layout.addWidget(QLabel("Settings"), 0, 0)
+        self.settings_content = {}
+
+        self.settings_content['axis_threshold_label'] = QLabel()
+        self.settings_content['axis_threshold_label'].setAlignment(Qt.AlignLeft)
+        self.settings_content['axis_threshold_label'].setText(lang['axis_threshold'])
+        self.settings.layout.addWidget(self.settings_content['axis_threshold_label'], 0, 0)
+
+        self.settings_content['axis_threshold'] = QSpinBox()
+        self.settings_content['axis_threshold'].setFixedSize(42, 20)
+        self.settings_content['axis_threshold'].setRange(1, 100)
+        self.settings_content['axis_threshold'].setValue(int(var.settings['axis_threshold'] * 100))
+        self.settings.layout.addWidget(self.settings_content['axis_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['axis_threshold'].valueChanged.connect(self.axis_threshold)
+
         self.settings.setLayout(self.settings.layout)
 
         self.layout.addWidget(self.tabs)
@@ -267,6 +285,7 @@ class MainWindow(QMainWindow):
 
     def updater(self):
         self.wj_display()
+        #self.wj_switch_value()
 
     def wj_display(self):
         pct = vjoy.axis_values["weight_jacker"]
@@ -289,6 +308,42 @@ class MainWindow(QMainWindow):
         self.pct = 0.5
         if not self.is_running:
             ui['thread_pool'].start(self.calibrate)
+
+    @pyqtSlot()
+    def wj_increment(self):
+        var.settings['wj_increment'] = self.weight_jacker_content['increment'].value()
+
+    @pyqtSlot()
+    def wj_switch(self):
+        wj = self.weight_jacker_content['switch'].value()
+        var.settings['wj_switch'] = wj
+        var.status['weight_jacker']['secondary'] = (wj * 0.025) + 0.5
+        if var.status['weight_jacker']['switched'] == True:
+            vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
+
+    @pyqtSlot()
+    def wj_switch_value(self):
+        pct = round((var.status['weight_jacker']['secondary'] - 0.5) / 0.025)
+        self.weight_jacker_content['switch'].setValue(pct)
+        self.weight_jacker_content['switch'].update()
+
+    @pyqtSlot()
+    def wj_increment_mode(self):
+        if self.weight_jacker_content['increment_mode'].currentText() == "Continuous":
+            var.settings['wj_continuous'] = True
+        elif self.weight_jacker_content['increment_mode'].currentText() == "Single":
+            var.settings['wj_continuous'] = False
+
+    @pyqtSlot()
+    def wj_switch_mode(self):
+        if self.weight_jacker_content['switch_mode'].currentText() == "Toggle":
+            var.settings['wj_toggle'] = True
+        elif self.weight_jacker_content['switch_mode'].currentText() == "Hold":
+            var.settings['wj_toggle'] = False
+
+    @pyqtSlot()
+    def axis_threshold(self):
+        var.settings['axis_threshold'] = (self.settings_content['axis_threshold'].value() / 100)
 
     @pyqtSlot()
     def bind(self):

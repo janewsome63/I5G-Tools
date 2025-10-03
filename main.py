@@ -12,6 +12,8 @@ from devices import device_info
 def weight_jacker_increment():
     while True:
         try:
+            increment = var.settings['wj_increment'] * 0.025
+
             if not var.status['calibration'] and not var.bindings['status']['active']:
                 if var.bindings['weight_jacker']['up']:
                     up = var.bindings['weight_jacker']['up']
@@ -39,71 +41,71 @@ def weight_jacker_increment():
                 if up['type'] == "button":
                     if dev.device_info[up['guid']]['buttons'][up['num']]:
 
-                        vjoy.set("weight_jacker", current + 0.025)
+                        vjoy.set("weight_jacker", current + increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
                         while dev.device_info[up['guid']]['buttons'][up['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
-                                vjoy.set("weight_jacker", current + 0.025)
-                                current = current + 0.025
+                                vjoy.set("weight_jacker", current + increment)
+                                current = current + increment
                             sleep(0.05)
                 elif up['type'] == "axis":
                     if dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['axis_threshold']:
-                        vjoy.set("weight_jacker", current + 0.025)
+                        vjoy.set("weight_jacker", current + increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
                         while dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
-                                vjoy.set("weight_jacker", current + 0.025)
-                                current = current + 0.025
+                                vjoy.set("weight_jacker", current + increment)
+                                current = current + increment
                             sleep(0.05)
                 elif up['type'] == "hat":
                     if dev.device_info[up['guid']]['hats'][up['num']] == up['dir']:
-                        vjoy.set("weight_jacker", current + 0.025)
+                        vjoy.set("weight_jacker", current + increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
                         while dev.device_info[up['guid']]['hats'][up['num']] == up['dir'] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
-                                vjoy.set("weight_jacker", current + 0.025)
-                                current = current + 0.025
+                                vjoy.set("weight_jacker", current + increment)
+                                current = current + increment
                             sleep(0.05)
 
                 if down['type'] == "button":
                     if dev.device_info[down['guid']]['buttons'][down['num']]:
 
-                        vjoy.set("weight_jacker", current - 0.025)
+                        vjoy.set("weight_jacker", current - increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
                         while dev.device_info[down['guid']]['buttons'][down['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
-                                vjoy.set("weight_jacker", current - 0.025)
-                                current = current - 0.025
+                                vjoy.set("weight_jacker", current - increment)
+                                current = current - increment
                             sleep(0.05)
                 elif down['type'] == "axis":
                     if dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['axis_threshold']:
-                        vjoy.set("weight_jacker", current - 0.025)
+                        vjoy.set("weight_jacker", current - increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
                         while dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
-                                vjoy.set("weight_jacker", current - 0.025)
-                                current = current - 0.025
+                                vjoy.set("weight_jacker", current - increment)
+                                current = current - increment
                             sleep(0.05)
                 elif down['type'] == "hat":
                     if dev.device_info[down['guid']]['hats'][down['num']] == down['dir']:
-                        vjoy.set("weight_jacker", current - 0.025)
+                        vjoy.set("weight_jacker", current - increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
                         while dev.device_info[down['guid']]['hats'][down['num']] == down['dir'] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
-                                vjoy.set("weight_jacker", current - 0.025)
-                                current = current - 0.025
+                                vjoy.set("weight_jacker", current - increment)
+                                current = current - increment
                             sleep(0.05)
         except Exception as e:
             print(e)
