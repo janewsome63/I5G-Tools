@@ -110,7 +110,7 @@ def weight_jacker_increment():
         except Exception as e:
             print(e)
 
-        sleep(var.settings['polling_frequency'])
+        sleep(var.settings['frequency'])
 
 def weight_jacker_switch():
     while True:
@@ -134,7 +134,7 @@ def weight_jacker_switch():
                             var.status['weight_jacker']['switched'] = True
                             vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
 
-                        while dev.device_info[switch['guid']]['buttons'][switch['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
+                        while dev.device_info[switch['guid']]['buttons'][switch['num']] and not var.bindings['status']['active']:
                             sleep(0.05)
 
                         if not var.settings['wj_toggle']:
@@ -153,7 +153,7 @@ def weight_jacker_switch():
                             var.status['weight_jacker']['switched'] = True
                             vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
 
-                        while dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                        while dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['axis_threshold'] and not var.bindings['status']['active']:
                             sleep(0.05)
 
                         if not var.settings['wj_toggle']:
@@ -172,8 +172,7 @@ def weight_jacker_switch():
                             var.status['weight_jacker']['switched'] = True
                             vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
 
-                        while dev.device_info[switch['guid']]['hats'][switch['num']] == switch['dir'] and not var.status['calibration'] and not var.bindings['status'][
-                            'active']:
+                        while dev.device_info[switch['guid']]['hats'][switch['num']] == switch['dir'] and not var.bindings['status']['active']:
                             sleep(0.05)
 
                         if not var.settings['wj_toggle']:
@@ -185,7 +184,7 @@ def weight_jacker_switch():
                                 vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
         except Exception as e:
             print(e)
-        sleep(var.settings['polling_frequency'])
+        sleep(var.settings['frequency'])
 
 if __name__ == '__main__':
     detect = threading.Thread(target=dev.device_detection, daemon=True)

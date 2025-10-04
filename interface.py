@@ -54,7 +54,8 @@ lang = {
     "bind": "Bind",
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
-    "axis_threshold": "Axis Threshold %",
+    "threshold": "Axis Threshold:",
+    "scale": "Scale Factor:",
     "none": "None",
 }
 
@@ -66,11 +67,11 @@ ui = {
 }
 
 var.settings = {
-    "polling_frequency": 0.1,
-    "update_frequency": 10,
-    "scale_factor": "1.25",
-    "vjoy_device": 1,
-    "axis_threshold": 0.90,
+    "threshold": 0.90,
+    "frequency": 0.1,
+    "scale": "1.25",
+    "device": 1,
+    
     "wj_continuous": True,
     "wj_toggle": False,
     "wj_increment": 1,
@@ -242,17 +243,33 @@ class MainWindow(QMainWindow):
         self.settings.layout = QGridLayout()
         self.settings_content = {}
 
-        self.settings_content['axis_threshold_label'] = QLabel()
-        self.settings_content['axis_threshold_label'].setAlignment(Qt.AlignLeft)
-        self.settings_content['axis_threshold_label'].setText(lang['axis_threshold'])
-        self.settings.layout.addWidget(self.settings_content['axis_threshold_label'], 0, 0)
+        self.settings_content['threshold_label'] = QLabel()
+        self.settings_content['threshold_label'].setAlignment(Qt.AlignLeft)
+        self.settings_content['threshold_label'].setText(lang['threshold'])
+        self.settings.layout.addWidget(self.settings_content['threshold_label'], 0, 0)
 
-        self.settings_content['axis_threshold'] = QSpinBox()
-        self.settings_content['axis_threshold'].setFixedSize(42, 20)
-        self.settings_content['axis_threshold'].setRange(1, 100)
-        self.settings_content['axis_threshold'].setValue(int(var.settings['axis_threshold'] * 100))
-        self.settings.layout.addWidget(self.settings_content['axis_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['axis_threshold'].valueChanged.connect(self.axis_threshold)
+        self.settings_content['threshold'] = QSpinBox()
+        self.settings_content['threshold'].setFixedSize(42, 20)
+        self.settings_content['threshold'].setRange(1, 100)
+        self.settings_content['threshold'].setValue(int(var.settings['threshold'] * 100))
+        self.settings.layout.addWidget(self.settings_content['threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['threshold'].valueChanged.connect(self.threshold)
+
+        self.settings_content['scale_label'] = QLabel()
+        self.settings_content['scale_label'].setAlignment(Qt.AlignLeft)
+        self.settings_content['scale_label'].setText(lang['scale'])
+        self.settings.layout.addWidget(self.settings_content['scale_label'], 1, 0)
+
+        self.settings_content['scale'] = QComboBox()
+        self.settings_content['scale'].setFixedSize(60, 22)
+        self.settings_content['scale'].addItem("0.50" + "x")
+        self.settings_content['scale'].addItem("0.75" + "x")
+        self.settings_content['scale'].addItem("1.00" + "x")
+        self.settings_content['scale'].addItem("1.25" + "x")
+        self.settings_content['scale'].addItem("1.50" + "x")
+        self.settings_content['scale'].setCurrentText(var.settings['scale'] + "x")
+        self.settings.layout.addWidget(self.settings_content['scale'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['scale'].currentTextChanged.connect(self.scale)
 
         self.settings.setLayout(self.settings.layout)
 
@@ -261,7 +278,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.tabs)
 
         ui['timer'].timeout.connect(self.updater)
-        ui['timer'].start(var.settings['update_frequency'])
+        ui['timer'].start(int((var.settings['frequency'] * 1000) / 10))
 
         self.index = {
             "weight_jacker": {
@@ -305,7 +322,10 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def wj_calibrate(self):
         self.axis = "weight_jacker"
-        self.pct = 0.5
+        if not var.status['weight_jacker']['switched']:
+            self.pct = var.status['weight_jacker']['primary']
+        elif var.status['weight_jacker']['switched']:
+            self.pct = var.status['weight_jacker']['secondary']
         if not self.is_running:
             ui['thread_pool'].start(self.calibrate)
 
@@ -342,8 +362,14 @@ class MainWindow(QMainWindow):
             var.settings['wj_toggle'] = False
 
     @pyqtSlot()
-    def axis_threshold(self):
-        var.settings['axis_threshold'] = (self.settings_content['axis_threshold'].value() / 100)
+    def threshold(self):
+        var.settings['threshold'] = (self.settings_content['threshold'].value() / 100)
+
+    @pyqtSlot()
+    def scale(self):
+        scale = self.settings_content['scale'].currentText()
+        scale = scale.replace("x", "")
+        var.settings['scale'] = scale
 
     @pyqtSlot()
     def bind(self):
@@ -449,7 +475,7 @@ class MainWindow(QMainWindow):
             self.is_running = False
 
 def main():
-    os.environ["QT_SCALE_FACTOR"] = var.settings['scale_factor']
+    os.environ["QT_SCALE_FACTOR"] = var.settings['scale']
 
     app = QApplication(sys.argv)
 

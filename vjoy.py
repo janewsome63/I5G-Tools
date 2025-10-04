@@ -33,7 +33,7 @@ def set(axis, pct):
         elif raw > 32768:
             raw = 32768
 
-        vjoy.VJoyDevice(var.settings['vjoy_device']).set_axis(axis_ref[axis], raw)
+        vjoy.VJoyDevice(var.settings['device']).set_axis(axis_ref[axis], raw)
         axis_values[axis] = round(raw / 32768, 3)
         if var.status[axis]['switched']:
             var.status[axis]['secondary'] = axis_values[axis]
@@ -45,9 +45,11 @@ def set(axis, pct):
 
 def calibrate(axis, pct_end):
     var.status['calibration'] = True
-    var.status['weight_jacker']['switched'] = False
     step = 0.05
-    pct = var.status['weight_jacker']['primary']
+    if not var.status[axis]['switched']:
+        pct = var.status[axis]['primary']
+    elif var.status[axis]['switched']:
+        pct = var.status[axis]['secondary']
     while pct >= 0.0:
         set(axis, pct)
         pct = pct - step
@@ -67,7 +69,7 @@ def calibrate(axis, pct_end):
 
 def intialize():
     sleep(1.0)
-    vjoy.VJoyDevice(var.settings['vjoy_device']).update()
+    vjoy.VJoyDevice(var.settings['device']).update()
     set("weight_jacker", 0.5)
     set("front_roll_bar", 1.0)
     set("rear_roll_bar", 0.0)
