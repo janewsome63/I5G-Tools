@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Implement options on WJ tab, add axis threshold setting">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Work on config file started; fix issue #2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vjoy.py" beforeDir="false" afterPath="$PROJECT_DIR$/vjoy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -258,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759464376774</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Work on config file started; fix issue #2">
+      <option name="closed" value="true" />
+      <created>1759540136566</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1759540136566</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -285,6 +289,7 @@
     <MESSAGE value="Work on binding and control detection" />
     <MESSAGE value="Rework controller polling system, weight jacker tool section functional" />
     <MESSAGE value="Implement options on WJ tab, add axis threshold setting" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement options on WJ tab, add axis threshold setting" />
+    <MESSAGE value="Work on config file started; fix issue #2" />
+    <option name="LAST_COMMIT_MESSAGE" value="Work on config file started; fix issue #2" />
   </component>
 </project>

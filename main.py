@@ -51,12 +51,12 @@ def weight_jacker_increment():
                                 current = current + increment
                             sleep(0.05)
                 elif up['type'] == "axis":
-                    if dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['axis_threshold']:
+                    if dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['threshold']:
                         vjoy.set("weight_jacker", current + increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
-                        while dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                        while dev.device_info[up['guid']]['axes'][up['num']] >= var.settings['threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
                                 vjoy.set("weight_jacker", current + increment)
                                 current = current + increment
@@ -86,12 +86,12 @@ def weight_jacker_increment():
                                 current = current - increment
                             sleep(0.05)
                 elif down['type'] == "axis":
-                    if dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['axis_threshold']:
+                    if dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['threshold']:
                         vjoy.set("weight_jacker", current - increment)
                         if var.settings['wj_continuous']:
                             sleep(0.1)
 
-                        while dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['axis_threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
+                        while dev.device_info[down['guid']]['axes'][down['num']] >= var.settings['threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
                             if var.settings['wj_continuous']:
                                 vjoy.set("weight_jacker", current - increment)
                                 current = current - increment
@@ -145,7 +145,7 @@ def weight_jacker_switch():
                                 var.status['weight_jacker']['switched'] = True
                                 vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
                 elif switch['type'] == "axis":
-                    if dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['axis_threshold']:
+                    if dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['threshold']:
                         if var.status['weight_jacker']['switched']:
                             var.status['weight_jacker']['switched'] = False
                             vjoy.set("weight_jacker", var.status['weight_jacker']['primary'])
@@ -153,7 +153,7 @@ def weight_jacker_switch():
                             var.status['weight_jacker']['switched'] = True
                             vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
 
-                        while dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['axis_threshold'] and not var.bindings['status']['active']:
+                        while dev.device_info[switch['guid']]['axes'][switch['num']] >= var.settings['threshold'] and not var.bindings['status']['active']:
                             sleep(0.05)
 
                         if not var.settings['wj_toggle']:
