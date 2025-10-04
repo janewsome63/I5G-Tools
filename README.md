@@ -4,3 +4,5 @@
 2.) WJ Still acts odd when calibration is pressed while toggled
 
 3.) WJ tab settings not implemented
+
+4.) Increase/Decrease/Switch buttons need to be mapped every time the program is opened
