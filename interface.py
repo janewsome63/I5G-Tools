@@ -400,7 +400,7 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                         }
                 elif var.event['type'] == "axis":
-                    if var.event['value'] >= 0.95:
+                    if var.event['value'] >= var.settings['threshold']:
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
