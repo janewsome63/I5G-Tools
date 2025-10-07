@@ -71,11 +71,13 @@ var.settings = {
     "frequency": 0.1,
     "scale": "1.25",
     "device": 1,
-    
-    "wj_continuous": True,
-    "wj_toggle": False,
-    "wj_increment": 1,
-    "wj_switch": -20,
+
+    "weight_jacker": {
+        "continuous": True,
+        "toggle": False,
+        "increment": 1,
+        "switch": -20,
+    },
 }
 
 class MainWindow(QMainWindow):
@@ -135,14 +137,14 @@ class MainWindow(QMainWindow):
         self.weight_jacker_content['increment'] = QSpinBox()
         self.weight_jacker_content['increment'].setFixedSize(38, 20)
         self.weight_jacker_content['increment'].setRange(1, 20)
-        self.weight_jacker_content['increment'].setValue(var.settings['wj_increment'])
+        self.weight_jacker_content['increment'].setValue(var.settings['weight_jacker']['increment'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.weight_jacker_content['increment'].valueChanged.connect(self.wj_increment)
 
         self.weight_jacker_content['switch'] = QSpinBox()
         self.weight_jacker_content['switch'].setFixedSize(40, 20)
         self.weight_jacker_content['switch'].setRange(-20, 20)
-        self.weight_jacker_content['switch'].setValue(var.settings['wj_switch'])
+        self.weight_jacker_content['switch'].setValue(var.settings['weight_jacker']['switch'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.weight_jacker_content['switch'].valueChanged.connect(self.wj_switch)
 
@@ -357,9 +359,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def wj_switch_mode(self):
         if self.weight_jacker_content['switch_mode'].currentText() == "Toggle":
-            var.settings['wj_toggle'] = True
+            var.settings['weight_jacker']['toggle'] = True
         elif self.weight_jacker_content['switch_mode'].currentText() == "Hold":
-            var.settings['wj_toggle'] = False
+            var.settings['weight_jacker']['toggle'] = False
 
     @pyqtSlot()
     def threshold(self):

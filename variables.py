@@ -5,34 +5,106 @@ bindings = {
         "control": None,
     },
     "weight_jacker": {
-        "up": None,
-        "down": None,
-        "switch": None,
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
     },
     "front_roll_bar": {
-        "up": None,
-        "down": None,
-        "switch": None,
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
     },
     "rear_roll_bar": {
-        "up": None,
-        "down": None,
-        "switch": None,
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
     },
     "fuel_map": {
-        "up": None,
-        "down": None,
-        "switch": None,
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
     },
     "bite_point": {
-        "up": None,
-        "down": None,
-        "switch": None,
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
     },
     "engine_warming": {
-        "up": None,
-        "down": None,
-        "switch": None,
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
     },
 }
 settings = {}
