@@ -1,6 +1,7 @@
-import pyvjoy as vjoy
 import devices as dev
 import variables as var
+
+import pyvjoy as vjoy
 from time import sleep
 
 axis_ref = {
@@ -25,8 +26,14 @@ axis_values = {
     "other": 0.0,
 }
 
+status = {
+    "busy": False,
+}
+
 def set(axis, pct):
-    try:
+    if not status['busy']:
+        switched = var.status[axis]['switched']
+        status['busy'] = True
         raw = round(pct * 32768)
         if raw <= 0:
             raw = 1
@@ -35,13 +42,11 @@ def set(axis, pct):
 
         vjoy.VJoyDevice(var.settings['device']).set_axis(axis_ref[axis], raw)
         axis_values[axis] = round(raw / 32768, 3)
-        if var.status[axis]['switched']:
+        if switched:
             var.status[axis]['secondary'] = axis_values[axis]
-        elif not var.status[axis]['switched']:
+        else:
             var.status[axis]['primary'] = axis_values[axis]
-    except Exception as e:
-        print(e)
-
+        status['busy'] = False
 
 def calibrate(axis, pct_end):
     var.status['calibration'] = True

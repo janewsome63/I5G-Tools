@@ -1,6 +1,7 @@
 import devices as dev
-import vjoy
+import functions as fn
 import variables as var
+import vjoy
 
 from time import sleep
 
@@ -13,132 +14,168 @@ step = {
     "throttle": 1 / (201 - 1),
 }
 
-def increment(control):
-    while True:
-        try:
-            if not var.status['calibration'] and not var.bindings['status']['active']:
-                if var.status[control]['switched']:
-                    current = var.status[control]['secondary']
+def control():
+    if fn.is_bind():
+        function = fn.is_bind()
+        if not var.status['calibration'] and not var.bindings['status']['active']:
+
+            # Up/Down
+            for direction in ("up", "down"):
+                if direction == "up":
+                    offset = step[function] * var.settings[function]['increment']
+                elif direction == "down":
+                    offset = step[function] * var.settings[function]['increment'] * -1
                 else:
-                    current = var.status[control]['primary']
-
-                for direction in ("up", "down"):
-                    if direction == "up":
-                        offset = step[control] * var.settings[control]['increment']
-                    elif direction == "down":
-                        offset = step[control] * var.settings[control]['increment'] * -1
-                    else:
-                        offset = 0.0
-
-                    bind = var.bindings[control][direction]
-
-                    if bind['type'] == "button":
-                        if dev.device_info[bind['guid']]['buttons'][bind['num']]:
-                            vjoy.set(control, current + offset)
-
-                            if var.settings[control]['continuous']:
-                                sleep(0.1)
-
-                            while dev.device_info[bind['guid']]['buttons'][bind['num']] and not var.status['calibration'] and not var.bindings['status']['active']:
-                                if var.settings[control]['continuous']:
-                                    current = current + offset
-                                    vjoy.set(control, current)
-
-                                sleep(0.05)
-                    elif bind['type'] == "axis":
-                        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold']:
-                            vjoy.set(control, current + offset)
-
-                            if var.settings[control]['continuous']:
-                                sleep(0.1)
-
-                            while dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold'] and not var.status['calibration'] and not var.bindings['status']['active']:
-                                if var.settings[control]['continuous']:
-                                    current = current + offset
-                                    vjoy.set(control, current)
-
-                                sleep(0.05)
-                    elif bind['type'] == "hat":
-                        if dev.device_info[bind['guid']]['hats'][bind['num']] == bind['dir']:
-                            vjoy.set(control, current + offset)
-
-                            if var.settings[control]['continuous']:
-                                sleep(0.1)
-
-                            while dev.device_info[bind['guid']]['hats'][bind['num']] == bind['dir'] and not var.status['calibration'] and not var.bindings['status']['active']:
-                                if var.settings[control]['continuous']:
-                                    current = current + offset
-                                    vjoy.set(control, current)
-
-                                sleep(0.05)
-
-        except Exception as e:
-            print(e)
-
-        sleep(var.settings['frequency'])
-
-def switch(control):
-    while True:
-        try:
-            if not var.status['calibration'] and not var.bindings['status']['active']:
-                bind = var.bindings[control]['switch']
-
+                    offset = 0.0
+    
+                bind = var.bindings[function][direction]
+    
                 if bind['type'] == "button":
                     if dev.device_info[bind['guid']]['buttons'][bind['num']]:
-                        if var.status[control]['switched']:
-                            var.status[control]['switched'] = False
-                            vjoy.set(control, var.status[control]['primary'])
-                        elif not var.status[control]['switched']:
-                            var.status[control]['switched'] = True
-                            vjoy.set(control, var.status[control]['secondary'])
+                        var.status[function]['thread']['current'] += 1
+                        thread_id = var.status[function]['thread']['current']
+                        var.status[function]['thread']['running'] = thread_id
 
-                        while dev.device_info[bind['guid']]['buttons'][bind['num']] and not var.bindings['status']['active']:
-                            sleep(0.05)
+                        if var.status[function]['switched']:
+                            vjoy.set(function, var.status[function]['secondary'] + offset)
+                        else:
+                            vjoy.set(function, var.status[function]['primary'] + offset)
 
-                        if not var.settings[control]['toggle']:
-                            if var.status[control]['switched']:
-                                var.status[control]['switched'] = False
-                                vjoy.set(control, var.status[control]['primary'])
-                            elif not var.status[control]['switched']:
-                                var.status[control]['switched'] = True
-                                vjoy.set(control, var.status[control]['secondary'])
+                        if var.settings[function]['continuous']:
+                            sleep(0.2)
+                        while dev.device_info[bind['guid']]['buttons'][bind['num']] and var.status[function]['thread']['running'] == thread_id:
+                            if var.status['calibration'] or var.bindings['status']['active']:
+                                break
+                            if var.settings[function]['continuous']:
+                                if var.status[function]['switched']:
+                                    vjoy.set(function, var.status[function]['secondary'] + offset)
+                                else:
+                                    vjoy.set(function, var.status[function]['primary'] + offset)
+                            sleep(0.075)
+
+                        if var.status[function]['thread']['running'] == thread_id:
+                            var.status[function]['thread']['running'] = 0
+
                 elif bind['type'] == "axis":
                     if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold']:
-                        if var.status[control]['switched']:
-                            var.status[control]['switched'] = False
-                            vjoy.set(control, var.status[control]['primary'])
-                        elif not var.status[control]['switched']:
-                            var.status[control]['switched'] = True
-                            vjoy.set(control, var.status[control]['secondary'])
+                        var.status[function]['thread']['current'] += 1
+                        thread_id = var.status[function]['thread']['current']
+                        var.status[function]['thread']['running'] = thread_id
 
+                        if var.status[function]['switched']:
+                            vjoy.set(function, var.status[function]['secondary'] + offset)
+                        else:
+                            vjoy.set(function, var.status[function]['primary'] + offset)
+
+                        if var.settings[function]['continuous']:
+                            sleep(0.2)
+                        while dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold'] and var.status[function]['thread']['running'] == thread_id:
+                            if var.status['calibration'] or var.bindings['status']['active']:
+                                break
+                            if var.settings[function]['continuous']:
+                                if var.status[function]['switched']:
+                                    vjoy.set(function, var.status[function]['secondary'] + offset)
+                                else:
+                                    vjoy.set(function, var.status[function]['primary'] + offset)
+                            sleep(0.075)
+
+                        if var.status[function]['thread']['running'] == thread_id:
+                            var.status[function]['thread']['running'] = 0
+
+                elif bind['type'] == "hat":
+                    if bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
+                        var.status[function]['thread']['current'] += 1
+                        thread_id = var.status[function]['thread']['current']
+                        var.status[function]['thread']['running'] = thread_id
+
+                        if var.status[function]['switched']:
+                            vjoy.set(function, var.status[function]['secondary'] + offset)
+                        else:
+                            vjoy.set(function, var.status[function]['primary'] + offset)
+
+                        if var.settings[function]['continuous']:
+                            sleep(0.2)
+                        while bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']] and var.status[function]['thread']['running'] == thread_id:
+                            if var.status['calibration'] or var.bindings['status']['active']:
+                                break
+                            if var.settings[function]['continuous']:
+                                if var.status[function]['switched']:
+                                    vjoy.set(function, var.status[function]['secondary'] + offset)
+                                else:
+                                    vjoy.set(function, var.status[function]['primary'] + offset)
+                            sleep(0.075)
+
+                        if var.status[function]['thread']['running'] == thread_id:
+                            var.status[function]['thread']['running'] = 0
+
+            # Switch
+            bind = var.bindings[function]['switch']
+
+            if bind['type'] == "button":
+                if dev.device_info[bind['guid']]['buttons'][bind['num']]:
+                    if not var.status[function]['thread']['waiting']:
+                        if var.status[function]['switched']:
+                            var.status[function]['switched'] = False
+                            vjoy.set(function, var.status[function]['primary'])
+                        elif not var.status[function]['switched']:
+                            var.status[function]['switched'] = True
+                            vjoy.set(function, var.status[function]['secondary'])
+
+                        var.status[function]['thread']['waiting'] = True
+                        while dev.device_info[bind['guid']]['buttons'][bind['num']] and not var.bindings['status']['active']:
+                            sleep(0.05)
+                        var.status[function]['thread']['waiting'] = False
+
+                        if not var.settings[function]['toggle']:
+                            if var.status[function]['switched']:
+                                var.status[function]['switched'] = False
+                                vjoy.set(function, var.status[function]['primary'])
+                            elif not var.status[function]['switched']:
+                                var.status[function]['switched'] = True
+                                vjoy.set(function, var.status[function]['secondary'])
+
+            elif bind['type'] == "axis":
+                if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold']:
+                    if not var.status[function]['thread']['waiting']:
+                        if var.status[function]['switched']:
+                            var.status[function]['switched'] = False
+                            vjoy.set(function, var.status[function]['primary'])
+                        elif not var.status[function]['switched']:
+                            var.status[function]['switched'] = True
+                            vjoy.set(function, var.status[function]['secondary'])
+
+                        var.status[function]['thread']['waiting'] = True
                         while dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold'] and not var.bindings['status']['active']:
                             sleep(0.05)
+                        var.status[function]['thread']['waiting'] = False
 
-                        if not var.settings[control]['toggle']:
-                            if var.status[control]['switched']:
-                                var.status[control]['switched'] = False
-                                vjoy.set(control, var.status[control]['primary'])
-                            elif not var.status[control]['switched']:
-                                var.status[control]['switched'] = True
-                                vjoy.set(control, var.status[control]['secondary'])
-                elif bind['type'] == "hat":
-                    if dev.device_info[bind['guid']]['hats'][bind['num']] == bind['dir']:
-                        if var.status[control]['switched']:
-                            var.status[control]['switched'] = False
-                            vjoy.set(control, var.status[control]['primary'])
-                        elif not var.status[control]['switched']:
-                            var.status[control]['switched'] = True
-                            vjoy.set(control, var.status[control]['secondary'])
+                        if not var.settings[function]['toggle']:
+                            if var.status[function]['switched']:
+                                var.status[function]['switched'] = False
+                                vjoy.set(function, var.status[function]['primary'])
+                            elif not var.status[function]['switched']:
+                                var.status[function]['switched'] = True
+                                vjoy.set(function, var.status[function]['secondary'])
 
-                        while dev.device_info[bind['guid']]['hats'][bind['num']] == bind['dir'] and not var.bindings['status']['active']:
+            elif bind['type'] == "hat":
+                if bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
+                    if not var.status[function]['thread']['waiting']:
+                        if var.status[function]['switched']:
+                            var.status[function]['switched'] = False
+                            vjoy.set(function, var.status[function]['primary'])
+                        elif not var.status[function]['switched']:
+                            var.status[function]['switched'] = True
+                            vjoy.set(function, var.status[function]['secondary'])
+
+                        var.status[function]['thread']['waiting'] = True
+                        while bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']] and not var.bindings['status']['active']:
                             sleep(0.05)
+                        var.status[function]['thread']['waiting'] = False
 
-                        if not var.settings[control]['toggle']:
-                            if var.status[control]['switched']:
-                                var.status[control]['switched'] = False
-                                vjoy.set(control, var.status[control]['primary'])
-                            elif not var.status[control]['switched']:
-                                var.status[control]['switched'] = True
-                                vjoy.set(control, var.status[control]['secondary'])
-        except Exception as e:
-            print(e)
+                        if not var.settings[function]['toggle']:
+                            if var.status[function]['switched']:
+                                var.status[function]['switched'] = False
+                                vjoy.set(function, var.status[function]['primary'])
+                            elif not var.status[function]['switched']:
+                                var.status[function]['switched'] = True
+                                vjoy.set(function, var.status[function]['secondary'])

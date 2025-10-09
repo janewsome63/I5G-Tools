@@ -114,41 +114,81 @@ status = {
         "primary": 0.5,
         "secondary": 0.0,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "front_roll_bar": {
         "primary": 1.0,
         "secondary": 0.0,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "rear_roll_bar": {
         "primary": 0.0,
         "secondary": 1.0,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "fuel_map": {
         "primary": 0.0,
         "secondary": 1.0,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "bite_point": {
         "primary": 0.0,
         "secondary": 0.5,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "engine_warming": {
         "primary": 0.0,
         "secondary": 0.2,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "brake": {
         "primary": 0.0,
         "secondary": 0.2,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     },
     "other": {
         "primary": 0.0,
         "secondary": 0.2,
         "switched": False,
+        "thread": {
+            "current": 0,
+            "running": 0,
+            "waiting": False,
+        },
     }
 }
 event = {

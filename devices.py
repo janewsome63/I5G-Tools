@@ -1,3 +1,5 @@
+import controls as con
+import functions as fn
 import variables as var
 import vjoy
 
@@ -113,11 +115,14 @@ def device_detection():
 
             if e.type == p.JOYBUTTONDOWN:
                 log_event(e.joy, "button", e.button, True)
+                fn.start_thread(con.control)
             elif e.type == p.JOYBUTTONUP:
                 log_event(e.joy, "button", e.button, False)
             elif e.type == p.JOYAXISMOTION:
                 log_event(e.joy, "axis", e.axis, e.value)
+                fn.start_thread(con.control)
             elif e.type == p.JOYHATMOTION:
                 log_event(e.joy, "hat", e.hat, e.value)
+                fn.start_thread(con.control)
 
     p.quit()

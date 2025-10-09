@@ -1,14 +1,14 @@
+import devices as dev
+import functions as fn
+import variables as var
+import vjoy
+
 import math
 import sys
 import os
 import time
 import threading
 from string import capwords
-
-import devices as dev
-import functions as fn
-import variables as var
-import vjoy
 
 from PyQt5.QtCore import (
     QSize,
@@ -333,12 +333,12 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def wj_increment(self):
-        var.settings['wj_increment'] = self.weight_jacker_content['increment'].value()
+        var.settings['weight_jacker']['increment'] = self.weight_jacker_content['increment'].value()
 
     @pyqtSlot()
     def wj_switch(self):
         wj = self.weight_jacker_content['switch'].value()
-        var.settings['wj_switch'] = wj
+        var.settings['weight_jacker']['switch'] = wj
         var.status['weight_jacker']['secondary'] = (wj * 0.025) + 0.5
         if var.status['weight_jacker']['switched'] == True:
             vjoy.set("weight_jacker", var.status['weight_jacker']['secondary'])
@@ -352,9 +352,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def wj_increment_mode(self):
         if self.weight_jacker_content['increment_mode'].currentText() == "Continuous":
-            var.settings['wj_continuous'] = True
+            var.settings['weight_jacker']['continuous'] = True
         elif self.weight_jacker_content['increment_mode'].currentText() == "Single":
-            var.settings['wj_continuous'] = False
+            var.settings['weight_jacker']['continuous'] = False
 
     @pyqtSlot()
     def wj_switch_mode(self):
