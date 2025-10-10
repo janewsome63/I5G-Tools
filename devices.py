@@ -1,14 +1,14 @@
+import os
+
+import pygame as p
+
 import controls as con
 import functions as fn
 import variables as var
-import vjoy
-
-import pygame as p
-import os
-from time import sleep
 
 devices = []
 device_info = {}
+
 
 def add_device(index):
     device = p.joystick.Joystick(index)
@@ -47,7 +47,8 @@ def remove_device(instance):
             del device_info[guid]
             break
 
-def log_event (index, type, num, value):
+
+def log_event(index, type, num, value):
     guid = p.joystick.Joystick(index).get_guid()
     if guid in device_info:
         if type == "button":
@@ -91,6 +92,7 @@ def log_event (index, type, num, value):
         }
         print(var.event)
 
+
 def device_detection():
     os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
     p.init()
@@ -115,14 +117,14 @@ def device_detection():
 
             if e.type == p.JOYBUTTONDOWN:
                 log_event(e.joy, "button", e.button, True)
-                fn.start_thread(con.control)
+                fn.start_thread(con.controls)
             elif e.type == p.JOYBUTTONUP:
                 log_event(e.joy, "button", e.button, False)
             elif e.type == p.JOYAXISMOTION:
                 log_event(e.joy, "axis", e.axis, e.value)
-                fn.start_thread(con.control)
+                fn.start_thread(con.controls)
             elif e.type == p.JOYHATMOTION:
                 log_event(e.joy, "hat", e.hat, e.value)
-                fn.start_thread(con.control)
+                fn.start_thread(con.controls)
 
     p.quit()

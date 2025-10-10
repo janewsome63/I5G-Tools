@@ -1,8 +1,9 @@
-import devices as dev
-import variables as var
+from time import sleep
 
 import pyvjoy as vjoy
-from time import sleep
+
+import devices as dev
+import variables as var
 
 axis_ref = {
     "weight_jacker": vjoy.HID_USAGE_X,

@@ -1,6 +1,8 @@
-import variables as var
 import configparser
 import threading
+
+import variables as var
+
 
 def write_config():
     config = configparser.ConfigParser()
@@ -35,7 +37,10 @@ def is_bind():
         if function != "status":
             for control in var.bindings[function]:
                 if event == var.bindings[function][control]:
-                    result = function
+                    result = {
+                        "function": function,
+                        "control": control,
+                    }
                     break
 
     return result

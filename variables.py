@@ -115,8 +115,7 @@ status = {
         "secondary": 0.0,
         "switched": False,
         "thread": {
-            "current": 0,
-            "running": 0,
+            "running": None,
             "waiting": False,
         },
     },

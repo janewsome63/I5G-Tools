@@ -1,21 +1,11 @@
-import devices as dev
-import functions as fn
-import variables as var
-import vjoy
-
-import math
-import sys
 import os
-import time
-import threading
+import sys
 from string import capwords
 
 from PyQt5.QtCore import (
     QSize,
     Qt,
-    QObject,
     QTimer,
-    QRunnable,
     QThreadPool,
     pyqtSlot
 )
@@ -35,6 +25,8 @@ from PyQt5.QtWidgets import (
     QLineEdit
 )
 
+import variables as var
+import vjoy
 from devices import device_info
 
 lang = {
@@ -80,6 +72,7 @@ var.settings = {
     },
 }
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -105,7 +98,7 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.settings, "Settings")
         self.tabs.setUsesScrollButtons(False)
 
-        #--------Weight Jacker Tab--------#
+        # --------Weight Jacker Tab--------#
         self.weight_jacker_content = {}
         self.weight_jacker.layout = QGridLayout()
 
@@ -138,14 +131,16 @@ class MainWindow(QMainWindow):
         self.weight_jacker_content['increment'].setFixedSize(38, 20)
         self.weight_jacker_content['increment'].setRange(1, 20)
         self.weight_jacker_content['increment'].setValue(var.settings['weight_jacker']['increment'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment'], 1, 1,
+                                            alignment=Qt.AlignmentFlag.AlignLeft)
         self.weight_jacker_content['increment'].valueChanged.connect(self.wj_increment)
 
         self.weight_jacker_content['switch'] = QSpinBox()
         self.weight_jacker_content['switch'].setFixedSize(40, 20)
         self.weight_jacker_content['switch'].setRange(-20, 20)
         self.weight_jacker_content['switch'].setValue(var.settings['weight_jacker']['switch'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch'], 1, 2,
+                                            alignment=Qt.AlignmentFlag.AlignLeft)
         self.weight_jacker_content['switch'].valueChanged.connect(self.wj_switch)
 
         self.weight_jacker_content['increment_mode_label'] = QLabel()
@@ -221,27 +216,27 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker.setLayout(self.weight_jacker.layout)
 
-        #--------Roll Bars Tab--------#
+        # --------Roll Bars Tab--------#
         self.roll_bars.layout = QGridLayout()
         self.roll_bars.layout.addWidget(QLabel("Roll Bars"), 0, 0)
         self.roll_bars.setLayout(self.roll_bars.layout)
 
-        #--------Fuel Map Tab--------#
+        # --------Fuel Map Tab--------#
         self.fuel_map.layout = QGridLayout()
         self.fuel_map.layout.addWidget(QLabel("Fuel Map"), 0, 0)
         self.fuel_map.setLayout(self.fuel_map.layout)
 
-        #--------Bite Point Tab--------#
+        # --------Bite Point Tab--------#
         self.bite_point.layout = QGridLayout()
         self.bite_point.layout.addWidget(QLabel("Bite Point"), 0, 0)
         self.bite_point.setLayout(self.bite_point.layout)
 
-        #--------Engine Warming Tab--------#
+        # --------Engine Warming Tab--------#
         self.engine_warming.layout = QGridLayout()
         self.engine_warming.layout.addWidget(QLabel("Engine Warming"), 0, 0)
         self.engine_warming.setLayout(self.engine_warming.layout)
 
-        #--------Settings Tab--------#
+        # --------Settings Tab--------#
         self.settings.layout = QGridLayout()
         self.settings_content = {}
 
@@ -304,7 +299,7 @@ class MainWindow(QMainWindow):
 
     def updater(self):
         self.wj_display()
-        #self.wj_switch_value()
+        # self.wj_switch_value()
 
     def wj_display(self):
         pct = vjoy.axis_values["weight_jacker"]
@@ -435,7 +430,6 @@ class MainWindow(QMainWindow):
         else:
             self.index[function][control]['device'].setText(lang['none'])
 
-
         var.bindings['status'] = {
             "active": False,
             "function": None,
@@ -475,6 +469,7 @@ class MainWindow(QMainWindow):
             ui['thread_pool'].start(self.bind)
         else:
             self.is_running = False
+
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = var.settings['scale']
