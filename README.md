@@ -3,8 +3,4 @@
 
 2.) An axis can only be bound in its positive direction
 
-3.) WJ Still acts odd when calibration is pressed while toggled
-
-4.) WJ tab settings not implemented
-
-5.) Increase/Decrease/Switch buttons need to be mapped every time the program is opened
+3.) Increase/Decrease/Switch buttons need to be mapped every time the program is opened
