@@ -91,15 +91,19 @@ def switch(bind, function):
                     vjoy.set(function, var.status[function]['secondary'])
 
 def controls():
-    if fn.is_bind():
-        function = fn.is_bind()['function']
-        control = fn.is_bind()['control']
-        if not var.status['calibration'] and not var.bindings['status']['active']:
+    check = fn.is_bind()
+    #print(check)
+    if check:
+        #print("check pass")
+        for entry in check:
+            function = entry['function']
+            control = entry['control']
+            if not var.status['calibration'] and not var.bindings['status']['active']:
 
-            bind = var.bindings[function][control]
+                bind = var.bindings[function][control]
 
-            if control == "up" or control == "down":
-                increment(bind, function, control)
+                if control == "up" or control == "down":
+                    increment(bind, function, control)
 
-            elif control == "switch":
-                switch(bind, function)
+                elif control == "switch":
+                    switch(bind, function)
