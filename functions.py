@@ -47,15 +47,28 @@ def is_bind():
             for control in var.bindings[function]:
                 if event['type'] == "axis" and var.bindings[function][control] != None:
                     if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and (event['value'] >= var.settings['high_threshold'] or event['value'] <= var.settings['low_threshold']):
-                        result = {
+                        result = [{
                             "function": function,
                             "control": control,
-                        }
+                        }]
+                        break
+                elif event['type'] == "hat":
+                    if var.bindings[function][control]['type'] == "hat" and var.bindings[function][control]['dir'] in event['dir']:
+                        if result == None:
+                            result = [{
+                                "function": function,
+                                "control": control,
+                            }]
+                        else:
+                            result.append({
+                                "function": function,
+                                "control": control,
+                            })
                 elif event == var.bindings[function][control]:
-                    result = {
+                    result = [{
                         "function": function,
                         "control": control,
-                    }
+                    }]
                     break
 
     return result
