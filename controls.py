@@ -4,6 +4,7 @@ import devices as dev
 import functions as fn
 import variables as var
 import vjoy
+import history
 
 step = {
     "weight_jacker": 1 / (41 - 1),
@@ -21,7 +22,9 @@ def check_pressed(bind):
         else:
             pressed = False
     elif bind['type'] == "axis":
-        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['threshold']:
+        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['high_threshold']:
+            pressed = True
+        elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['low_threshold']:
             pressed = True
         else:
             pressed = False

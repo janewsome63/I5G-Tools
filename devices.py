@@ -5,6 +5,7 @@ import pygame as p
 import controls as con
 import functions as fn
 import variables as var
+import history
 
 devices = []
 device_info = {}
@@ -58,6 +59,7 @@ def log_event(index, type, num, value):
             if guid in device_info and "axes" in device_info[guid] and num in device_info[guid]['axes']:
                 value = round((value + 1) / 2, 2)
                 device_info[guid]['axes'][num] = value
+                history.add(guid,num,value)
         elif type == "hat":
             if guid in device_info and "hats" in device_info[guid] and num in device_info[guid]['hats']:
                 if value[1] == 1:

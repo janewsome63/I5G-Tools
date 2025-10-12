@@ -7,7 +7,9 @@ import variables as var
 def write_config():
     config = configparser.ConfigParser()
     config['General'] = {
-        "threshold": var.settings['threshold'],
+        "high_threshold": var.settings['high_threshold'],
+        "low_threshold": var.settings['low_threshold'],
+        "axis_samples": var.settings['axis_samples'],
         "frequency": var.settings['frequency'],
         "scale": var.settings['scale'],
         "device": var.settings['device'],
@@ -25,6 +27,13 @@ def is_bind():
             "num": var.event['num'],
             "dir": var.event['value']
         }
+    elif var.event['type'] == "axis":
+        event = {
+            "guid": var.event['guid'],
+            "type": var.event['type'],
+            "num": var.event['num'],
+            "value": var.event['value']
+        }
     else:
         event = {
             "guid": var.event['guid'],
@@ -36,7 +45,13 @@ def is_bind():
     for function in var.bindings:
         if function != "status":
             for control in var.bindings[function]:
-                if event == var.bindings[function][control]:
+                if event['type'] == "axis" and var.bindings[function][control] != None:
+                    if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and (event['value'] >= var.settings['high_threshold'] or event['value'] <= var.settings['low_threshold']):
+                        result = {
+                            "function": function,
+                            "control": control,
+                        }
+                elif event == var.bindings[function][control]:
                     result = {
                         "function": function,
                         "control": control,

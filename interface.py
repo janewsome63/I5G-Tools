@@ -1,6 +1,7 @@
 import os
 import sys
 from string import capwords
+import history
 
 from PyQt5.QtCore import (
     QSize,
@@ -46,7 +47,9 @@ lang = {
     "bind": "Bind",
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
-    "threshold": "Axis Threshold:",
+    "high_threshold": "High Axis Threshold:",
+    "low_threshold": "Low Axis Threshold:",
+    "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor:",
     "none": "None",
 }
@@ -59,10 +62,12 @@ ui = {
 }
 
 var.settings = {
-    "threshold": 0.90,
+    "high_threshold": 0.90,
+    "low_threshold": 0.10,
     "frequency": 0.1,
     "scale": "1.25",
     "device": 1,
+    "axis_samples": 2,
 
     "weight_jacker": {
         "continuous": True,
@@ -240,22 +245,46 @@ class MainWindow(QMainWindow):
         self.settings.layout = QGridLayout()
         self.settings_content = {}
 
-        self.settings_content['threshold_label'] = QLabel()
-        self.settings_content['threshold_label'].setAlignment(Qt.AlignLeft)
-        self.settings_content['threshold_label'].setText(lang['threshold'])
-        self.settings.layout.addWidget(self.settings_content['threshold_label'], 0, 0)
+        self.settings_content['high_threshold_label'] = QLabel()
+        self.settings_content['high_threshold_label'].setAlignment(Qt.AlignLeft)
+        self.settings_content['high_threshold_label'].setText(lang['high_threshold'])
+        self.settings.layout.addWidget(self.settings_content['high_threshold_label'], 0, 0)
 
-        self.settings_content['threshold'] = QSpinBox()
-        self.settings_content['threshold'].setFixedSize(42, 20)
-        self.settings_content['threshold'].setRange(1, 100)
-        self.settings_content['threshold'].setValue(int(var.settings['threshold'] * 100))
-        self.settings.layout.addWidget(self.settings_content['threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['threshold'].valueChanged.connect(self.threshold)
+        self.settings_content['high_threshold'] = QSpinBox()
+        self.settings_content['high_threshold'].setFixedSize(42, 20)
+        self.settings_content['high_threshold'].setRange(1, 100)
+        self.settings_content['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
+        self.settings.layout.addWidget(self.settings_content['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['high_threshold'].valueChanged.connect(self.high_threshold)
+
+        self.settings_content['low_threshold_label'] = QLabel()
+        self.settings_content['low_threshold_label'].setAlignment(Qt.AlignLeft)
+        self.settings_content['low_threshold_label'].setText(lang['low_threshold'])
+        self.settings.layout.addWidget(self.settings_content['low_threshold_label'], 1, 0)
+
+        self.settings_content['low_threshold'] = QSpinBox()
+        self.settings_content['low_threshold'].setFixedSize(42, 20)
+        self.settings_content['low_threshold'].setRange(1, 100)
+        self.settings_content['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
+        self.settings.layout.addWidget(self.settings_content['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['low_threshold'].valueChanged.connect(self.low_threshold)
+
+        self.settings_content['axis_samples'] = QLabel()
+        self.settings_content['axis_samples'].setAlignment(Qt.AlignLeft)
+        self.settings_content['axis_samples'].setText(lang['axis_samples'])
+        self.settings.layout.addWidget(self.settings_content['axis_samples'], 2, 0)
+
+        self.settings_content['axis_samples'] = QSpinBox()
+        self.settings_content['axis_samples'].setFixedSize(42, 20)
+        self.settings_content['axis_samples'].setRange(2, 10)
+        self.settings_content['axis_samples'].setValue(int(var.settings['axis_samples']))
+        self.settings.layout.addWidget(self.settings_content['axis_samples'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['axis_samples'].valueChanged.connect(self.axis_samples)
 
         self.settings_content['scale_label'] = QLabel()
         self.settings_content['scale_label'].setAlignment(Qt.AlignLeft)
         self.settings_content['scale_label'].setText(lang['scale'])
-        self.settings.layout.addWidget(self.settings_content['scale_label'], 1, 0)
+        self.settings.layout.addWidget(self.settings_content['scale_label'], 3, 0)
 
         self.settings_content['scale'] = QComboBox()
         self.settings_content['scale'].setFixedSize(60, 22)
@@ -265,7 +294,7 @@ class MainWindow(QMainWindow):
         self.settings_content['scale'].addItem("1.25" + "x")
         self.settings_content['scale'].addItem("1.50" + "x")
         self.settings_content['scale'].setCurrentText(var.settings['scale'] + "x")
-        self.settings.layout.addWidget(self.settings_content['scale'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings.layout.addWidget(self.settings_content['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.settings_content['scale'].currentTextChanged.connect(self.scale)
 
         self.settings.setLayout(self.settings.layout)
@@ -359,8 +388,16 @@ class MainWindow(QMainWindow):
             var.settings['weight_jacker']['toggle'] = False
 
     @pyqtSlot()
-    def threshold(self):
-        var.settings['threshold'] = (self.settings_content['threshold'].value() / 100)
+    def high_threshold(self):
+        var.settings['high_threshold'] = (self.settings_content['high_threshold'].value() / 100)
+
+    @pyqtSlot()
+    def low_threshold(self):
+        var.settings['low_threshold'] = (self.settings_content['low_threshold'].value() / 100)
+
+    @pyqtSlot()
+    def axis_samples(self):
+        var.settings['axis_samples'] = self.settings_content['axis_samples'].value()
 
     @pyqtSlot()
     def scale(self):
@@ -374,6 +411,7 @@ class MainWindow(QMainWindow):
         var.bindings['status']['active'] = True
         function = var.bindings['status']['function']
         control = var.bindings['status']['control']
+        history.clear()
 
         self.index[function][control]['bind'].setText(lang['binding'])
 
@@ -397,11 +435,19 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                         }
                 elif var.event['type'] == "axis":
-                    if var.event['value'] >= var.settings['threshold']:
+                    if var.event['value'] >= var.settings['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
+                            "value": var.settings['high_threshold']
+                        }
+                    if var.event['value'] <= var.settings['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                        var.bindings[function][control] = {
+                            "guid": var.event['guid'],
+                            "type": var.event['type'],
+                            "num": var.event['num'],
+                            "value": var.settings['low_threshold']
                         }
                 elif var.event['type'] == "hat":
                     if var.event['value'] != "none":
@@ -421,6 +467,16 @@ class MainWindow(QMainWindow):
                 num = str(var.bindings[function][control]['num'])
                 dir = capwords(var.bindings[function][control]['dir'])
                 dev_pretty = name + " - " + type + " " + num + " " + dir
+            elif "value" in var.bindings[function][control]:
+                name = device_info[var.bindings[function][control]['guid']]['name']
+                type = capwords(var.bindings[function][control]['type'])
+                num = str(var.bindings[function][control]['num'])
+                axis_dir = var.bindings[function][control]['value'] > 0.5
+                dev_pretty = name + " - " + type + " " + num
+                if axis_dir:
+                    dev_pretty += "+"
+                else:
+                    dev_pretty += "-"
             else:
                 name = device_info[var.bindings[function][control]['guid']]['name']
                 type = capwords(var.bindings[function][control]['type'])
