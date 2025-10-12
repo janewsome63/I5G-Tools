@@ -252,7 +252,7 @@ class MainWindow(QMainWindow):
 
         self.settings_content['high_threshold'] = QSpinBox()
         self.settings_content['high_threshold'].setFixedSize(42, 20)
-        self.settings_content['high_threshold'].setRange(1, 100)
+        self.settings_content['high_threshold'].setRange(51, 99)
         self.settings_content['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
         self.settings.layout.addWidget(self.settings_content['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.settings_content['high_threshold'].valueChanged.connect(self.high_threshold)
@@ -264,7 +264,7 @@ class MainWindow(QMainWindow):
 
         self.settings_content['low_threshold'] = QSpinBox()
         self.settings_content['low_threshold'].setFixedSize(42, 20)
-        self.settings_content['low_threshold'].setRange(1, 100)
+        self.settings_content['low_threshold'].setRange(1, 49)
         self.settings_content['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
         self.settings.layout.addWidget(self.settings_content['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.settings_content['low_threshold'].valueChanged.connect(self.low_threshold)
