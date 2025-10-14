@@ -49,13 +49,16 @@ def set(axis, pct):
             var.status[axis]['primary'] = axis_values[axis]
         status['busy'] = False
 
-def calibrate(axis, pct_end):
+def calibrate(axis):
     var.status['calibration'] = True
+    while var.status[axis]['thread']['waiting']: #wait for any hold loops to finish
+        sleep(0.05)
     step = 0.05
     if not var.status[axis]['switched']:
         pct = var.status[axis]['primary']
     elif var.status[axis]['switched']:
         pct = var.status[axis]['secondary']
+    pct_end = pct
     while pct >= 0.0:
         set(axis, pct)
         pct = pct - step

@@ -78,9 +78,8 @@ def switch(bind, function):
                 vjoy.set(function, var.status[function]['secondary'])
 
             var.status[function]['thread']['waiting'] = True
-            while check_pressed(bind) and not var.bindings['status']['active']:
+            while check_pressed(bind) and not var.bindings['status']['active'] and not var.status['calibration']:
                 sleep(0.05)
-            var.status[function]['thread']['waiting'] = False
 
             if not var.settings[function]['toggle']:
                 if var.status[function]['switched']:
@@ -89,6 +88,7 @@ def switch(bind, function):
                 elif not var.status[function]['switched']:
                     var.status[function]['switched'] = True
                     vjoy.set(function, var.status[function]['secondary'])
+            var.status[function]['thread']['waiting'] = False
 
 def controls():
     check = fn.is_bind()

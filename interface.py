@@ -342,7 +342,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def calibrate(self):
         self.is_running = True
-        vjoy.calibrate(self.axis, self.pct)
+        vjoy.calibrate(self.axis)
         self.is_running = False
 
     @pyqtSlot()
