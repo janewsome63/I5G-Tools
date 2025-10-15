@@ -52,7 +52,8 @@ lang = {
     "low_threshold": "Low Axis Threshold:",
     "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor:",
-    "timer": "Loop Speed in Continuous Mode (in ms):",
+    "timer_loop": "Continuous Mode Loop Timer (in ms):",
+    "timer_first": "Continuous Mode Initial Loop Timer (in ms)",
     "none": "None",
 }
 
@@ -70,7 +71,8 @@ var.settings = {
     "scale": "1.25",
     "device": 1,
     "axis_samples": 2,
-    "timer": 150,
+    "timer_loop": 150,
+    "timer_first": 300,
 
     "weight_jacker": {
         "continuous": True,
@@ -300,17 +302,29 @@ class MainWindow(QMainWindow):
         self.settings.layout.addWidget(self.settings_content['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.settings_content['scale'].currentTextChanged.connect(self.scale)
 
-        self.settings_content['timer'] = QLabel()
-        self.settings_content['timer'].setAlignment(Qt.AlignLeft)
-        self.settings_content['timer'].setText(lang['timer'])
-        self.settings.layout.addWidget(self.settings_content['timer'], 4, 0)
+        self.settings_content['timer_first'] = QLabel()
+        self.settings_content['timer_first'].setAlignment(Qt.AlignLeft)
+        self.settings_content['timer_first'].setText(lang['timer_first'])
+        self.settings.layout.addWidget(self.settings_content['timer_first'], 4, 0)
 
-        self.settings_content['timer'] = QSpinBox()
-        self.settings_content['timer'].setFixedSize(42, 20)
-        self.settings_content['timer'].setRange(1, 1000)
-        self.settings_content['timer'].setValue(int(var.settings['timer']))
-        self.settings.layout.addWidget(self.settings_content['timer'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['timer'].valueChanged.connect(self.timer)
+        self.settings_content['timer_first'] = QSpinBox()
+        self.settings_content['timer_first'].setFixedSize(42, 20)
+        self.settings_content['timer_first'].setRange(1, 1000)
+        self.settings_content['timer_first'].setValue(int(var.settings['timer_first']))
+        self.settings.layout.addWidget(self.settings_content['timer_first'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['timer_first'].valueChanged.connect(self.timer_first)
+
+        self.settings_content['timer_loop'] = QLabel()
+        self.settings_content['timer_loop'].setAlignment(Qt.AlignLeft)
+        self.settings_content['timer_loop'].setText(lang['timer_loop'])
+        self.settings.layout.addWidget(self.settings_content['timer_loop'], 5, 0)
+
+        self.settings_content['timer_loop'] = QSpinBox()
+        self.settings_content['timer_loop'].setFixedSize(42, 20)
+        self.settings_content['timer_loop'].setRange(1, 1000)
+        self.settings_content['timer_loop'].setValue(int(var.settings['timer_loop']))
+        self.settings.layout.addWidget(self.settings_content['timer_loop'], 5, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['timer_loop'].valueChanged.connect(self.timer_loop)
 
         self.settings.setLayout(self.settings.layout)
 
@@ -421,8 +435,12 @@ class MainWindow(QMainWindow):
         var.settings['scale'] = scale
 
     @pyqtSlot()
-    def timer(self):
-        var.settings['timer'] = self.settings_content['timer'].value()
+    def timer_loop(self):
+        var.settings['timer_loop'] = self.settings_content['timer_loop'].value()
+
+    @pyqtSlot()
+    def timer_first(self):
+        var.settings['timer_first'] = self.settings_content['timer_first'].value()
 
     @pyqtSlot()
     def bind(self):

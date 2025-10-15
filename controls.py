@@ -56,6 +56,7 @@ def increment(bind, function, control):
         if var.settings[function]['continuous']:
             count = 1
             interval = int(10)
+            timer = var.settings['timer_first']/1000
             while check_pressed(bind) and not var.status['calibration'] and not var.bindings['status']['active']:
                 if count % interval == 0:
                     #print("continuous loop")
@@ -63,7 +64,9 @@ def increment(bind, function, control):
                         vjoy.set(function, var.status[function]['secondary'] + offset)
                     else:
                         vjoy.set(function, var.status[function]['primary'] + offset)
-                sleep(var.settings['timer']/1000/interval)
+                    if count == 10:
+                        timer = var.settings['timer_loop']/1000
+                sleep(timer/interval)
                 count += 1
 
 def switch(bind, function):
