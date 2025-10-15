@@ -70,6 +70,7 @@ def increment(bind, function, control):
 def switch(bind, function):
    if check_pressed(bind):
         if not var.status[function]['thread']['waiting']:
+            var.status[function]['thread']['waiting'] = True
             if var.status[function]['switched']:
                 var.status[function]['switched'] = False
                 vjoy.set(function, var.status[function]['primary'])
@@ -77,7 +78,6 @@ def switch(bind, function):
                 var.status[function]['switched'] = True
                 vjoy.set(function, var.status[function]['secondary'])
 
-            var.status[function]['thread']['waiting'] = True
             while check_pressed(bind) and not var.bindings['status']['active'] and not var.status['calibration']:
                 sleep(0.05)
 
