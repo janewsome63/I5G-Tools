@@ -55,17 +55,22 @@ def increment(bind, function, control):
             vjoy.set(function, var.status[function]['primary'] + offset)
 
         if var.settings[function]['continuous']:
-            sleep(0.2)
-        while check_pressed(bind) and var.status[function]['thread']['running'] == control and not var.status['calibration'] and not var.bindings['status']['active']:
-            if var.settings[function]['continuous']:
-                if var.status[function]['switched']:
-                    vjoy.set(function, var.status[function]['secondary'] + offset)
-                else:
-                    vjoy.set(function, var.status[function]['primary'] + offset)
-            sleep(0.075)
+            count = 1
+            interval = int(10)
+            while check_pressed(bind) and var.status[function]['thread']['running'] == control and not var.status['calibration'] and not var.bindings['status']['active']:
+                if count % interval == 0:
+                    #print("continuous loop")
+                    if var.status[function]['switched']:
+                        vjoy.set(function, var.status[function]['secondary'] + offset)
+                    else:
+                        vjoy.set(function, var.status[function]['primary'] + offset)
+                sleep(0.075/interval)
+                count += 1
 
         if var.status[function]['thread']['running'] == control:
             var.status[function]['thread']['running'] = None
+    elif var.status[function]['thread']['running'] == control:
+        print("increment already running ", control)
 
 def switch(bind, function):
    if check_pressed(bind):
