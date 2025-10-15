@@ -6,6 +6,7 @@ import controls as con
 import functions as fn
 import variables as var
 import history
+from time import sleep
 
 devices = []
 device_info = {}
@@ -128,5 +129,6 @@ def device_detection():
             elif e.type == p.JOYHATMOTION:
                 log_event(e.joy, "hat", e.hat, e.value)
                 fn.start_thread(con.controls)
+        sleep(0.001)
 
     p.quit()

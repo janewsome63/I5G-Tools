@@ -2,6 +2,7 @@ import os
 import sys
 from string import capwords
 import history
+from time import sleep
 
 from PyQt5.QtCore import (
     QSize,
@@ -51,6 +52,7 @@ lang = {
     "low_threshold": "Low Axis Threshold:",
     "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor:",
+    "timer": "Loop Speed in Continuous Mode (in ms):",
     "none": "None",
 }
 
@@ -68,6 +70,7 @@ var.settings = {
     "scale": "1.25",
     "device": 1,
     "axis_samples": 2,
+    "timer": 150,
 
     "weight_jacker": {
         "continuous": True,
@@ -297,6 +300,18 @@ class MainWindow(QMainWindow):
         self.settings.layout.addWidget(self.settings_content['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.settings_content['scale'].currentTextChanged.connect(self.scale)
 
+        self.settings_content['timer'] = QLabel()
+        self.settings_content['timer'].setAlignment(Qt.AlignLeft)
+        self.settings_content['timer'].setText(lang['timer'])
+        self.settings.layout.addWidget(self.settings_content['timer'], 4, 0)
+
+        self.settings_content['timer'] = QSpinBox()
+        self.settings_content['timer'].setFixedSize(42, 20)
+        self.settings_content['timer'].setRange(1, 1000)
+        self.settings_content['timer'].setValue(int(var.settings['timer']))
+        self.settings.layout.addWidget(self.settings_content['timer'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.settings_content['timer'].valueChanged.connect(self.timer)
+
         self.settings.setLayout(self.settings.layout)
 
         self.layout.addWidget(self.tabs)
@@ -406,6 +421,10 @@ class MainWindow(QMainWindow):
         var.settings['scale'] = scale
 
     @pyqtSlot()
+    def timer(self):
+        var.settings['timer'] = self.settings_content['timer'].value()
+
+    @pyqtSlot()
     def bind(self):
         self.is_running = True
         var.bindings['status']['active'] = True
@@ -457,6 +476,7 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                             "dir": var.event['value'],
                         }
+            sleep(0.001)
 
         self.index[function][control]['bind'].setText(lang['bind'])
 
