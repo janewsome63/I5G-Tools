@@ -33,7 +33,7 @@ from devices import device_info
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.2a",
+    "version": "v0.2.1a",
     "up": "Increase:",
     "down": "Decrease:",
     "switch": "Switch:",
@@ -48,6 +48,7 @@ lang = {
     "bind": "Bind",
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
+    "calibrating": "<-Calibrating->",
     "high_threshold": "High Axis Threshold:",
     "low_threshold": "Low Axis Threshold:",
     "axis_samples": "Number of Axis Samples:",
@@ -373,19 +374,30 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def calibrate(self):
-        self.is_running = True
+        
+        self.weight_jacker_content['calibrate'].setText(lang['calibrating'])
+
         vjoy.calibrate(self.axis)
-        self.is_running = False
+        while self.is_running == True:
+            sleep(0.1)
+        self.weight_jacker_content['calibrate'].setText(lang['calibrate'])
+        vjoy.set(self.axis,self.pct)
+        var.status['calibration'] = False
 
     @pyqtSlot()
     def wj_calibrate(self):
         self.axis = "weight_jacker"
-        if not var.status['weight_jacker']['switched']:
-            self.pct = var.status['weight_jacker']['primary']
-        elif var.status['weight_jacker']['switched']:
-            self.pct = var.status['weight_jacker']['secondary']
         if not self.is_running:
+            self.is_running = True
+            var.status['calibration'] = True
+            sleep(0.1) #wait for loops to stop
+            if not var.status['weight_jacker']['switched']:
+                self.pct = var.status['weight_jacker']['primary']
+            elif var.status['weight_jacker']['switched']:
+                self.pct = var.status['weight_jacker']['secondary']
             ui['thread_pool'].start(self.calibrate)
+        else:
+            self.is_running = False
 
     @pyqtSlot()
     def wj_increment(self):
