@@ -124,6 +124,7 @@ class MainWindow(QMainWindow):
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['axis'], 0, 1)
 
         self.weight_jacker_content['calibrate'] = QPushButton()
+        self.weight_jacker_content['calibrate'].setMinimumWidth(100)
         self.weight_jacker_content['calibrate'].setText(lang['calibrate'])
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['calibrate'], 0, 2)
         self.weight_jacker_content['calibrate'].clicked.connect(self.wj_calibrate)
