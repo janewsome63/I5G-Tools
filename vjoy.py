@@ -62,15 +62,15 @@ def calibrate(axis):
     while pct >= 0.0:
         set(axis, pct)
         pct = pct - step
+        sleep(0.02)
     while pct <= 1.0:
         set(axis, pct)
         pct = pct + step
-    while pct >= 0.0:
+        sleep(0.02)
+    while pct >= pct_end:
         set(axis, pct)
         pct = pct - step
-    while pct <= pct_end:
-        set(axis, pct)
-        pct = pct + step
+        sleep(0.02)
 
     sleep(0.25)
 
