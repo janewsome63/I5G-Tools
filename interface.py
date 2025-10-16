@@ -33,7 +33,7 @@ from devices import device_info
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1a",
+    "version": "v0.2a",
     "up": "Increase:",
     "down": "Decrease:",
     "switch": "Switch:",
@@ -183,6 +183,7 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker_content['up_device'] = QLineEdit()
         self.weight_jacker_content['up_device'].setAlignment(Qt.AlignCenter)
+        var.bindings['weight_jacker']['up'] = None
         self.weight_jacker_content['up_device'].setText(str(var.bindings['weight_jacker']['up']))
         self.weight_jacker_content['up_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['up_device'], 3, 1)
@@ -199,6 +200,7 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker_content['down_device'] = QLineEdit()
         self.weight_jacker_content['down_device'].setAlignment(Qt.AlignCenter)
+        var.bindings['weight_jacker']['down'] = None
         self.weight_jacker_content['down_device'].setText(str(var.bindings['weight_jacker']['down']))
         self.weight_jacker_content['down_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['down_device'], 4, 1)
@@ -215,6 +217,7 @@ class MainWindow(QMainWindow):
 
         self.weight_jacker_content['switch_device'] = QLineEdit()
         self.weight_jacker_content['switch_device'].setAlignment(Qt.AlignCenter)
+        var.bindings['weight_jacker']['switch'] = None
         self.weight_jacker_content['switch_device'].setText(str(var.bindings['weight_jacker']['switch']))
         self.weight_jacker_content['switch_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_device'], 5, 1)
