@@ -33,7 +33,7 @@ from devices import device_info
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.2.1a",
+    "version": "v0.2.2a",
     "up": "Increase:",
     "down": "Decrease:",
     "switch": "Switch:",
