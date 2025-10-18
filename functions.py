@@ -50,7 +50,8 @@ def is_bind():
         if function != "status":
             for control in var.bindings[function]:
                 if event['type'] == "axis" and var.bindings[function][control] != None:
-                    if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and event['value'] == var.bindings[function][control]['value']:
+                    #if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and event['value'] == var.bindings[function][control]['value']:
+                    if event == var.bindings[function][control]:
                         result = [{
                             "function": function,
                             "control": control,

@@ -109,125 +109,134 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.settings, "Settings")
         self.tabs.setUsesScrollButtons(False)
 
+        self.content = {"weight_jacker": {
+                            "weight_jacker":{
+
+                            },
+                        },
+                        "settings": {
+
+                        },
+                        }
+
         # --------Weight Jacker Tab--------#
-        self.weight_jacker_content = {}
         self.weight_jacker.layout = QGridLayout()
 
-        self.weight_jacker_content['lcd'] = QLCDNumber()
-        self.weight_jacker_content['lcd'].display(0)
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['lcd'], 0, 0)
+        self.content['weight_jacker']['lcd'] = QLCDNumber()
+        self.content['weight_jacker']['lcd'].display(0)
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['lcd'], 0, 0)
 
-        self.weight_jacker_content['axis'] = QProgressBar()
-        self.weight_jacker_content['axis'].setTextVisible(False)
-        self.weight_jacker_content['axis'].setMinimum(0)
-        self.weight_jacker_content['axis'].setMaximum(100)
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['axis'], 0, 1)
+        self.content['weight_jacker']['axis'] = QProgressBar()
+        self.content['weight_jacker']['axis'].setTextVisible(False)
+        self.content['weight_jacker']['axis'].setMinimum(0)
+        self.content['weight_jacker']['axis'].setMaximum(100)
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['axis'], 0, 1)
 
-        self.weight_jacker_content['calibrate'] = QPushButton()
-        self.weight_jacker_content['calibrate'].setMinimumWidth(100)
-        self.weight_jacker_content['calibrate'].setText(lang['calibrate'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['calibrate'], 0, 2)
-        self.weight_jacker_content['calibrate'].clicked.connect(lambda: self.calibrate_start("weight_jacker"))
+        self.content['weight_jacker']['calibrate'] = QPushButton()
+        self.content['weight_jacker']['calibrate'].setMinimumWidth(100)
+        self.content['weight_jacker']['calibrate'].setText(lang['calibrate'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['calibrate'], 0, 2)
+        self.content['weight_jacker']['calibrate'].clicked.connect(lambda: self.calibrate_start("weight_jacker"))
 
-        self.weight_jacker_content['increment_label'] = QLabel()
-        self.weight_jacker_content['increment_label'].setAlignment(Qt.AlignLeft)
-        self.weight_jacker_content['increment_label'].setText(lang['increment'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment_label'], 1, 0)
+        self.content['weight_jacker']['increment_label'] = QLabel()
+        self.content['weight_jacker']['increment_label'].setAlignment(Qt.AlignLeft)
+        self.content['weight_jacker']['increment_label'].setText(lang['increment'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['increment_label'], 1, 0)
 
-        self.weight_jacker_content['switch_label'] = QLabel()
-        self.weight_jacker_content['switch_label'].setAlignment(Qt.AlignRight)
-        self.weight_jacker_content['switch_label'].setText(lang['switch_value'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_label'], 1, 1)
+        self.content['weight_jacker']['switch_label'] = QLabel()
+        self.content['weight_jacker']['switch_label'].setAlignment(Qt.AlignRight)
+        self.content['weight_jacker']['switch_label'].setText(lang['switch_value'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_label'], 1, 1)
 
-        self.weight_jacker_content['increment'] = QSpinBox()
-        self.weight_jacker_content['increment'].setFixedSize(38, 20)
-        self.weight_jacker_content['increment'].setRange(1, 20)
-        self.weight_jacker_content['increment'].setValue(var.settings['weight_jacker']['increment'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment'], 1, 1,
+        self.content['weight_jacker']['increment'] = QSpinBox()
+        self.content['weight_jacker']['increment'].setFixedSize(38, 20)
+        self.content['weight_jacker']['increment'].setRange(1, 20)
+        self.content['weight_jacker']['increment'].setValue(var.settings['weight_jacker']['increment'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['increment'], 1, 1,
                                             alignment=Qt.AlignmentFlag.AlignLeft)
-        self.weight_jacker_content['increment'].valueChanged.connect(lambda: self.increment("weight_jacker"))
+        self.content['weight_jacker']['increment'].valueChanged.connect(lambda: self.increment("weight_jacker"))
 
-        self.weight_jacker_content['switch'] = QSpinBox()
-        self.weight_jacker_content['switch'].setFixedSize(40, 20)
-        self.weight_jacker_content['switch'].setRange(-20, 20)
-        self.weight_jacker_content['switch'].setValue(var.settings['weight_jacker']['switch'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch'], 1, 2,
+        self.content['weight_jacker']['switch'] = QSpinBox()
+        self.content['weight_jacker']['switch'].setFixedSize(40, 20)
+        self.content['weight_jacker']['switch'].setRange(-20, 20)
+        self.content['weight_jacker']['switch'].setValue(var.settings['weight_jacker']['switch'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch'], 1, 2,
                                             alignment=Qt.AlignmentFlag.AlignLeft)
-        self.weight_jacker_content['switch'].valueChanged.connect(lambda: self.switch("weight_jacker"))
+        self.content['weight_jacker']['switch'].valueChanged.connect(lambda: self.switch("weight_jacker"))
 
-        self.weight_jacker_content['increment_mode_label'] = QLabel()
-        self.weight_jacker_content['increment_mode_label'].setAlignment(Qt.AlignRight)
-        self.weight_jacker_content['increment_mode_label'].setText(lang['increment_mode'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment_mode_label'], 2, 0)
+        self.content['weight_jacker']['increment_mode_label'] = QLabel()
+        self.content['weight_jacker']['increment_mode_label'].setAlignment(Qt.AlignRight)
+        self.content['weight_jacker']['increment_mode_label'].setText(lang['increment_mode'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['increment_mode_label'], 2, 0)
 
-        self.weight_jacker_content['switch_mode_label'] = QLabel()
-        self.weight_jacker_content['switch_mode_label'].setAlignment(Qt.AlignRight)
-        self.weight_jacker_content['switch_mode_label'].setText(lang['switch_mode'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_mode_label'], 2, 1)
+        self.content['weight_jacker']['switch_mode_label'] = QLabel()
+        self.content['weight_jacker']['switch_mode_label'].setAlignment(Qt.AlignRight)
+        self.content['weight_jacker']['switch_mode_label'].setText(lang['switch_mode'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_mode_label'], 2, 1)
 
-        self.weight_jacker_content['increment_mode'] = QComboBox()
-        self.weight_jacker_content['increment_mode'].setFixedSize(93, 22)
-        self.weight_jacker_content['increment_mode'].addItem(lang['continuous'])
-        self.weight_jacker_content['increment_mode'].addItem(lang['single'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['increment_mode'], 2, 1)
-        self.weight_jacker_content['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("weight_jacker"))
+        self.content['weight_jacker']['increment_mode'] = QComboBox()
+        self.content['weight_jacker']['increment_mode'].setFixedSize(93, 22)
+        self.content['weight_jacker']['increment_mode'].addItem(lang['continuous'])
+        self.content['weight_jacker']['increment_mode'].addItem(lang['single'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['increment_mode'], 2, 1)
+        self.content['weight_jacker']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("weight_jacker"))
 
-        self.weight_jacker_content['switch_mode'] = QComboBox()
-        self.weight_jacker_content['switch_mode'].addItem(lang['hold'])
-        self.weight_jacker_content['switch_mode'].addItem(lang['toggle'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_mode'], 2, 2)
-        self.weight_jacker_content['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("weight_jacker"))
+        self.content['weight_jacker']['switch_mode'] = QComboBox()
+        self.content['weight_jacker']['switch_mode'].addItem(lang['hold'])
+        self.content['weight_jacker']['switch_mode'].addItem(lang['toggle'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_mode'], 2, 2)
+        self.content['weight_jacker']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("weight_jacker"))
 
-        self.weight_jacker_content['up_label'] = QLabel()
-        self.weight_jacker_content['up_label'].setAlignment(Qt.AlignLeft)
-        self.weight_jacker_content['up_label'].setText(lang['up'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['up_label'], 3, 0)
+        self.content['weight_jacker']['up_label'] = QLabel()
+        self.content['weight_jacker']['up_label'].setAlignment(Qt.AlignLeft)
+        self.content['weight_jacker']['up_label'].setText(lang['up'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_label'], 3, 0)
 
-        self.weight_jacker_content['up_device'] = QLineEdit()
-        self.weight_jacker_content['up_device'].setAlignment(Qt.AlignCenter)
+        self.content['weight_jacker']['up_device'] = QLineEdit()
+        self.content['weight_jacker']['up_device'].setAlignment(Qt.AlignCenter)
         var.bindings['weight_jacker']['up'] = None
-        self.weight_jacker_content['up_device'].setText(str(var.bindings['weight_jacker']['up']))
-        self.weight_jacker_content['up_device'].setReadOnly(True)
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['up_device'], 3, 1)
+        self.content['weight_jacker']['up_device'].setText(str(var.bindings['weight_jacker']['up']))
+        self.content['weight_jacker']['up_device'].setReadOnly(True)
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_device'], 3, 1)
 
-        self.weight_jacker_content['up_bind'] = QPushButton()
-        self.weight_jacker_content['up_bind'].setText(lang['bind'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['up_bind'], 3, 2)
-        self.weight_jacker_content['up_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","up"))
+        self.content['weight_jacker']['up_bind'] = QPushButton()
+        self.content['weight_jacker']['up_bind'].setText(lang['bind'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_bind'], 3, 2)
+        self.content['weight_jacker']['up_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","up"))
 
-        self.weight_jacker_content['down_label'] = QLabel()
-        self.weight_jacker_content['down_label'].setAlignment(Qt.AlignLeft)
-        self.weight_jacker_content['down_label'].setText(lang['down'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['down_label'], 4, 0)
+        self.content['weight_jacker']['down_label'] = QLabel()
+        self.content['weight_jacker']['down_label'].setAlignment(Qt.AlignLeft)
+        self.content['weight_jacker']['down_label'].setText(lang['down'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_label'], 4, 0)
 
-        self.weight_jacker_content['down_device'] = QLineEdit()
-        self.weight_jacker_content['down_device'].setAlignment(Qt.AlignCenter)
+        self.content['weight_jacker']['down_device'] = QLineEdit()
+        self.content['weight_jacker']['down_device'].setAlignment(Qt.AlignCenter)
         var.bindings['weight_jacker']['down'] = None
-        self.weight_jacker_content['down_device'].setText(str(var.bindings['weight_jacker']['down']))
-        self.weight_jacker_content['down_device'].setReadOnly(True)
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['down_device'], 4, 1)
+        self.content['weight_jacker']['down_device'].setText(str(var.bindings['weight_jacker']['down']))
+        self.content['weight_jacker']['down_device'].setReadOnly(True)
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_device'], 4, 1)
 
-        self.weight_jacker_content['down_bind'] = QPushButton()
-        self.weight_jacker_content['down_bind'].setText(lang['bind'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['down_bind'], 4, 2)
-        self.weight_jacker_content['down_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","down"))
+        self.content['weight_jacker']['down_bind'] = QPushButton()
+        self.content['weight_jacker']['down_bind'].setText(lang['bind'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_bind'], 4, 2)
+        self.content['weight_jacker']['down_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","down"))
 
-        self.weight_jacker_content['switch_label'] = QLabel()
-        self.weight_jacker_content['switch_label'].setAlignment(Qt.AlignLeft)
-        self.weight_jacker_content['switch_label'].setText(lang['switch'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_label'], 5, 0)
+        self.content['weight_jacker']['switch_label'] = QLabel()
+        self.content['weight_jacker']['switch_label'].setAlignment(Qt.AlignLeft)
+        self.content['weight_jacker']['switch_label'].setText(lang['switch'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_label'], 5, 0)
 
-        self.weight_jacker_content['switch_device'] = QLineEdit()
-        self.weight_jacker_content['switch_device'].setAlignment(Qt.AlignCenter)
+        self.content['weight_jacker']['switch_device'] = QLineEdit()
+        self.content['weight_jacker']['switch_device'].setAlignment(Qt.AlignCenter)
         var.bindings['weight_jacker']['switch'] = None
-        self.weight_jacker_content['switch_device'].setText(str(var.bindings['weight_jacker']['switch']))
-        self.weight_jacker_content['switch_device'].setReadOnly(True)
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_device'], 5, 1)
+        self.content['weight_jacker']['switch_device'].setText(str(var.bindings['weight_jacker']['switch']))
+        self.content['weight_jacker']['switch_device'].setReadOnly(True)
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_device'], 5, 1)
 
-        self.weight_jacker_content['switch_bind'] = QPushButton()
-        self.weight_jacker_content['switch_bind'].setText(lang['bind'])
-        self.weight_jacker.layout.addWidget(self.weight_jacker_content['switch_bind'], 5, 2)
-        self.weight_jacker_content['switch_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","switch"))
+        self.content['weight_jacker']['switch_bind'] = QPushButton()
+        self.content['weight_jacker']['switch_bind'].setText(lang['bind'])
+        self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_bind'], 5, 2)
+        self.content['weight_jacker']['switch_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","switch"))
 
         self.weight_jacker.setLayout(self.weight_jacker.layout)
 
@@ -253,83 +262,82 @@ class MainWindow(QMainWindow):
 
         # --------Settings Tab--------#
         self.settings.layout = QGridLayout()
-        self.settings_content = {}
 
-        self.settings_content['high_threshold_label'] = QLabel()
-        self.settings_content['high_threshold_label'].setAlignment(Qt.AlignLeft)
-        self.settings_content['high_threshold_label'].setText(lang['high_threshold'])
-        self.settings.layout.addWidget(self.settings_content['high_threshold_label'], 0, 0)
+        self.content['settings']['high_threshold_label'] = QLabel()
+        self.content['settings']['high_threshold_label'].setAlignment(Qt.AlignLeft)
+        self.content['settings']['high_threshold_label'].setText(lang['high_threshold'])
+        self.settings.layout.addWidget(self.content['settings']['high_threshold_label'], 0, 0)
 
-        self.settings_content['high_threshold'] = QSpinBox()
-        self.settings_content['high_threshold'].setFixedSize(42, 20)
-        self.settings_content['high_threshold'].setRange(51, 99)
-        self.settings_content['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
-        self.settings.layout.addWidget(self.settings_content['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['high_threshold'].valueChanged.connect(self.high_threshold)
+        self.content['settings']['high_threshold'] = QSpinBox()
+        self.content['settings']['high_threshold'].setFixedSize(42, 20)
+        self.content['settings']['high_threshold'].setRange(51, 99)
+        self.content['settings']['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
+        self.settings.layout.addWidget(self.content['settings']['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
 
-        self.settings_content['low_threshold_label'] = QLabel()
-        self.settings_content['low_threshold_label'].setAlignment(Qt.AlignLeft)
-        self.settings_content['low_threshold_label'].setText(lang['low_threshold'])
-        self.settings.layout.addWidget(self.settings_content['low_threshold_label'], 1, 0)
+        self.content['settings']['low_threshold_label'] = QLabel()
+        self.content['settings']['low_threshold_label'].setAlignment(Qt.AlignLeft)
+        self.content['settings']['low_threshold_label'].setText(lang['low_threshold'])
+        self.settings.layout.addWidget(self.content['settings']['low_threshold_label'], 1, 0)
 
-        self.settings_content['low_threshold'] = QSpinBox()
-        self.settings_content['low_threshold'].setFixedSize(42, 20)
-        self.settings_content['low_threshold'].setRange(1, 49)
-        self.settings_content['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
-        self.settings.layout.addWidget(self.settings_content['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['low_threshold'].valueChanged.connect(self.low_threshold)
+        self.content['settings']['low_threshold'] = QSpinBox()
+        self.content['settings']['low_threshold'].setFixedSize(42, 20)
+        self.content['settings']['low_threshold'].setRange(1, 49)
+        self.content['settings']['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
+        self.settings.layout.addWidget(self.content['settings']['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
 
-        self.settings_content['axis_samples'] = QLabel()
-        self.settings_content['axis_samples'].setAlignment(Qt.AlignLeft)
-        self.settings_content['axis_samples'].setText(lang['axis_samples'])
-        self.settings.layout.addWidget(self.settings_content['axis_samples'], 2, 0)
+        self.content['settings']['axis_samples'] = QLabel()
+        self.content['settings']['axis_samples'].setAlignment(Qt.AlignLeft)
+        self.content['settings']['axis_samples'].setText(lang['axis_samples'])
+        self.settings.layout.addWidget(self.content['settings']['axis_samples'], 2, 0)
 
-        self.settings_content['axis_samples'] = QSpinBox()
-        self.settings_content['axis_samples'].setFixedSize(42, 20)
-        self.settings_content['axis_samples'].setRange(2, 10)
-        self.settings_content['axis_samples'].setValue(int(var.settings['axis_samples']))
-        self.settings.layout.addWidget(self.settings_content['axis_samples'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['axis_samples'].valueChanged.connect(self.axis_samples)
+        self.content['settings']['axis_samples'] = QSpinBox()
+        self.content['settings']['axis_samples'].setFixedSize(42, 20)
+        self.content['settings']['axis_samples'].setRange(2, 10)
+        self.content['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
+        self.settings.layout.addWidget(self.content['settings']['axis_samples'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['axis_samples'].valueChanged.connect(lambda: self.settings_set('axis_samples'))
 
-        self.settings_content['scale_label'] = QLabel()
-        self.settings_content['scale_label'].setAlignment(Qt.AlignLeft)
-        self.settings_content['scale_label'].setText(lang['scale'])
-        self.settings.layout.addWidget(self.settings_content['scale_label'], 3, 0)
+        self.content['settings']['scale_label'] = QLabel()
+        self.content['settings']['scale_label'].setAlignment(Qt.AlignLeft)
+        self.content['settings']['scale_label'].setText(lang['scale'])
+        self.settings.layout.addWidget(self.content['settings']['scale_label'], 3, 0)
 
-        self.settings_content['scale'] = QComboBox()
-        self.settings_content['scale'].setFixedSize(60, 22)
-        self.settings_content['scale'].addItem("0.50" + "x")
-        self.settings_content['scale'].addItem("0.75" + "x")
-        self.settings_content['scale'].addItem("1.00" + "x")
-        self.settings_content['scale'].addItem("1.25" + "x")
-        self.settings_content['scale'].addItem("1.50" + "x")
-        self.settings_content['scale'].setCurrentText(var.settings['scale'] + "x")
-        self.settings.layout.addWidget(self.settings_content['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['scale'].currentTextChanged.connect(self.scale)
+        self.content['settings']['scale'] = QComboBox()
+        self.content['settings']['scale'].setFixedSize(60, 22)
+        self.content['settings']['scale'].addItem("0.50" + "x")
+        self.content['settings']['scale'].addItem("0.75" + "x")
+        self.content['settings']['scale'].addItem("1.00" + "x")
+        self.content['settings']['scale'].addItem("1.25" + "x")
+        self.content['settings']['scale'].addItem("1.50" + "x")
+        self.content['settings']['scale'].setCurrentText(var.settings['scale'] + "x")
+        self.settings.layout.addWidget(self.content['settings']['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['scale'].currentTextChanged.connect(self.scale)
 
-        self.settings_content['timer_first'] = QLabel()
-        self.settings_content['timer_first'].setAlignment(Qt.AlignLeft)
-        self.settings_content['timer_first'].setText(lang['timer_first'])
-        self.settings.layout.addWidget(self.settings_content['timer_first'], 4, 0)
+        self.content['settings']['timer_first'] = QLabel()
+        self.content['settings']['timer_first'].setAlignment(Qt.AlignLeft)
+        self.content['settings']['timer_first'].setText(lang['timer_first'])
+        self.settings.layout.addWidget(self.content['settings']['timer_first'], 4, 0)
 
-        self.settings_content['timer_first'] = QSpinBox()
-        self.settings_content['timer_first'].setFixedSize(42, 20)
-        self.settings_content['timer_first'].setRange(1, 1000)
-        self.settings_content['timer_first'].setValue(int(var.settings['timer_first']))
-        self.settings.layout.addWidget(self.settings_content['timer_first'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['timer_first'].valueChanged.connect(self.timer_first)
+        self.content['settings']['timer_first'] = QSpinBox()
+        self.content['settings']['timer_first'].setFixedSize(42, 20)
+        self.content['settings']['timer_first'].setRange(1, 1000)
+        self.content['settings']['timer_first'].setValue(int(var.settings['timer_first']))
+        self.settings.layout.addWidget(self.content['settings']['timer_first'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
 
-        self.settings_content['timer_loop'] = QLabel()
-        self.settings_content['timer_loop'].setAlignment(Qt.AlignLeft)
-        self.settings_content['timer_loop'].setText(lang['timer_loop'])
-        self.settings.layout.addWidget(self.settings_content['timer_loop'], 5, 0)
+        self.content['settings']['timer_loop'] = QLabel()
+        self.content['settings']['timer_loop'].setAlignment(Qt.AlignLeft)
+        self.content['settings']['timer_loop'].setText(lang['timer_loop'])
+        self.settings.layout.addWidget(self.content['settings']['timer_loop'], 5, 0)
 
-        self.settings_content['timer_loop'] = QSpinBox()
-        self.settings_content['timer_loop'].setFixedSize(42, 20)
-        self.settings_content['timer_loop'].setRange(1, 1000)
-        self.settings_content['timer_loop'].setValue(int(var.settings['timer_loop']))
-        self.settings.layout.addWidget(self.settings_content['timer_loop'], 5, 1, alignment=Qt.AlignmentFlag.AlignLeft)
-        self.settings_content['timer_loop'].valueChanged.connect(self.timer_loop)
+        self.content['settings']['timer_loop'] = QSpinBox()
+        self.content['settings']['timer_loop'].setFixedSize(42, 20)
+        self.content['settings']['timer_loop'].setRange(1, 1000)
+        self.content['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
+        self.settings.layout.addWidget(self.content['settings']['timer_loop'], 5, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
 
         self.settings.setLayout(self.settings.layout)
 
@@ -343,19 +351,19 @@ class MainWindow(QMainWindow):
         self.index = {
             "weight_jacker": {
                 "up": {
-                    "bind": self.weight_jacker_content['up_bind'],
-                    "device": self.weight_jacker_content['up_device'],
-                    "label": self.weight_jacker_content['up_label'],
+                    "bind": self.content['weight_jacker']['up_bind'],
+                    "device": self.content['weight_jacker']['up_device'],
+                    "label": self.content['weight_jacker']['up_label'],
                 },
                 "down": {
-                    "bind": self.weight_jacker_content['down_bind'],
-                    "device": self.weight_jacker_content['down_device'],
-                    "label": self.weight_jacker_content['down_label'],
+                    "bind": self.content['weight_jacker']['down_bind'],
+                    "device": self.content['weight_jacker']['down_device'],
+                    "label": self.content['weight_jacker']['down_label'],
                 },
                 "switch": {
-                    "bind": self.weight_jacker_content['switch_bind'],
-                    "device": self.weight_jacker_content['switch_device'],
-                    "label": self.weight_jacker_content['switch_label'],
+                    "bind": self.content['weight_jacker']['switch_bind'],
+                    "device": self.content['weight_jacker']['switch_device'],
+                    "label": self.content['weight_jacker']['switch_label'],
                 }
             }
         }
@@ -365,24 +373,24 @@ class MainWindow(QMainWindow):
 
     def wj_display(self):
         pct = vjoy.axis_values["weight_jacker"]
-        self.weight_jacker_content['axis'].setValue(int(pct * 100))
-        self.weight_jacker_content['axis'].update()
+        self.content['weight_jacker']['axis'].setValue(int(pct * 100))
+        self.content['weight_jacker']['axis'].update()
 
         pct = pct - 0.5
-        self.weight_jacker_content['lcd'].display(round(pct / 0.025))
-        self.weight_jacker_content['lcd'].update()
+        self.content['weight_jacker']['lcd'].display(round(pct / 0.025))
+        self.content['weight_jacker']['lcd'].update()
 
     @pyqtSlot()
     def calibrate(self):
-        if self.axis == "weight_jacker":
-            self.weight_jacker_content['calibrate'].setText(lang['calibrating'])
+        if self.axis in self.content:
+            self.content[self.axis]['calibrate'].setText(lang['calibrating'])
         else:
             print("Warning: calibrate()")
 
         vjoy.calibrate(self.axis)
         while self.is_running == True:
             sleep(0.1)
-        self.weight_jacker_content['calibrate'].setText(lang['calibrate'])
+        self.content[self.axis]['calibrate'].setText(lang['calibrate'])
         vjoy.set(self.axis,self.pct)
         var.status['calibration'] = False
 
@@ -403,11 +411,11 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def increment(self, func):
-        var.settings[func]['increment'] = self.weight_jacker_content['increment'].value()
+        var.settings[func]['increment'] = self.content[func]['increment'].value()
 
     @pyqtSlot()
     def switch(self, func):
-        wj = self.weight_jacker_content['switch'].value()
+        wj = self.content[func]['switch'].value()
         var.settings[func]['switch'] = wj
         var.status[func]['secondary'] = (wj * 0.025) + 0.5
         if var.status[func]['switched'] == True:
@@ -415,43 +423,30 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def increment_mode(self, func):
-        if self.weight_jacker_content['increment_mode'].currentText() == "Continuous":
+        if self.content[func]['increment_mode'].currentText() == "Continuous":
             var.settings[func]['continuous'] = True
-        elif self.weight_jacker_content['increment_mode'].currentText() == "Single":
+        elif self.content[func]['increment_mode'].currentText() == "Single":
             var.settings[func]['continuous'] = False
 
     @pyqtSlot()
     def switch_mode(self, func):
-        if self.weight_jacker_content['switch_mode'].currentText() == "Toggle":
+        if self.content[func]['switch_mode'].currentText() == "Toggle":
             var.settings[func]['toggle'] = True
-        elif self.weight_jacker_content['switch_mode'].currentText() == "Hold":
+        elif self.content[func]['switch_mode'].currentText() == "Hold":
             var.settings[func]['toggle'] = False
 
     @pyqtSlot()
-    def high_threshold(self):
-        var.settings['high_threshold'] = (self.settings_content['high_threshold'].value() / 100)
-
-    @pyqtSlot()
-    def low_threshold(self):
-        var.settings['low_threshold'] = (self.settings_content['low_threshold'].value() / 100)
-
-    @pyqtSlot()
-    def axis_samples(self):
-        var.settings['axis_samples'] = self.settings_content['axis_samples'].value()
+    def settings_set(self, func):
+        value = self.content['settings'][func].value()
+        if func == 'high_threshold' or func == 'low_threshold':
+            value = value/100
+        var.settings[func] = value
 
     @pyqtSlot()
     def scale(self):
-        scale = self.settings_content['scale'].currentText()
+        scale = self.content['settings']['scale'].currentText()
         scale = scale.replace("x", "")
         var.settings['scale'] = scale
-
-    @pyqtSlot()
-    def timer_loop(self):
-        var.settings['timer_loop'] = self.settings_content['timer_loop'].value()
-
-    @pyqtSlot()
-    def timer_first(self):
-        var.settings['timer_first'] = self.settings_content['timer_first'].value()
 
     @pyqtSlot()
     def bind(self):
