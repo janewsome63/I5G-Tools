@@ -39,26 +39,31 @@ def check_pressed(bind):
     return pressed
 
 def increment(bind, function, control):
+    #print("increment function print1: ", bind, function, control)
     if control == "up":
         offset = step[function] * var.settings[function]['increment']
     elif control == "down":
         offset = step[function] * var.settings[function]['increment'] * -1
     else:
         offset = 0.0
-
+    #print("offset: ", offset)
     if check_pressed(bind):
 
         if var.status[function]['switched']:
             vjoy.set(function, var.status[function]['secondary'] + offset)
+            #print("secondary")
         else:
             vjoy.set(function, var.status[function]['primary'] + offset)
+            #print("primary")
 
         if var.settings[function]['continuous']:
             count = 1
+            #print("count check1: ", count)
             interval = int(10)
             timer = var.settings['timer_first']/1000
             while check_pressed(bind) and not var.status['calibration'] and not var.bindings['status']['active']:
                 if count % interval == 0:
+                    #print("count check2: ", count, var.status[function]['switched'])
                     #print("continuous loop")
                     if var.status[function]['switched']:
                         vjoy.set(function, var.status[function]['secondary'] + offset)
@@ -68,26 +73,28 @@ def increment(bind, function, control):
                         timer = var.settings['timer_loop']/1000
                 sleep(timer/interval)
                 count += 1
+    #else:
+        #print("bind check_pressed failed: ", bind)
 
 def switch(bind, function):
    if check_pressed(bind):
+        if var.status[function]['switched']:
+            var.status[function]['switched'] = False
+            vjoy.set(function, var.status[function]['primary'])
+        elif not var.status[function]['switched']:
+            var.status[function]['switched'] = True
+            vjoy.set(function, var.status[function]['secondary'])
+
+        while check_pressed(bind) and not var.bindings['status']['active'] and not var.status['calibration']:
+            sleep(0.05)
+
+        if not var.settings[function]['toggle']:
             if var.status[function]['switched']:
                 var.status[function]['switched'] = False
                 vjoy.set(function, var.status[function]['primary'])
             elif not var.status[function]['switched']:
                 var.status[function]['switched'] = True
                 vjoy.set(function, var.status[function]['secondary'])
-
-            while check_pressed(bind) and not var.bindings['status']['active'] and not var.status['calibration']:
-                sleep(0.05)
-
-            if not var.settings[function]['toggle']:
-                if var.status[function]['switched']:
-                    var.status[function]['switched'] = False
-                    vjoy.set(function, var.status[function]['primary'])
-                elif not var.status[function]['switched']:
-                    var.status[function]['switched'] = True
-                    vjoy.set(function, var.status[function]['secondary'])
 
 def controls():
     check = fn.is_bind()
@@ -97,15 +104,19 @@ def controls():
         for entry in check:
             function = entry['function']
             control = entry['control']
+            #print("entry, function, control: ", entry, function, control)
             if not var.status['calibration'] and not var.bindings['status']['active']:
 
                 bind = var.bindings[function][control]
+                #print("bind: ", bind)
 
                 if control == "up" or control == "down":
                     if var.status[function]['thread']['running'] != control:
                         var.status[function]['thread']['running'] = control
                         increment(bind, function, control)
                         var.status[function]['thread']['running'] = None
+                    #else:
+                        #print("thread running check failed: ", var.status[function['thread']['running']])
 
                 elif control == "switch":
                     if not var.status[function]['thread']['waiting']:
