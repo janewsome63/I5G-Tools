@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Fix axis bind repeating, streamline control implementation further">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Split roll bar tabs, add fuel map tab functions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -284,7 +283,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760067386245</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Split roll bar tabs, add fuel map tab functions">
+      <option name="closed" value="true" />
+      <created>1760906303944</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1760906303944</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -314,6 +321,7 @@
     <MESSAGE value="Work on config file started; fix issue #2" />
     <MESSAGE value="Rework control loop; now triggered by creating new thread on device event" />
     <MESSAGE value="Fix axis bind repeating, streamline control implementation further" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix axis bind repeating, streamline control implementation further" />
+    <MESSAGE value="Split roll bar tabs, add fuel map tab functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="Split roll bar tabs, add fuel map tab functions" />
   </component>
 </project>
