@@ -28,6 +28,7 @@ from PyQt5.QtWidgets import (
     QLineEdit
 )
 
+from controls import step
 import variables as var
 import vjoy
 from devices import device_info
@@ -879,9 +880,12 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def switch(self, func):
-        wj = self.content[func]['switch'].value()
-        var.settings[func]['switch'] = wj
-        var.status[func]['secondary'] = (wj * 0.025) + 0.5
+        value = self.content[func]['switch'].value()
+        var.settings[func]['switch'] = value
+        if func == "weight_jacker":
+            var.status[func]['secondary'] = (value * step[func]) + 0.5
+        else:
+            var.status[func]['secondary'] = (value * step[func]) - step[func]
         if var.status[func]['switched'] == True:
             vjoy.set(func, var.status[func]['secondary'])
 
