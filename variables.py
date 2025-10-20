@@ -1,3 +1,5 @@
+import os
+
 bindings = {
     "status": {
         "active": False,
@@ -72,40 +74,40 @@ bindings = {
             "num": 0,
         },
     },
-    "bite_point": {
-        "up": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "down": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "switch": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-    },
-    "engine_warming": {
-        "up": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "down": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "switch": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-    },
+    # "bite_point": {
+    #     "up": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "down": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "switch": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    # },
+    # "engine_warming": {
+    #     "up": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "down": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "switch": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    # },
 }
 settings = {}
 status = {
@@ -190,9 +192,14 @@ status = {
         },
     }
 }
+
 event = {
     "guid": 0,
     "type": "",
     "num": 0,
     "value": None,
+}
+
+backend = {
+    "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + "settings.ini",
 }

@@ -1,6 +1,5 @@
 import os
 import sys
-from string import capwords
 import history
 from time import sleep
 import math
@@ -29,9 +28,10 @@ from PyQt5.QtWidgets import (
 )
 
 from controls import step
+import functions as fn
 import variables as var
 import vjoy
-from devices import device_info
+import devices as dev
 
 lang = {
     "title": "I5G Tools",
@@ -78,7 +78,7 @@ var.settings = {
     "high_threshold": 0.90,
     "low_threshold": 0.10,
     "frequency": 0.1,
-    "scale": "1.25",
+    "scale": 1.25,
     "device": 1,
     "axis_samples": 2,
     "timer_loop": 150,
@@ -88,25 +88,25 @@ var.settings = {
         "continuous": True,
         "toggle": False,
         "increment": 1,
-        "switch": -20,
+        "switch_value": -20,
     },
     "front_roll_bar": {
         "continuous": False,
         "toggle": False,
         "increment": 1,
-        "switch": 1,
+        "switch_value": 1,
     },
     "rear_roll_bar": {
         "continuous": False,
         "toggle": False,
         "increment": 1,
-        "switch": 6,
+        "switch_value": 6,
     },
     "fuel_map": {
         "continuous": False,
         "toggle": True,
         "increment": 1,
-        "switch": 8,
+        "switch_value": 8,
     },
 }
 
@@ -191,7 +191,7 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['switch'] = QSpinBox()
         self.content['weight_jacker']['switch'].setFixedSize(40, 20)
         self.content['weight_jacker']['switch'].setRange(-20, 20)
-        self.content['weight_jacker']['switch'].setValue(var.settings['weight_jacker']['switch'])
+        self.content['weight_jacker']['switch'].setValue(var.settings['weight_jacker']['switch_value'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['weight_jacker']['switch'].valueChanged.connect(lambda: self.switch("weight_jacker"))
 
@@ -233,8 +233,7 @@ class MainWindow(QMainWindow):
 
         self.content['weight_jacker']['up_device'] = QLineEdit()
         self.content['weight_jacker']['up_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['weight_jacker']['up'] = None
-        self.content['weight_jacker']['up_device'].setText(str(var.bindings['weight_jacker']['up']))
+        self.content['weight_jacker']['up_device'].setText(dev.format("weight_jacker", "up"))
         self.content['weight_jacker']['up_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_device'], 3, 1)
 
@@ -250,8 +249,7 @@ class MainWindow(QMainWindow):
 
         self.content['weight_jacker']['down_device'] = QLineEdit()
         self.content['weight_jacker']['down_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['weight_jacker']['down'] = None
-        self.content['weight_jacker']['down_device'].setText(str(var.bindings['weight_jacker']['down']))
+        self.content['weight_jacker']['down_device'].setText(dev.format("weight_jacker", "down"))
         self.content['weight_jacker']['down_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_device'], 4, 1)
 
@@ -267,8 +265,7 @@ class MainWindow(QMainWindow):
 
         self.content['weight_jacker']['switch_device'] = QLineEdit()
         self.content['weight_jacker']['switch_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['weight_jacker']['switch'] = None
-        self.content['weight_jacker']['switch_device'].setText(str(var.bindings['weight_jacker']['switch']))
+        self.content['weight_jacker']['switch_device'].setText(dev.format("weight_jacker", "switch"))
         self.content['weight_jacker']['switch_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_device'], 5, 1)
 
@@ -318,7 +315,7 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['switch'] = QSpinBox()
         self.content['front_roll_bar']['switch'].setFixedSize(40, 20)
         self.content['front_roll_bar']['switch'].setRange(1, 6)
-        self.content['front_roll_bar']['switch'].setValue(var.settings['front_roll_bar']['switch'])
+        self.content['front_roll_bar']['switch'].setValue(var.settings['front_roll_bar']['switch_value'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch'], 2, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['front_roll_bar']['switch'].valueChanged.connect(lambda: self.switch("front_roll_bar"))
 
@@ -360,8 +357,7 @@ class MainWindow(QMainWindow):
 
         self.content['front_roll_bar']['up_device'] = QLineEdit()
         self.content['front_roll_bar']['up_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['front_roll_bar']['up'] = None
-        self.content['front_roll_bar']['up_device'].setText(str(var.bindings['front_roll_bar']['up']))
+        self.content['front_roll_bar']['up_device'].setText(dev.format("front_roll_bar", "up"))
         self.content['front_roll_bar']['up_device'].setReadOnly(True)
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['up_device'], 4, 1)
 
@@ -377,8 +373,7 @@ class MainWindow(QMainWindow):
 
         self.content['front_roll_bar']['down_device'] = QLineEdit()
         self.content['front_roll_bar']['down_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['front_roll_bar']['down'] = None
-        self.content['front_roll_bar']['down_device'].setText(str(var.bindings['front_roll_bar']['down']))
+        self.content['front_roll_bar']['down_device'].setText(dev.format("front_roll_bar", "down"))
         self.content['front_roll_bar']['down_device'].setReadOnly(True)
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['down_device'], 5, 1)
 
@@ -394,8 +389,7 @@ class MainWindow(QMainWindow):
 
         self.content['front_roll_bar']['switch_device'] = QLineEdit()
         self.content['front_roll_bar']['switch_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['front_roll_bar']['switch'] = None
-        self.content['front_roll_bar']['switch_device'].setText(str(var.bindings['front_roll_bar']['switch']))
+        self.content['front_roll_bar']['switch_device'].setText(dev.format("front_roll_bar", "switch"))
         self.content['front_roll_bar']['switch_device'].setReadOnly(True)
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch_device'], 6, 1)
 
@@ -445,7 +439,7 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['switch'] = QSpinBox()
         self.content['rear_roll_bar']['switch'].setFixedSize(40, 20)
         self.content['rear_roll_bar']['switch'].setRange(1, 6)
-        self.content['rear_roll_bar']['switch'].setValue(var.settings['rear_roll_bar']['switch'])
+        self.content['rear_roll_bar']['switch'].setValue(var.settings['rear_roll_bar']['switch_value'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch'], 2, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['rear_roll_bar']['switch'].valueChanged.connect(lambda: self.switch("rear_roll_bar"))
 
@@ -487,8 +481,7 @@ class MainWindow(QMainWindow):
 
         self.content['rear_roll_bar']['up_device'] = QLineEdit()
         self.content['rear_roll_bar']['up_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['rear_roll_bar']['up'] = None
-        self.content['rear_roll_bar']['up_device'].setText(str(var.bindings['rear_roll_bar']['up']))
+        self.content['rear_roll_bar']['up_device'].setText(dev.format("rear_roll_bar", "up"))
         self.content['rear_roll_bar']['up_device'].setReadOnly(True)
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['up_device'], 4, 1)
 
@@ -504,8 +497,7 @@ class MainWindow(QMainWindow):
 
         self.content['rear_roll_bar']['down_device'] = QLineEdit()
         self.content['rear_roll_bar']['down_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['rear_roll_bar']['down'] = None
-        self.content['rear_roll_bar']['down_device'].setText(str(var.bindings['rear_roll_bar']['down']))
+        self.content['rear_roll_bar']['down_device'].setText(dev.format("rear_roll_bar", "down"))
         self.content['rear_roll_bar']['down_device'].setReadOnly(True)
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['down_device'], 5, 1)
 
@@ -521,8 +513,7 @@ class MainWindow(QMainWindow):
 
         self.content['rear_roll_bar']['switch_device'] = QLineEdit()
         self.content['rear_roll_bar']['switch_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['rear_roll_bar']['switch'] = None
-        self.content['rear_roll_bar']['switch_device'].setText(str(var.bindings['rear_roll_bar']['switch']))
+        self.content['rear_roll_bar']['switch_device'].setText(dev.format("rear_roll_bar", "switch"))
         self.content['rear_roll_bar']['switch_device'].setReadOnly(True)
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch_device'], 6, 1)
 
@@ -572,7 +563,7 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['switch'] = QSpinBox()
         self.content['fuel_map']['switch'].setFixedSize(40, 20)
         self.content['fuel_map']['switch'].setRange(1, 8)
-        self.content['fuel_map']['switch'].setValue(var.settings['fuel_map']['switch'])
+        self.content['fuel_map']['switch'].setValue(var.settings['fuel_map']['switch_value'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['fuel_map']['switch'].valueChanged.connect(lambda: self.switch("fuel_map"))
 
@@ -614,8 +605,7 @@ class MainWindow(QMainWindow):
 
         self.content['fuel_map']['up_device'] = QLineEdit()
         self.content['fuel_map']['up_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['fuel_map']['up'] = None
-        self.content['fuel_map']['up_device'].setText(str(var.bindings['fuel_map']['up']))
+        self.content['fuel_map']['up_device'].setText(dev.format("fuel_map", "up"))
         self.content['fuel_map']['up_device'].setReadOnly(True)
         self.fuel_map.layout.addWidget(self.content['fuel_map']['up_device'], 3, 1)
 
@@ -631,8 +621,7 @@ class MainWindow(QMainWindow):
 
         self.content['fuel_map']['down_device'] = QLineEdit()
         self.content['fuel_map']['down_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['fuel_map']['down'] = None
-        self.content['fuel_map']['down_device'].setText(str(var.bindings['fuel_map']['down']))
+        self.content['fuel_map']['down_device'].setText(dev.format("fuel_map", "down"))
         self.content['fuel_map']['down_device'].setReadOnly(True)
         self.fuel_map.layout.addWidget(self.content['fuel_map']['down_device'], 4, 1)
 
@@ -648,8 +637,7 @@ class MainWindow(QMainWindow):
 
         self.content['fuel_map']['switch_device'] = QLineEdit()
         self.content['fuel_map']['switch_device'].setAlignment(Qt.AlignCenter)
-        var.bindings['fuel_map']['switch'] = None
-        self.content['fuel_map']['switch_device'].setText(str(var.bindings['fuel_map']['switch']))
+        self.content['fuel_map']['switch_device'].setText(dev.format("fuel_map", "switch"))
         self.content['fuel_map']['switch_device'].setReadOnly(True)
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch_device'], 5, 1)
 
@@ -721,7 +709,7 @@ class MainWindow(QMainWindow):
         self.content['settings']['scale'].addItem("1.00" + "x")
         self.content['settings']['scale'].addItem("1.25" + "x")
         self.content['settings']['scale'].addItem("1.50" + "x")
-        self.content['settings']['scale'].setCurrentText(var.settings['scale'] + "x")
+        self.content['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
         self.settings.layout.addWidget(self.content['settings']['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['scale'].currentTextChanged.connect(self.scale)
 
@@ -877,17 +865,19 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def increment(self, func):
         var.settings[func]['increment'] = self.content[func]['increment'].value()
+        fn.write_config()
 
     @pyqtSlot()
     def switch(self, func):
         value = self.content[func]['switch'].value()
-        var.settings[func]['switch'] = value
+        var.settings[func]['switch_value'] = value
         if func == "weight_jacker":
             var.status[func]['secondary'] = (value * step[func]) + 0.5
         else:
             var.status[func]['secondary'] = (value * step[func]) - step[func]
         if var.status[func]['switched'] == True:
             vjoy.set(func, var.status[func]['secondary'])
+        fn.write_config()
 
     @pyqtSlot()
     def increment_mode(self, func):
@@ -895,6 +885,7 @@ class MainWindow(QMainWindow):
             var.settings[func]['continuous'] = True
         elif self.content[func]['increment_mode'].currentText() == "Single":
             var.settings[func]['continuous'] = False
+        fn.write_config()
 
     @pyqtSlot()
     def switch_mode(self, func):
@@ -902,6 +893,7 @@ class MainWindow(QMainWindow):
             var.settings[func]['toggle'] = True
         elif self.content[func]['switch_mode'].currentText() == "Hold":
             var.settings[func]['toggle'] = False
+        fn.write_config()
 
     @pyqtSlot()
     def settings_set(self, func):
@@ -909,12 +901,14 @@ class MainWindow(QMainWindow):
         if func == 'high_threshold' or func == 'low_threshold':
             value = value/100
         var.settings[func] = value
+        fn.write_config()
 
     @pyqtSlot()
     def scale(self):
         scale = self.content['settings']['scale'].currentText()
         scale = scale.replace("x", "")
         var.settings['scale'] = scale
+        fn.write_config()
 
     @pyqtSlot()
     def bind(self):
@@ -972,37 +966,14 @@ class MainWindow(QMainWindow):
 
         self.index[function][control]['bind'].setText(lang['bind'])
 
-        if var.bindings[function][control]:
-            if "dir" in var.bindings[function][control]:
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                type = capwords(var.bindings[function][control]['type'])
-                num = str(var.bindings[function][control]['num'])
-                dir = capwords(var.bindings[function][control]['dir'])
-                dev_pretty = name + " - " + type + " " + num + " " + dir
-            elif "value" in var.bindings[function][control]:
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                type = capwords(var.bindings[function][control]['type'])
-                num = str(var.bindings[function][control]['num'])
-                axis_dir = var.bindings[function][control]['value'] > 0.5
-                dev_pretty = name + " - " + type + " " + num
-                if axis_dir:
-                    dev_pretty += "+"
-                else:
-                    dev_pretty += "-"
-            else:
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                type = capwords(var.bindings[function][control]['type'])
-                num = str(var.bindings[function][control]['num'])
-                dev_pretty = name + " - " + type + " " + num
-            self.index[function][control]['device'].setText(dev_pretty)
-        else:
-            self.index[function][control]['device'].setText(lang['none'])
+        self.index[function][control]['device'].setText(dev.format(function, control))
 
         var.bindings['status'] = {
             "active": False,
             "function": None,
             "control": None,
         }
+        fn.write_config()
         self.is_running = False
 
     @pyqtSlot()
@@ -1018,7 +989,7 @@ class MainWindow(QMainWindow):
 
 
 def main():
-    os.environ["QT_SCALE_FACTOR"] = var.settings['scale']
+    os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])
 
     app = QApplication(sys.argv)
 

@@ -1,23 +1,51 @@
-import configparser
+import configparser as parse
+import os.path
 import threading
-
+from string import capwords
+from turtle import config_dict
+from ast import literal_eval as eval
 import variables as var
 
+def read_config():
+    if os.path.exists(var.backend['config']):
+        config = parse.ConfigParser()
+        config.read(var.backend['config'])
+        for section in config.sections():
+            for item in config[section]:
+                setting = eval(config[section][item])
+
+                if section == "GENERAL":
+                    var.settings[item] = setting
+                elif item == "up" or item == "down" or item == "switch":
+                    var.bindings[section.lower()][item] = setting
+                else:
+                    var.settings[section.lower()][item] = setting
+    else:
+        write_config()
 
 def write_config():
-    config = configparser.ConfigParser()
-    config['General'] = {
-        "high_threshold": var.settings['high_threshold'],
-        "low_threshold": var.settings['low_threshold'],
-        "axis_samples": var.settings['axis_samples'],
-        "frequency": var.settings['frequency'],
-        "scale": var.settings['scale'],
-        "device": var.settings['device'],
-    }
+    config = parse.ConfigParser()
 
-    config['Weight Jacker'] = {
+    config['GENERAL'] = {}
+    for setting in var.settings:
+        if isinstance(var.settings[setting], dict):
+            config[setting.upper()] = {}
+            for subsetting in var.settings[setting]:
+                config[setting.upper()][subsetting] = str(var.settings[setting][subsetting])
+        else:
+            config['GENERAL'][setting] = str(var.settings[setting])
 
-    }
+    for bind in var.bindings:
+        if bind != "status":
+            for subbind in var.bindings[bind]:
+                config[bind.upper()][subbind] = str(var.bindings[bind][subbind])
+
+    directory = os.path.split(var.backend['config'])[1]
+    if not directory:
+        os.mkdir(directory)
+
+    with open(var.backend['config'], 'w') as file:
+        config.write(file)
 
 def is_bind():
     if var.event['type'] == "hat":

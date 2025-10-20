@@ -1,7 +1,7 @@
 import os
 
 import pygame as p
-
+from string import capwords
 import controls as con
 import functions as fn
 import variables as var
@@ -10,7 +10,6 @@ from time import sleep
 
 devices = []
 device_info = {}
-
 
 def add_device(index):
     device = p.joystick.Joystick(index)
@@ -132,3 +131,32 @@ def device_detection():
         sleep(0.001)
 
     p.quit()
+
+def format(function, control):
+    if var.bindings[function][control]:
+        if "dir" in var.bindings[function][control]:
+            name = device_info[var.bindings[function][control]['guid']]['name']
+            type = capwords(var.bindings[function][control]['type'])
+            num = str(var.bindings[function][control]['num'])
+            dir = capwords(var.bindings[function][control]['dir'])
+            dev_pretty = name + " - " + type + " " + num + " " + dir
+        elif "value" in var.bindings[function][control]:
+            name = device_info[var.bindings[function][control]['guid']]['name']
+            type = capwords(var.bindings[function][control]['type'])
+            num = str(var.bindings[function][control]['num'])
+            axis_dir = var.bindings[function][control]['value'] > 0.5
+            dev_pretty = name + " - " + type + " " + num
+            if axis_dir:
+                dev_pretty += "+"
+            else:
+                dev_pretty += "-"
+        elif var.bindings[function][control]['type'] == "none":
+            dev_pretty = "None"
+        else:
+            name = device_info[var.bindings[function][control]['guid']]['name']
+            type = capwords(var.bindings[function][control]['type'])
+            num = str(var.bindings[function][control]['num'])
+            dev_pretty = name + " - " + type + " " + num
+        return dev_pretty
+    else:
+        return lang['none']
