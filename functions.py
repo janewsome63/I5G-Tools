@@ -40,8 +40,8 @@ def write_config():
             for subbind in var.bindings[bind]:
                 config[bind.upper()][subbind] = str(var.bindings[bind][subbind])
 
-    directory = os.path.split(var.backend['config'])[1]
-    if not directory:
+    directory = os.path.split(var.backend['config'])[0]
+    if not os.path.exists(directory):
         os.mkdir(directory)
 
     with open(var.backend['config'], 'w') as file:
