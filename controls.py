@@ -78,7 +78,7 @@ def increment(bind, function, control):
                 sleep(var.settings['timer_first']/(1000*interval))
     #else:
         #print("bind check_pressed failed: ", bind)
-    var.status[function]['thread']['running'] = None
+    var.status[function]['thread']['running'][control] = False
 
 def switch(bind, function):
     if check_pressed(bind):
@@ -116,8 +116,8 @@ def controls():
                 #print("bind: ", bind)
 
                 if control == "up" or control == "down":
-                    if var.status[function]['thread']['running'] != control:
-                        var.status[function]['thread']['running'] = control
+                    if var.status[function]['thread']['running'][control] == False:
+                        var.status[function]['thread']['running'][control] = True
                         print("start thread: ", function, control)
                         fn.start_thread(lambda: increment(bind, function, control))
                         #increment(bind, function, control)

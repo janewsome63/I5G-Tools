@@ -117,7 +117,10 @@ status = {
         "secondary": 0.0,
         "switched": False,
         "thread": {
-            "running": None,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -127,7 +130,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -137,7 +143,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -147,7 +156,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -157,7 +169,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -167,7 +182,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -177,7 +195,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     },
@@ -187,7 +208,10 @@ status = {
         "switched": False,
         "thread": {
             "current": 0,
-            "running": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
             "waiting": False,
         },
     }
