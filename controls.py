@@ -56,10 +56,10 @@ def increment(bind, function, control):
             vjoy.set(function, var.status[function]['primary'] + offset)
             #print("primary")
 
+        interval = int(10)
         if var.settings[function]['continuous']:
             count = 1
             #print("count check1: ", count)
-            interval = int(10)
             timer = var.settings['timer_first']/1000
             while check_pressed(bind) and not var.status['calibration'] and not var.bindings['status']['active']:
                 if count % interval == 0:
@@ -73,6 +73,9 @@ def increment(bind, function, control):
                         timer = var.settings['timer_loop']/1000
                 sleep(timer/interval)
                 count += 1
+        else:
+            while check_pressed(bind) and not var.status['calibration'] and not var.bindings['status']['active']:
+                sleep(var.settings['timer_first']/(1000*interval))
     #else:
         #print("bind check_pressed failed: ", bind)
     var.status[function]['thread']['running'] = None
@@ -115,6 +118,7 @@ def controls():
                 if control == "up" or control == "down":
                     if var.status[function]['thread']['running'] != control:
                         var.status[function]['thread']['running'] = control
+                        print("start thread: ", function, control)
                         fn.start_thread(lambda: increment(bind, function, control))
                         #increment(bind, function, control)
                         #var.status[function]['thread']['running'] = None
