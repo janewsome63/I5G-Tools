@@ -144,7 +144,7 @@ def format(function, control):
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])
             num = str(var.bindings[function][control]['num'])
-            axis_dir = var.bindings[function][control]['value'] > 0.5
+            axis_dir = var.bindings[function][control]['value'] >= var.settings['high_threshold']
             dev_pretty = name + " - " + type + " " + num
             if axis_dir:
                 dev_pretty += "+"

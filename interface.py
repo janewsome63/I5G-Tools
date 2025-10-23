@@ -35,7 +35,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.3.1a",
+    "version": "v0.3.2a",
     "up": "Increase:",
     "down": "Decrease:",
     "switch": "Switch:",
@@ -898,10 +898,21 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def settings_set(self, func):
         value = self.content['settings'][func].value()
-        if func == 'high_threshold' or func == 'low_threshold':
-            value = value/100
-        var.settings[func] = value
-        fn.write_config()
+        if func == 'high_threshold':
+            if value/100 > var.settings['low_threshold']:
+                self.content['settings']['low_threshold'].setRange(1, value-1)
+                fn.reset_bind_thresh(func, value/100)
+                var.settings[func] = value/100
+                fn.write_config()
+        elif func == 'low_threshold':
+            if value/100 < var.settings['high_threshold']:
+                self.content['settings']['high_threshold'].setRange(value+1, 99)
+                fn.reset_bind_thresh(func, value/100)
+                var.settings[func] = value/100
+                fn.write_config()
+        else:
+            var.settings[func] = value
+            fn.write_config()
 
     @pyqtSlot()
     def scale(self):

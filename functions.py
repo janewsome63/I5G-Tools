@@ -116,6 +116,17 @@ def is_bind():
     print(result)
     return result
 
+def reset_bind_thresh(thresh, value):
+    if not (thresh == 'low_threshold' or thresh == 'high_threshold'):
+        print("Warning: reset_bind_thresh with arguments: ", thresh, value)
+        return
+    for function in var.bindings:
+        if function != 'status':
+            for control in var.bindings[function]:
+                if var.bindings[function][control] != None and var.bindings[function][control]['type'] == 'axis':
+                    if (var.bindings[function][control]['value'] == var.settings['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['low_threshold'] and thresh == 'low_threshold'):
+                        var.bindings[function][control]['value'] = value
+
 def start_thread(target):
     thread = threading.Thread(target=target, daemon=True)
     thread.start()

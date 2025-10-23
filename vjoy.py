@@ -33,24 +33,25 @@ status = {
 
 def set(axis, pct):
     #print("vjoy set check1")
-    if not status['busy']:
-        status['busy'] = True
-        switched = var.status[axis]['switched']
-        raw = round(pct * 32768)
-        if raw <= 0:
-            raw = 1
-        elif raw > 32768:
-            raw = 32768
+    while status['busy']: # no queue, just whoever happens to check at the right time first if there are multiple instances of vjoy.set() in this loop
+        sleep(0.01)
+    status['busy'] = True
+    switched = var.status[axis]['switched']
+    raw = round(pct * 32768)
+    if raw <= 0:
+        raw = 1
+    elif raw > 32768:
+        raw = 32768
 
-        vjoy.VJoyDevice(var.settings['device']).set_axis(axis_ref[axis], raw)
-        axis_values[axis] = round(raw / 32768, 3)
-        if switched:
-            var.status[axis]['secondary'] = axis_values[axis]
-            #print("new secondary: ", var.status[axis]['secondary'])
-        else:
-            var.status[axis]['primary'] = axis_values[axis]
-            #print("new primary: ", var.status[axis]['primary'])
-        status['busy'] = False
+    vjoy.VJoyDevice(var.settings['device']).set_axis(axis_ref[axis], raw)
+    axis_values[axis] = round(raw / 32768, 3)
+    if switched:
+        var.status[axis]['secondary'] = axis_values[axis]
+        #print("new secondary: ", var.status[axis]['secondary'])
+    else:
+        var.status[axis]['primary'] = axis_values[axis]
+        #print("new primary: ", var.status[axis]['primary'])
+    status['busy'] = False
 
 def calibrate(axis):
     #var.status['calibration'] = True
