@@ -159,4 +159,4 @@ def format(function, control):
             dev_pretty = name + " - " + type + " " + num
         return dev_pretty
     else:
-        return lang['none']
+        return 'None'

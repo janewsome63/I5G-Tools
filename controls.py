@@ -75,6 +75,7 @@ def increment(bind, function, control):
                 count += 1
     #else:
         #print("bind check_pressed failed: ", bind)
+    var.status[function]['thread']['running'] = None
 
 def switch(bind, function):
     if check_pressed(bind):
@@ -116,7 +117,7 @@ def controls():
                         var.status[function]['thread']['running'] = control
                         fn.start_thread(lambda: increment(bind, function, control))
                         #increment(bind, function, control)
-                        var.status[function]['thread']['running'] = None
+                        #var.status[function]['thread']['running'] = None
                     # else:
                     #     print("thread running check failed: ", var.status[function['thread']['running']])
 
