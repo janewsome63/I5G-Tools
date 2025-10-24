@@ -74,6 +74,7 @@ ui = {
     "thread_pool": QThreadPool(),
 }
 
+
 var.settings = {
     "high_threshold": 0.90,
     "low_threshold": 0.10,
@@ -668,7 +669,7 @@ class MainWindow(QMainWindow):
 
         self.content['settings']['high_threshold'] = QSpinBox()
         self.content['settings']['high_threshold'].setFixedSize(60, 20)
-        self.content['settings']['high_threshold'].setRange(51, 99)
+        self.content['settings']['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)
         self.content['settings']['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
         self.settings.layout.addWidget(self.content['settings']['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
@@ -680,7 +681,7 @@ class MainWindow(QMainWindow):
 
         self.content['settings']['low_threshold'] = QSpinBox()
         self.content['settings']['low_threshold'].setFixedSize(60, 20)
-        self.content['settings']['low_threshold'].setRange(1, 49)
+        self.content['settings']['low_threshold'].setRange(1, max(int(var.settings['high_threshold']*100)-1,49))
         self.content['settings']['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
         self.settings.layout.addWidget(self.content['settings']['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
