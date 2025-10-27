@@ -57,7 +57,7 @@ def log_event(index, type, num, value):
                 device_info[guid]['buttons'][num] = value
         elif type == "axis":
             if guid in device_info and "axes" in device_info[guid] and num in device_info[guid]['axes']:
-                value = round((value + 1) / 2, 2)
+                value = round((value + 1) / 2, 3)
                 device_info[guid]['axes'][num] = value
                 history.add(guid,num,value)
         elif type == "hat":
@@ -146,9 +146,9 @@ def format(function, control):
             num = str(var.bindings[function][control]['num'])
             axis_dir = var.bindings[function][control]['value'] >= var.settings['high_threshold']
             dev_pretty = name + " - " + type + " " + num
-            if axis_dir:
+            if axis_dir and function != 'bite_point':
                 dev_pretty += "+"
-            else:
+            elif function != 'bite_point':
                 dev_pretty += "-"
         elif var.bindings[function][control]['type'] == "none":
             dev_pretty = "None"

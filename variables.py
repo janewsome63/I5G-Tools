@@ -74,23 +74,27 @@ bindings = {
             "num": 0,
         },
     },
-    # "bite_point": {
-    #     "up": {
-    #         "guid": 0,
-    #         "type": "none",
-    #         "num": 0,
-    #     },
-    #     "down": {
-    #         "guid": 0,
-    #         "type": "none",
-    #         "num": 0,
-    #     },
-    #     "switch": {
-    #         "guid": 0,
-    #         "type": "none",
-    #         "num": 0,
-    #     },
-    # },
+    "bite_point": {
+        "pedal": {
+            "guid": 0,
+            "type": "none",
+        },
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+    },
     # "engine_warming": {
     #     "up": {
     #         "guid": 0,
@@ -171,7 +175,8 @@ status = {
             "current": 0,
             "running": {
                 "up": False,
-                "down": False
+                "down": False,
+                "pedal": False
             },
             "waiting": False,
         },

@@ -20,6 +20,7 @@ from PyQt5.QtWidgets import (
     QProgressBar,
     QPushButton,
     QSpinBox,
+    QDoubleSpinBox,
     QGridLayout,
     QWidget,
     QTabWidget,
@@ -35,7 +36,8 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.3.2a",
+    "version": "v0.4.0a",
+    "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
     "switch": "Switch:",
@@ -109,6 +111,12 @@ var.settings = {
         "increment": 1,
         "switch_value": 8,
     },
+    "bite_point": {
+        "continuous": False,
+        "toggle": False,
+        "increment": 1,
+        "switch_value": 50,
+    },
 }
 
 class MainWindow(QMainWindow):
@@ -149,6 +157,9 @@ class MainWindow(QMainWindow):
             },
             "fuel_map": {
                "fuel_map": {},
+            },
+            "bite_point": {
+                "bite_point": {},
             },
             "settings": {},
             }
@@ -651,7 +662,148 @@ class MainWindow(QMainWindow):
 
         # --------Bite Point Tab--------#
         self.bite_point.layout = QGridLayout()
-        self.bite_point.layout.addWidget(QLabel("Bite Point"), 0, 0)
+        # self.bite_point.layout.addWidget(QLabel("Bite Point"), 0, 0)
+
+        self.content['bite_point']['lcd'] = QLCDNumber()
+        self.content['bite_point']['lcd'].display(0)
+        self.content['bite_point']['lcd'].setSmallDecimalPoint(False)
+        self.bite_point.layout.addWidget(self.content['bite_point']['lcd'], 0, 0)
+
+        self.content['bite_point']['axis'] = QProgressBar()
+        self.content['bite_point']['axis'].setTextVisible(False)
+        self.content['bite_point']['axis'].setMinimum(0)
+        self.content['bite_point']['axis'].setMaximum(100)
+        self.bite_point.layout.addWidget(self.content['bite_point']['axis'], 0, 1)
+
+        self.content['bite_point']['calibrate'] = QPushButton()
+        self.content['bite_point']['calibrate'].setMinimumWidth(100)
+        self.content['bite_point']['calibrate'].setText(lang['calibrate'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['calibrate'], 0, 2)
+        self.content['bite_point']['calibrate'].clicked.connect(lambda: self.calibrate_start("bite_point"))
+
+        self.content['bite_point']['increment_label'] = QLabel()
+        self.content['bite_point']['increment_label'].setAlignment(Qt.AlignLeft)
+        self.content['bite_point']['increment_label'].setText(lang['increment'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['increment_label'], 1, 0)
+
+        self.content['bite_point']['switch_label'] = QLabel()
+        self.content['bite_point']['switch_label'].setAlignment(Qt.AlignRight)
+        self.content['bite_point']['switch_label'].setText(lang['switch_value'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch_label'], 1, 1)
+
+        self.content['bite_point']['increment'] = QDoubleSpinBox()
+        self.content['bite_point']['increment'].setFixedSize(48, 20)
+        self.content['bite_point']['increment'].setRange(0.1, 5)
+        self.content['bite_point']['increment'].setSingleStep(0.1)
+        self.content['bite_point']['increment'].setDecimals(1)
+        self.content['bite_point']['increment'].setValue(var.settings['bite_point']['increment'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['bite_point']['increment'].valueChanged.connect(lambda: self.increment("bite_point"))
+
+        self.content['bite_point']['switch'] = QDoubleSpinBox()
+        self.content['bite_point']['switch'].setFixedSize(50, 20)
+        self.content['bite_point']['switch'].setRange(0.0, 100.0)
+        self.content['bite_point']['switch'].setSingleStep(0.1)
+        self.content['bite_point']['switch'].setDecimals(1)
+        self.content['bite_point']['switch'].setValue(var.settings['bite_point']['switch_value'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['bite_point']['switch'].valueChanged.connect(lambda: self.switch("bite_point"))
+
+        self.content['bite_point']['increment_mode_label'] = QLabel()
+        self.content['bite_point']['increment_mode_label'].setAlignment(Qt.AlignRight)
+        self.content['bite_point']['increment_mode_label'].setText(lang['increment_mode'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['increment_mode_label'], 2, 0)
+
+        self.content['bite_point']['switch_mode_label'] = QLabel()
+        self.content['bite_point']['switch_mode_label'].setAlignment(Qt.AlignRight)
+        self.content['bite_point']['switch_mode_label'].setText(lang['switch_mode'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch_mode_label'], 2, 1)
+
+        self.content['bite_point']['increment_mode'] = QComboBox()
+        self.content['bite_point']['increment_mode'].setFixedSize(93, 22)
+        self.content['bite_point']['increment_mode'].addItem(lang['continuous'])
+        self.content['bite_point']['increment_mode'].addItem(lang['single'])
+        if var.settings['bite_point']['continuous']:
+            self.content['bite_point']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['bite_point']['increment_mode'].setCurrentText(lang['single'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['increment_mode'], 2, 1)
+        self.content['bite_point']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("bite_point"))
+
+        self.content['bite_point']['switch_mode'] = QComboBox()
+        self.content['bite_point']['switch_mode'].addItem(lang['hold'])
+        self.content['bite_point']['switch_mode'].addItem(lang['toggle'])
+        if var.settings['bite_point']['toggle']:
+            self.content['bite_point']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['bite_point']['switch_mode'].setCurrentText(lang['hold'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch_mode'], 2, 2)
+        self.content['bite_point']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("bite_point"))
+
+        self.content['bite_point']['pedal_label'] = QLabel()
+        self.content['bite_point']['pedal_label'].setAlignment(Qt.AlignLeft)
+        self.content['bite_point']['pedal_label'].setText(lang['pedal'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['pedal_label'], 3, 0)
+
+        self.content['bite_point']['pedal_device'] = QLineEdit()
+        self.content['bite_point']['pedal_device'].setAlignment(Qt.AlignCenter)
+        self.content['bite_point']['pedal_device'].setText(dev.format("bite_point", "pedal"))
+        self.content['bite_point']['pedal_device'].setReadOnly(True)
+        self.bite_point.layout.addWidget(self.content['bite_point']['pedal_device'], 3, 1)
+
+        self.content['bite_point']['pedal_bind'] = QPushButton()
+        self.content['bite_point']['pedal_bind'].setText(lang['bind'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['pedal_bind'], 3, 2)
+        self.content['bite_point']['pedal_bind'].clicked.connect(lambda: self.bind_start("bite_point","pedal"))
+
+        self.content['bite_point']['up_label'] = QLabel()
+        self.content['bite_point']['up_label'].setAlignment(Qt.AlignLeft)
+        self.content['bite_point']['up_label'].setText(lang['up'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['up_label'], 4, 0)
+
+        self.content['bite_point']['up_device'] = QLineEdit()
+        self.content['bite_point']['up_device'].setAlignment(Qt.AlignCenter)
+        self.content['bite_point']['up_device'].setText(dev.format("bite_point", "up"))
+        self.content['bite_point']['up_device'].setReadOnly(True)
+        self.bite_point.layout.addWidget(self.content['bite_point']['up_device'], 4, 1)
+
+        self.content['bite_point']['up_bind'] = QPushButton()
+        self.content['bite_point']['up_bind'].setText(lang['bind'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['up_bind'], 4, 2)
+        self.content['bite_point']['up_bind'].clicked.connect(lambda: self.bind_start("bite_point","up"))
+
+        self.content['bite_point']['down_label'] = QLabel()
+        self.content['bite_point']['down_label'].setAlignment(Qt.AlignLeft)
+        self.content['bite_point']['down_label'].setText(lang['down'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['down_label'], 5, 0)
+
+        self.content['bite_point']['down_device'] = QLineEdit()
+        self.content['bite_point']['down_device'].setAlignment(Qt.AlignCenter)
+        self.content['bite_point']['down_device'].setText(dev.format("bite_point", "down"))
+        self.content['bite_point']['down_device'].setReadOnly(True)
+        self.bite_point.layout.addWidget(self.content['bite_point']['down_device'], 5, 1)
+
+        self.content['bite_point']['down_bind'] = QPushButton()
+        self.content['bite_point']['down_bind'].setText(lang['bind'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['down_bind'], 5, 2)
+        self.content['bite_point']['down_bind'].clicked.connect(lambda: self.bind_start("bite_point","down"))
+
+        self.content['bite_point']['switch_label'] = QLabel()
+        self.content['bite_point']['switch_label'].setAlignment(Qt.AlignLeft)
+        self.content['bite_point']['switch_label'].setText(lang['switch'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch_label'], 6, 0)
+
+        self.content['bite_point']['switch_device'] = QLineEdit()
+        self.content['bite_point']['switch_device'].setAlignment(Qt.AlignCenter)
+        self.content['bite_point']['switch_device'].setText(dev.format("bite_point", "switch"))
+        self.content['bite_point']['switch_device'].setReadOnly(True)
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch_device'], 6, 1)
+
+        self.content['bite_point']['switch_bind'] = QPushButton()
+        self.content['bite_point']['switch_bind'].setText(lang['bind'])
+        self.bite_point.layout.addWidget(self.content['bite_point']['switch_bind'], 6, 2)
+        self.content['bite_point']['switch_bind'].clicked.connect(lambda: self.bind_start("bite_point","switch"))
+
         self.bite_point.setLayout(self.bite_point.layout)
 
         # --------Engine Warming Tab--------#
@@ -813,6 +965,28 @@ class MainWindow(QMainWindow):
                     "label": self.content['fuel_map']['switch_label'],
                 }
             },
+            "bite_point": {
+                "pedal": {
+                    "bind": self.content['bite_point']['pedal_bind'],
+                    "device": self.content['bite_point']['pedal_device'],
+                    "label": self.content['bite_point']['pedal_label'],
+                },
+                "up": {
+                    "bind": self.content['bite_point']['up_bind'],
+                    "device": self.content['bite_point']['up_device'],
+                    "label": self.content['bite_point']['up_label'],
+                },
+                "down": {
+                    "bind": self.content['bite_point']['down_bind'],
+                    "device": self.content['bite_point']['down_device'],
+                    "label": self.content['bite_point']['down_label'],
+                },
+                "switch": {
+                    "bind": self.content['bite_point']['switch_bind'],
+                    "device": self.content['bite_point']['switch_device'],
+                    "label": self.content['bite_point']['switch_label'],
+                }
+            },
         }
 
         ui['timer'].timeout.connect(self.updater)
@@ -829,9 +1003,15 @@ class MainWindow(QMainWindow):
                 self.content[func]['axis'].setValue(int(pct * 100))
                 self.content[func]['axis'].update()
 
-                pct = pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum()
-                #pct = math.floor(pct) Works without, and was causing lcd display issues
-                self.content[func]['lcd'].display(round(pct / var.settings[func]['increment']))
+                if func == 'bite_point':
+                    if (pct*100)%1 == 0:
+                        self.content[func]['lcd'].display(str(round(pct*100)) + ".0") # bad hack to get the lcd to always display one decimal place
+                    else:
+                        self.content[func]['lcd'].display(round(pct*100, 1))
+                else:
+                    pct = pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum()
+                    #pct = math.floor(pct) Works without, and was causing lcd display issues
+                    self.content[func]['lcd'].display(round(pct / var.settings[func]['increment']))
                 self.content[func]['lcd'].update()
 
     @pyqtSlot()
@@ -874,6 +1054,8 @@ class MainWindow(QMainWindow):
         var.settings[func]['switch_value'] = value
         if func == "weight_jacker":
             var.status[func]['secondary'] = (value * step[func]) + 0.5
+        elif func == "bite_point":
+            var.status[func]['secondary'] = value/100
         else:
             var.status[func]['secondary'] = (value * step[func]) - step[func]
         if var.status[func]['switched'] == True:
@@ -952,13 +1134,20 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                         }
                 elif var.event['type'] == "axis":
-                    if var.event['value'] >= var.settings['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                    if function == 'bite_point':
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
-                            "value": var.settings['high_threshold']
                         }
+                    else:
+                        if var.event['value'] >= var.settings['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                            var.bindings[function][control] = {
+                                "guid": var.event['guid'],
+                                "type": var.event['type'],
+                                "num": var.event['num'],
+                                "value": var.settings['high_threshold']
+                            }
                     if var.event['value'] <= var.settings['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],

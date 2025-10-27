@@ -40,12 +40,20 @@ def check_pressed(bind):
 
 def increment(bind, function, control):
     #print("increment function print1: ", bind, function, control)
-    if control == "up":
-        offset = step[function] * var.settings[function]['increment']
-    elif control == "down":
-        offset = step[function] * var.settings[function]['increment'] * -1
+    if function == 'bite_point':
+        if control == "up":
+            offset = var.settings[function]['increment']/100
+        elif control == "down":
+            offset = -var.settings[function]['increment']/100
+        else:
+            offset = 0.0
     else:
-        offset = 0.0
+        if control == "up":
+            offset = step[function] * var.settings[function]['increment']
+        elif control == "down":
+            offset = step[function] * var.settings[function]['increment'] * -1
+        else:
+            offset = 0.0
     #print("offset: ", offset)
     if check_pressed(bind):
 
@@ -53,7 +61,10 @@ def increment(bind, function, control):
             vjoy.set(function, var.status[function]['secondary'] + offset)
             #print("secondary")
         else:
-            vjoy.set(function, var.status[function]['primary'] + offset)
+            if function == 'bite_point':
+                var.status[function]['secondary'] = var.status[function]['secondary'] + offset
+            else:
+                vjoy.set(function, var.status[function]['primary'] + offset)
             #print("primary")
 
         interval = int(10)
@@ -68,7 +79,10 @@ def increment(bind, function, control):
                     if var.status[function]['switched']:
                         vjoy.set(function, var.status[function]['secondary'] + offset)
                     else:
-                        vjoy.set(function, var.status[function]['primary'] + offset)
+                        if function == 'bite_point':
+                            var.status[function]['secondary'] = var.status[function]['secondary'] + offset
+                        else:
+                            vjoy.set(function, var.status[function]['primary'] + offset)
                     if count == 10:
                         timer = var.settings['timer_loop']/1000
                 sleep(timer/interval)
@@ -79,6 +93,7 @@ def increment(bind, function, control):
     #else:
         #print("bind check_pressed failed: ", bind)
     var.status[function]['thread']['running'][control] = False
+
 
 def switch(bind, function):
     if check_pressed(bind):
@@ -114,18 +129,42 @@ def controls():
 
                 bind = var.bindings[function][control]
                 #print("bind: ", bind)
+                if function == 'bite_point':
+                    if control == "pedal":
+                        value = entry['value']
+                        if var.status[function]['thread']['running'][control] == False:
+                            var.status[function]['thread']['running'][control] = True
+                            print("start thread: ", function, control, value)
+                            var.status[function]['primary'] = value
+                            if not var.status[function]['switched']:
+                                print("pedal set: ", function, value)
+                                vjoy.set(function, value)
+                            var.status[function]['thread']['running'][control] = False
+                    elif control == "up" or control == "down":
+                        if var.status[function]['thread']['running'][control] == False:
+                            var.status[function]['thread']['running'][control] = True
+                            print("start thread: ", function, control)
+                            fn.start_thread(lambda: increment(bind, function, control))
+                            #increment(bind, function, control)
+                            #var.status[function]['thread']['running'] = None
+                        # else:
+                        #     print("thread running check failed: ", var.status[function['thread']['running']])
+                    elif control == "switch":
+                        if not var.status[function]['thread']['waiting']:
+                            var.status[function]['thread']['waiting'] = True
+                            fn.start_thread(lambda: switch(bind, function))
+                else:
+                    if control == "up" or control == "down":
+                        if var.status[function]['thread']['running'][control] == False:
+                            var.status[function]['thread']['running'][control] = True
+                            print("start thread: ", function, control)
+                            fn.start_thread(lambda: increment(bind, function, control))
+                            #increment(bind, function, control)
+                            #var.status[function]['thread']['running'] = None
+                        # else:
+                        #     print("thread running check failed: ", var.status[function['thread']['running']])
 
-                if control == "up" or control == "down":
-                    if var.status[function]['thread']['running'][control] == False:
-                        var.status[function]['thread']['running'][control] = True
-                        print("start thread: ", function, control)
-                        fn.start_thread(lambda: increment(bind, function, control))
-                        #increment(bind, function, control)
-                        #var.status[function]['thread']['running'] = None
-                    # else:
-                    #     print("thread running check failed: ", var.status[function['thread']['running']])
-
-                elif control == "switch":
-                    if not var.status[function]['thread']['waiting']:
-                        var.status[function]['thread']['waiting'] = True
-                        fn.start_thread(lambda: switch(bind, function))
+                    elif control == "switch":
+                        if not var.status[function]['thread']['waiting']:
+                            var.status[function]['thread']['waiting'] = True
+                            fn.start_thread(lambda: switch(bind, function))

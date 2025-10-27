@@ -16,7 +16,7 @@ def read_config():
 
                 if section == "GENERAL":
                     var.settings[item] = setting
-                elif item == "up" or item == "down" or item == "switch":
+                elif item == "up" or item == "down" or item == "switch" or item == "pedal":
                     var.bindings[section.lower()][item] = setting
                 else:
                     var.settings[section.lower()][item] = setting
@@ -79,7 +79,20 @@ def is_bind():
             for control in var.bindings[function]:
                 if event['type'] == "axis" and var.bindings[function][control] != None:
                     #if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and event['value'] == var.bindings[function][control]['value']:
-                    if event == var.bindings[function][control]:
+                    if function == 'bite_point' and event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num']:
+                        if result == None:
+                            result = [{
+                                "function": function,
+                                "control": control,
+                                "value": var.event['value']
+                            }]
+                        else:
+                            result.append({
+                                "function": function,
+                                "control": control,
+                                "value": var.event['value']
+                            })
+                    elif event == var.bindings[function][control]:
                         if result == None:
                             result = [{
                                 "function": function,
@@ -107,7 +120,7 @@ def is_bind():
                         result = [{
                             "function": function,
                             "control": control,
-                        }]
+                            }]
                     else:
                         result.append({
                             "function": function,
