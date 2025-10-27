@@ -993,6 +993,21 @@ class MainWindow(QMainWindow):
         ui['timer'].start(int((var.settings['frequency'] * 1000) / 10))
 
     def updater(self):
+        for function in var.status:
+            if function in self.content:
+                value = var.status[function]['secondary']
+                if function == "weight_jacker":
+                    # var.status[function]['secondary'] = (value * step[function]) + 0.5
+                    value = int((value - 0.5)/step[function])
+                elif function == "bite_point":
+                    # var.status[function]['secondary'] = value/100
+                    value = float(value*100)
+                else:
+                    # var.status[function]['secondary'] = (value * step[function]) - step[function]
+                    value = int((value + step[function])/step[function])
+
+                self.content[function]['switch'].setValue(value)
+
         self.display()
 
     def display(self):
