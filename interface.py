@@ -36,7 +36,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.0a",
+    "version": "v0.4.1a",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -1149,7 +1149,7 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                         }
                 elif var.event['type'] == "axis":
-                    if function == 'bite_point':
+                    if function == 'bite_point' and control == 'pedal':
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
@@ -1163,13 +1163,13 @@ class MainWindow(QMainWindow):
                                 "num": var.event['num'],
                                 "value": var.settings['high_threshold']
                             }
-                    if var.event['value'] <= var.settings['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
-                        var.bindings[function][control] = {
-                            "guid": var.event['guid'],
-                            "type": var.event['type'],
-                            "num": var.event['num'],
-                            "value": var.settings['low_threshold']
-                        }
+                        if var.event['value'] <= var.settings['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                            var.bindings[function][control] = {
+                                "guid": var.event['guid'],
+                                "type": var.event['type'],
+                                "num": var.event['num'],
+                                "value": var.settings['low_threshold']
+                            }
                 elif var.event['type'] == "hat":
                     if var.event['value'] != "none":
                         var.bindings[function][control] = {

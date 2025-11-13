@@ -136,7 +136,7 @@ def reset_bind_thresh(thresh, value):
     for function in var.bindings:
         if function != 'status':
             for control in var.bindings[function]:
-                if var.bindings[function][control] != None and var.bindings[function][control]['type'] == 'axis':
+                if var.bindings[function][control] != None and var.bindings[function][control]['type'] == 'axis' and not (function == 'bite_point' and control == 'pedal'):
                     if (var.bindings[function][control]['value'] == var.settings['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['low_threshold'] and thresh == 'low_threshold'):
                         var.bindings[function][control]['value'] = value
 
