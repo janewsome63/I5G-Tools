@@ -1,10 +1,14 @@
 import configparser as parse
 import os.path
 import threading
+from os import write
 from string import capwords
 from turtle import config_dict
 from ast import literal_eval as eval
+
+import devices as dev
 import variables as var
+from time import sleep
 
 def read_config():
     if os.path.exists(var.backend['config']):
@@ -20,6 +24,19 @@ def read_config():
                     var.bindings[section.lower()][item] = setting
                 else:
                     var.settings[section.lower()][item] = setting
+        while not dev.device_info:
+            sleep(0.1)
+        sleep(0.1)
+        for function in var.bindings:
+            if function != "status":
+                for control in var.bindings[function]:
+                    if var.bindings[function][control]['guid'] != 0:
+                        try:
+                            dev.device_info[var.bindings[function][control]['guid']]
+                        except:
+                            var.bindings[function][control]['guid'] = 0
+                            var.bindings[function][control]['type'] = "none"
+                            var.bindings[function][control]['num'] = 0
     else:
         write_config()
 
