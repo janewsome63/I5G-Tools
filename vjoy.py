@@ -31,6 +31,8 @@ status = {
     "busy": False,
 }
 
+j = vjoy.VJoyDevice(1)
+
 def set(axis, pct):
     #print("vjoy set check1")
     while status['busy']: # no queue, just whoever happens to check at the right time first if there are multiple instances of vjoy.set() in this loop
@@ -43,7 +45,7 @@ def set(axis, pct):
     elif raw > 32768:
         raw = 32768
 
-    vjoy.VJoyDevice(var.settings['device']).set_axis(axis_ref[axis], raw)
+    j.set_axis(axis_ref[axis], raw)
     axis_values[axis] = round(raw / 32768, 3)
     if switched:
         var.status[axis]['secondary'] = axis_values[axis]
@@ -74,7 +76,7 @@ def calibrate(axis):
 
 def intialize():
     sleep(1.0)
-    vjoy.VJoyDevice(var.settings['device']).update()
+    j.update()
     set("weight_jacker", 0.5)
     set("front_roll_bar", 1.0)
     set("rear_roll_bar", 0.0)

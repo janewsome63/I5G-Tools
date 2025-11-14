@@ -36,7 +36,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.1a",
+    "version": "v0.4.2a",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -82,7 +82,7 @@ var.settings = {
     "low_threshold": 0.10,
     "frequency": 0.1,
     "scale": 1.25,
-    "device": 1,
+    #"device": 1,
     "axis_samples": 2,
     "timer_loop": 150,
     "timer_first": 300,
