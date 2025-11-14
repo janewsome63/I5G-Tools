@@ -104,6 +104,7 @@ def device_detection():
     for i in range(p.joystick.get_count()):
         add_device(i)
 
+    var.status['devices_loaded'] = True
     running = True
     p.event.wait(1000)
     p.event.clear()

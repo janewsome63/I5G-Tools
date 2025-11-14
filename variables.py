@@ -78,6 +78,7 @@ bindings = {
         "pedal": {
             "guid": 0,
             "type": "none",
+            "num": 0,
         },
         "up": {
             "guid": 0,
@@ -116,6 +117,7 @@ bindings = {
 settings = {}
 status = {
     "calibration": False,
+    "devices_loaded": False,
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,

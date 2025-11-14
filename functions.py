@@ -24,9 +24,8 @@ def read_config():
                     var.bindings[section.lower()][item] = setting
                 else:
                     var.settings[section.lower()][item] = setting
-        while not dev.device_info:
+        while not var.status['devices_loaded']:
             sleep(0.1)
-        sleep(0.1)
         for function in var.bindings:
             if function != "status":
                 for control in var.bindings[function]:
