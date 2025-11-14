@@ -33,9 +33,7 @@ def read_config():
                         try:
                             dev.device_info[var.bindings[function][control]['guid']]
                         except:
-                            var.bindings[function][control]['guid'] = 0
-                            var.bindings[function][control]['type'] = "none"
-                            var.bindings[function][control]['num'] = 0
+                            var.bindings[function][control] = {"guid": 0, "type": "none", "num": 0}
     else:
         write_config()
 

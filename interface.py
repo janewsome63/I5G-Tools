@@ -36,7 +36,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.3a",
+    "version": "v0.4.4a",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -1138,7 +1138,7 @@ class MainWindow(QMainWindow):
         var.bindings[function][control] = None
         while not var.bindings[function][control]:
             if self.is_running == False:
-                break
+                var.bindings[function][control] = {"guid": 0, "type": "none", "num": 0}
 
             if var.event['guid'] != 0:
                 if var.event['type'] == "button":

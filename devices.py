@@ -135,7 +135,9 @@ def device_detection():
 
 def format(function, control):
     if var.bindings[function][control]:
-        if "dir" in var.bindings[function][control]:
+        if var.bindings[function][control]['type'] == "none":
+            dev_pretty = "None"
+        elif "dir" in var.bindings[function][control]:
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])
             num = str(var.bindings[function][control]['num'])
@@ -151,8 +153,6 @@ def format(function, control):
                 dev_pretty += "+"
             elif function != 'bite_point':
                 dev_pretty += "-"
-        elif var.bindings[function][control]['type'] == "none":
-            dev_pretty = "None"
         else:
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])
