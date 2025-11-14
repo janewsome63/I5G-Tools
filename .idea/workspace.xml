@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Fix TypeError on unbinding, fix KeyError on undetected device binding">
-      <change beforePath="$PROJECT_DIR$/.idea/I5G-Tools.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/I5G-Tools.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Update to Python 3.14.0 and PyQt6">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +81,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.Run">
+  <component name="RunManager" selected="Shell Script.Compile">
     <configuration name="Run" type="PythonConfigurationType" factoryName="Python">
       <module name="I5G-Tools" />
       <option name="ENV_FILES" value="" />
@@ -358,7 +357,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763095023458</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Update to Python 3.14.0 and PyQt6">
+      <option name="closed" value="true" />
+      <created>1763104909269</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1763104909269</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -396,6 +403,7 @@
     <MESSAGE value="Fix memory leak caused by creating new vjoy device objects" />
     <MESSAGE value="Fix bindings being cleared due to checking for GUIDs before all devices had been loaded" />
     <MESSAGE value="Fix TypeError on unbinding, fix KeyError on undetected device binding" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix TypeError on unbinding, fix KeyError on undetected device binding" />
+    <MESSAGE value="Update to Python 3.14.0 and PyQt6" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update to Python 3.14.0 and PyQt6" />
   </component>
 </project>
