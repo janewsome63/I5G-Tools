@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Update to Python 3.14.0 and PyQt6">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Edit compile script to no longer use Resource Hacker">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +80,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="Shell Script.Compile">
+  <component name="RunManager" selected="Python.Run">
     <configuration name="Run" type="PythonConfigurationType" factoryName="Python">
       <module name="I5G-Tools" />
       <option name="ENV_FILES" value="" />
@@ -365,7 +364,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763104909269</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="Edit compile script to no longer use Resource Hacker">
+      <option name="closed" value="true" />
+      <created>1763106120452</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1763106120452</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -404,6 +411,7 @@
     <MESSAGE value="Fix bindings being cleared due to checking for GUIDs before all devices had been loaded" />
     <MESSAGE value="Fix TypeError on unbinding, fix KeyError on undetected device binding" />
     <MESSAGE value="Update to Python 3.14.0 and PyQt6" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update to Python 3.14.0 and PyQt6" />
+    <MESSAGE value="Edit compile script to no longer use Resource Hacker" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edit compile script to no longer use Resource Hacker" />
   </component>
 </project>

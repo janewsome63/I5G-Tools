@@ -36,7 +36,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.5a",
+    "version": "v0.4.6a",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -82,7 +82,6 @@ var.settings = {
     "low_threshold": 0.10,
     "frequency": 0.1,
     "scale": 1.25,
-    #"device": 1,
     "axis_samples": 2,
     "timer_loop": 150,
     "timer_first": 300,
@@ -91,7 +90,7 @@ var.settings = {
         "continuous": True,
         "toggle": False,
         "increment": 1,
-        "switch_value": -20,
+        "switch_value": 20,
     },
     "front_roll_bar": {
         "continuous": False,
@@ -1042,7 +1041,7 @@ class MainWindow(QMainWindow):
                     value = float(value*100)
                 else:
                     # var.status[function]['secondary'] = (value * step[function]) - step[function]
-                    value = int((value + step[function])/step[function])
+                    value = int((value / step[function]) + 1)
 
                 self.content[function]['switch'].setValue(value)
 
