@@ -1,8 +1,6 @@
 import os
 import sys
 
-from PyQt5.QtGui import QIcon
-
 import history
 from time import sleep
 import math
@@ -44,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.7a",
+    "version": "v0.4.8a",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -131,8 +129,13 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.is_running = False
 
+        if getattr(sys, 'frozen', False):
+            applicationPath = sys._MEIPASS
+        elif __file__:
+            applicationPath = os.path.dirname(__file__)
+        self.setWindowIcon(QIcon(os.path.join(applicationPath, "icon.ico")))
+
         self.setWindowTitle(lang['title'] + " " + lang['version'])
-        self.setWindowIcon(QIcon('icon.ico'))
         self.setFixedSize(QSize(ui['width'], ui['height']))
         self.layout = QVBoxLayout()
 

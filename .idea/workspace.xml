@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Small change to switch value updating">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.7a - Add window icon, fix reversing when switching between toggle and hold while toggled, tweak UI sizes and lang">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vjoy.py" beforeDir="false" afterPath="$PROJECT_DIR$/vjoy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -381,7 +382,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763110724844</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="v0.4.7a - Add window icon, fix reversing when switching between toggle and hold while toggled, tweak UI sizes and lang">
+      <option name="closed" value="true" />
+      <created>1763331883779</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1763331883779</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -396,7 +405,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding basics" />
     <MESSAGE value="Initial UI design" />
     <MESSAGE value="UI tweaks" />
     <MESSAGE value="Working on input device detection" />
@@ -421,6 +429,7 @@
     <MESSAGE value="Update to Python 3.14.0 and PyQt6" />
     <MESSAGE value="Edit compile script to no longer use Resource Hacker" />
     <MESSAGE value="Small change to switch value updating" />
-    <option name="LAST_COMMIT_MESSAGE" value="Small change to switch value updating" />
+    <MESSAGE value="v0.4.7a - Add window icon, fix reversing when switching between toggle and hold while toggled, tweak UI sizes and lang" />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.4.7a - Add window icon, fix reversing when switching between toggle and hold while toggled, tweak UI sizes and lang" />
   </component>
 </project>
