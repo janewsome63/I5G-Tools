@@ -59,7 +59,7 @@ def calibrate(axis):
     #var.status['calibration'] = True
     while var.status[axis]['thread']['waiting']: #wait for any hold loops to finish
         sleep(0.05)
-    step = 0.05
+    step = 0.01
     pct = 0.0
     while pct < 1.0:
         set(axis, pct)

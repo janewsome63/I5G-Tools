@@ -1,5 +1,8 @@
 import os
 import sys
+
+from PyQt5.QtGui import QIcon
+
 import history
 from time import sleep
 import math
@@ -11,6 +14,7 @@ from PyQt6.QtCore import (
     QThreadPool,
     pyqtSlot
 )
+
 from PyQt6.QtWidgets import (
     QApplication,
     QComboBox,
@@ -28,6 +32,10 @@ from PyQt6.QtWidgets import (
     QLineEdit
 )
 
+from PyQt6.QtGui import (
+    QIcon,
+)
+
 from controls import step
 import functions as fn
 import variables as var
@@ -36,7 +44,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.6a",
+    "version": "v0.4.7a",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -61,16 +69,16 @@ lang = {
     "timer_first": "Continuous Mode Initial Loop Timer (in ms)",
     "none": "None",
     "weight_jacker": "Weight Jacker",
-    "front_roll_bar": "Front Roll Bar",
-    "rear_roll_bar": "Rear Roll Bar",
+    "front_roll_bar": "Front Bar",
+    "rear_roll_bar": "Rear Bar",
     "fuel_map": "Fuel Map",
-    "bite_point": "Bite Point",
-    "engine_warming": "Engine Warming",
+    "bite_point": "Clutch",
+    "engine_warming": "Throttle",
     "settings": "Settings",
 }
 
 ui = {
-    "width": 550,
+    "width": 505,
     "height": 250,
     "timer": QTimer(),
     "thread_pool": QThreadPool(),
@@ -124,6 +132,7 @@ class MainWindow(QMainWindow):
         self.is_running = False
 
         self.setWindowTitle(lang['title'] + " " + lang['version'])
+        self.setWindowIcon(QIcon('icon.ico'))
         self.setFixedSize(QSize(ui['width'], ui['height']))
         self.layout = QVBoxLayout()
 
@@ -1126,6 +1135,8 @@ class MainWindow(QMainWindow):
         if self.content[func]['switch_mode'].currentText() == "Toggle":
             var.settings[func]['toggle'] = True
         elif self.content[func]['switch_mode'].currentText() == "Hold":
+            var.status[func]['switched'] = False
+            vjoy.set(func, var.status[func]['primary'])
             var.settings[func]['toggle'] = False
         fn.write_config()
 
