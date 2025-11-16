@@ -881,7 +881,7 @@ class MainWindow(QMainWindow):
         self.settings.layout.addWidget(self.content['settings']['axis_samples'], 2, 0)
 
         self.content['settings']['axis_samples'] = QSpinBox()
-        self.content['settings']['axis_samples'].setFixedSize(42, 20)
+        self.content['settings']['axis_samples'].setFixedSize(60, 20)
         self.content['settings']['axis_samples'].setRange(2, 10)
         self.content['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
         self.settings.layout.addWidget(self.content['settings']['axis_samples'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -893,7 +893,7 @@ class MainWindow(QMainWindow):
         self.settings.layout.addWidget(self.content['settings']['scale_label'], 3, 0)
 
         self.content['settings']['scale'] = QComboBox()
-        self.content['settings']['scale'].setFixedSize(60, 22)
+        self.content['settings']['scale'].setFixedSize(70, 22)
         self.content['settings']['scale'].addItem("0.50" + "x")
         self.content['settings']['scale'].addItem("0.75" + "x")
         self.content['settings']['scale'].addItem("1.00" + "x")
@@ -909,7 +909,7 @@ class MainWindow(QMainWindow):
         self.settings.layout.addWidget(self.content['settings']['timer_first'], 4, 0)
 
         self.content['settings']['timer_first'] = QSpinBox()
-        self.content['settings']['timer_first'].setFixedSize(42, 20)
+        self.content['settings']['timer_first'].setFixedSize(70, 20)
         self.content['settings']['timer_first'].setRange(1, 1000)
         self.content['settings']['timer_first'].setValue(int(var.settings['timer_first']))
         self.settings.layout.addWidget(self.content['settings']['timer_first'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -921,7 +921,7 @@ class MainWindow(QMainWindow):
         self.settings.layout.addWidget(self.content['settings']['timer_loop'], 5, 0)
 
         self.content['settings']['timer_loop'] = QSpinBox()
-        self.content['settings']['timer_loop'].setFixedSize(42, 20)
+        self.content['settings']['timer_loop'].setFixedSize(70, 20)
         self.content['settings']['timer_loop'].setRange(1, 1000)
         self.content['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
         self.settings.layout.addWidget(self.content['settings']['timer_loop'], 5, 1, alignment=Qt.AlignmentFlag.AlignLeft)
