@@ -131,15 +131,16 @@ def controls():
                 #print("bind: ", bind)
                 if function == 'bite_point':
                     if control == "pedal":
-                        value = entry['value']
-                        if var.status[function]['thread']['running'][control] == False:
-                            var.status[function]['thread']['running'][control] = True
-                            print("start thread: ", function, control, value)
-                            var.status[function]['primary'] = value
-                            if not var.status[function]['switched']:
-                                print("pedal set: ", function, value)
-                                vjoy.set(function, value)
-                            var.status[function]['thread']['running'][control] = False
+                        if 'value' in entry:
+                            value = entry['value']
+                            if var.status[function]['thread']['running'][control] == False:
+                                var.status[function]['thread']['running'][control] = True
+                                print("start thread: ", function, control, value)
+                                var.status[function]['primary'] = value
+                                if not var.status[function]['switched']:
+                                    print("pedal set: ", function, value)
+                                    vjoy.set(function, value)
+                                var.status[function]['thread']['running'][control] = False
                     elif control == "up" or control == "down":
                         if var.status[function]['thread']['running'][control] == False:
                             var.status[function]['thread']['running'][control] = True
