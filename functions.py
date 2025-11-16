@@ -86,7 +86,7 @@ def is_bind():
             "type": var.event['type'],
             "num": var.event['num'],
         }
-    result = None
+    result = []
 
     for function in var.bindings:
         if function != "status":
@@ -94,52 +94,19 @@ def is_bind():
                 if event['type'] == "axis" and var.bindings[function][control] != None:
                     #if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and event['value'] == var.bindings[function][control]['value']:
                     if function == 'bite_point' and event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num']:
-                        if result == None:
-                            result = [{
-                                "function": function,
-                                "control": control,
-                                "value": var.event['value']
-                            }]
-                        else:
-                            result.append({
-                                "function": function,
-                                "control": control,
-                                "value": var.event['value']
-                            })
+                        result.append({ "function": function, 
+                                        "control": control,
+                                        "value": var.event['value']})
                     elif event == var.bindings[function][control]:
-                        if result == None:
-                            result = [{
-                                "function": function,
-                                "control": control,
-                            }]
-                        else:
-                            result.append({
-                                "function": function,
-                                "control": control,
-                            })
+                        result.append({ "function": function,
+                                        "control": control})
                 elif event['type'] == "hat" and var.bindings[function][control] != None:
                     if var.bindings[function][control]['type'] == "hat" and var.bindings[function][control]['dir'] in event['dir']:
-                        if result == None:
-                            result = [{
-                                "function": function,
-                                "control": control,
-                            }]
-                        else:
-                            result.append({
-                                "function": function,
-                                "control": control,
-                            })
+                        result.append({ "function": function,
+                                        "control": control})
                 elif event == var.bindings[function][control]:
-                    if result == None:
-                        result = [{
-                            "function": function,
-                            "control": control,
-                            }]
-                    else:
-                        result.append({
-                            "function": function,
-                            "control": control,
-                        })
+                    result.append({ "function": function,
+                                    "control": control})
     print(result)
     return result
 
