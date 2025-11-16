@@ -1035,13 +1035,13 @@ class MainWindow(QMainWindow):
                 value = var.status[function]['secondary']
                 if function == "weight_jacker":
                     # var.status[function]['secondary'] = (value * step[function]) + 0.5
-                    value = int((value - 0.5)/step[function])
+                    value = int(round((value - 0.5)/step[function]))
                 elif function == "bite_point":
                     # var.status[function]['secondary'] = value/100
                     value = float(value*100)
                 else:
                     # var.status[function]['secondary'] = (value * step[function]) - step[function]
-                    value = int((value / step[function]) + 1)
+                    value = int(round((value / step[function]) + 1))
 
                 self.content[function]['switch'].setValue(value)
 
