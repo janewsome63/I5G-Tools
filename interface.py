@@ -189,7 +189,7 @@ class MainWindow(QMainWindow):
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['axis'], 0, 1)
 
         self.content['weight_jacker']['calibrate'] = QPushButton()
-        self.content['weight_jacker']['calibrate'].setFixedSize(70, 25)
+        self.content['weight_jacker']['calibrate'].setFixedSize(100, 25)
         self.content['weight_jacker']['calibrate'].setText(lang['calibrate'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['calibrate'], 0, 2)
         self.content['weight_jacker']['calibrate'].clicked.connect(lambda: self.calibrate_start("weight_jacker"))
@@ -263,7 +263,7 @@ class MainWindow(QMainWindow):
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_device'], 3, 1)
 
         self.content['weight_jacker']['up_bind'] = QPushButton()
-        self.content['weight_jacker']['up_bind'].setFixedSize(70, 25)
+        self.content['weight_jacker']['up_bind'].setFixedSize(100, 25)
         self.content['weight_jacker']['up_bind'].setText(lang['bind'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_bind'], 3, 2)
         self.content['weight_jacker']['up_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","up"))
@@ -281,7 +281,7 @@ class MainWindow(QMainWindow):
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_device'], 4, 1)
 
         self.content['weight_jacker']['down_bind'] = QPushButton()
-        self.content['weight_jacker']['down_bind'].setFixedSize(70, 25)
+        self.content['weight_jacker']['down_bind'].setFixedSize(100, 25)
         self.content['weight_jacker']['down_bind'].setText(lang['bind'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_bind'], 4, 2)
         self.content['weight_jacker']['down_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","down"))
@@ -300,7 +300,7 @@ class MainWindow(QMainWindow):
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_device'], 5, 1)
 
         self.content['weight_jacker']['switch_bind'] = QPushButton()
-        self.content['weight_jacker']['switch_bind'].setFixedSize(70, 25)
+        self.content['weight_jacker']['switch_bind'].setFixedSize(100, 25)
         self.content['weight_jacker']['switch_bind'].setText(lang['bind'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_bind'], 5, 2)
         self.content['weight_jacker']['switch_bind'].clicked.connect(lambda: self.bind_start("weight_jacker","switch"))
@@ -321,7 +321,7 @@ class MainWindow(QMainWindow):
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['axis'], 1, 1)
 
         self.content['front_roll_bar']['calibrate'] = QPushButton()
-        self.content['front_roll_bar']['calibrate'].setFixedSize(70, 25)
+        self.content['front_roll_bar']['calibrate'].setFixedSize(100, 25)
         self.content['front_roll_bar']['calibrate'].setText(lang['calibrate'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['calibrate'], 1, 2)
         self.content['front_roll_bar']['calibrate'].clicked.connect(lambda: self.calibrate_start("front_roll_bar"))
@@ -395,7 +395,7 @@ class MainWindow(QMainWindow):
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['up_device'], 4, 1)
 
         self.content['front_roll_bar']['up_bind'] = QPushButton()
-        self.content['front_roll_bar']['up_bind'].setFixedSize(70, 25)
+        self.content['front_roll_bar']['up_bind'].setFixedSize(100, 25)
         self.content['front_roll_bar']['up_bind'].setText(lang['bind'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['up_bind'], 4, 2)
         self.content['front_roll_bar']['up_bind'].clicked.connect(lambda: self.bind_start("front_roll_bar","up"))
@@ -413,7 +413,7 @@ class MainWindow(QMainWindow):
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['down_device'], 5, 1)
 
         self.content['front_roll_bar']['down_bind'] = QPushButton()
-        self.content['front_roll_bar']['down_bind'].setFixedSize(70, 25)
+        self.content['front_roll_bar']['down_bind'].setFixedSize(100, 25)
         self.content['front_roll_bar']['down_bind'].setText(lang['bind'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['down_bind'], 5, 2)
         self.content['front_roll_bar']['down_bind'].clicked.connect(lambda: self.bind_start("front_roll_bar","down"))
@@ -431,7 +431,7 @@ class MainWindow(QMainWindow):
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch_device'], 6, 1)
 
         self.content['front_roll_bar']['switch_bind'] = QPushButton()
-        self.content['front_roll_bar']['switch_bind'].setFixedSize(70, 25)
+        self.content['front_roll_bar']['switch_bind'].setFixedSize(100, 25)
         self.content['front_roll_bar']['switch_bind'].setText(lang['bind'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch_bind'], 6, 2)
         self.content['front_roll_bar']['switch_bind'].clicked.connect(lambda: self.bind_start("front_roll_bar","switch"))
@@ -452,7 +452,7 @@ class MainWindow(QMainWindow):
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['axis'], 1, 1)
 
         self.content['rear_roll_bar']['calibrate'] = QPushButton()
-        self.content['rear_roll_bar']['calibrate'].setFixedSize(70, 25)
+        self.content['rear_roll_bar']['calibrate'].setFixedSize(100, 25)
         self.content['rear_roll_bar']['calibrate'].setText(lang['calibrate'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['calibrate'], 1, 2)
         self.content['rear_roll_bar']['calibrate'].clicked.connect(lambda: self.calibrate_start("rear_roll_bar"))
@@ -526,7 +526,7 @@ class MainWindow(QMainWindow):
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['up_device'], 4, 1)
 
         self.content['rear_roll_bar']['up_bind'] = QPushButton()
-        self.content['rear_roll_bar']['up_bind'].setFixedSize(70, 25)
+        self.content['rear_roll_bar']['up_bind'].setFixedSize(100, 25)
         self.content['rear_roll_bar']['up_bind'].setText(lang['bind'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['up_bind'], 4, 2)
         self.content['rear_roll_bar']['up_bind'].clicked.connect(lambda: self.bind_start("rear_roll_bar","up"))
@@ -544,7 +544,7 @@ class MainWindow(QMainWindow):
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['down_device'], 5, 1)
 
         self.content['rear_roll_bar']['down_bind'] = QPushButton()
-        self.content['rear_roll_bar']['down_bind'].setFixedSize(70, 25)
+        self.content['rear_roll_bar']['down_bind'].setFixedSize(100, 25)
         self.content['rear_roll_bar']['down_bind'].setText(lang['bind'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['down_bind'], 5, 2)
         self.content['rear_roll_bar']['down_bind'].clicked.connect(lambda: self.bind_start("rear_roll_bar","down"))
@@ -562,7 +562,7 @@ class MainWindow(QMainWindow):
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch_device'], 6, 1)
 
         self.content['rear_roll_bar']['switch_bind'] = QPushButton()
-        self.content['rear_roll_bar']['switch_bind'].setFixedSize(70, 25)
+        self.content['rear_roll_bar']['switch_bind'].setFixedSize(100, 25)
         self.content['rear_roll_bar']['switch_bind'].setText(lang['bind'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch_bind'], 6, 2)
         self.content['rear_roll_bar']['switch_bind'].clicked.connect(lambda: self.bind_start("rear_roll_bar","switch"))
@@ -583,7 +583,7 @@ class MainWindow(QMainWindow):
         self.fuel_map.layout.addWidget(self.content['fuel_map']['axis'], 0, 1)
 
         self.content['fuel_map']['calibrate'] = QPushButton()
-        self.content['fuel_map']['calibrate'].setFixedSize(70, 25)
+        self.content['fuel_map']['calibrate'].setFixedSize(100, 25)
         self.content['fuel_map']['calibrate'].setText(lang['calibrate'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['calibrate'], 0, 2)
         self.content['fuel_map']['calibrate'].clicked.connect(lambda: self.calibrate_start("fuel_map"))
@@ -657,7 +657,7 @@ class MainWindow(QMainWindow):
         self.fuel_map.layout.addWidget(self.content['fuel_map']['up_device'], 3, 1)
 
         self.content['fuel_map']['up_bind'] = QPushButton()
-        self.content['fuel_map']['up_bind'].setFixedSize(70, 25)
+        self.content['fuel_map']['up_bind'].setFixedSize(100, 25)
         self.content['fuel_map']['up_bind'].setText(lang['bind'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['up_bind'], 3, 2)
         self.content['fuel_map']['up_bind'].clicked.connect(lambda: self.bind_start("fuel_map","up"))
@@ -675,7 +675,7 @@ class MainWindow(QMainWindow):
         self.fuel_map.layout.addWidget(self.content['fuel_map']['down_device'], 4, 1)
 
         self.content['fuel_map']['down_bind'] = QPushButton()
-        self.content['fuel_map']['down_bind'].setFixedSize(70, 25)
+        self.content['fuel_map']['down_bind'].setFixedSize(100, 25)
         self.content['fuel_map']['down_bind'].setText(lang['bind'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['down_bind'], 4, 2)
         self.content['fuel_map']['down_bind'].clicked.connect(lambda: self.bind_start("fuel_map","down"))
@@ -693,7 +693,7 @@ class MainWindow(QMainWindow):
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch_device'], 5, 1)
 
         self.content['fuel_map']['switch_bind'] = QPushButton()
-        self.content['fuel_map']['switch_bind'].setFixedSize(70, 25)
+        self.content['fuel_map']['switch_bind'].setFixedSize(100, 25)
         self.content['fuel_map']['switch_bind'].setText(lang['bind'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch_bind'], 5, 2)
         self.content['fuel_map']['switch_bind'].clicked.connect(lambda: self.bind_start("fuel_map","switch"))
@@ -716,7 +716,7 @@ class MainWindow(QMainWindow):
         self.bite_point.layout.addWidget(self.content['bite_point']['axis'], 0, 1)
 
         self.content['bite_point']['calibrate'] = QPushButton()
-        self.content['bite_point']['calibrate'].setFixedSize(70, 25)
+        self.content['bite_point']['calibrate'].setFixedSize(100, 25)
         self.content['bite_point']['calibrate'].setText(lang['calibrate'])
         self.bite_point.layout.addWidget(self.content['bite_point']['calibrate'], 0, 2)
         self.content['bite_point']['calibrate'].clicked.connect(lambda: self.calibrate_start("bite_point"))
@@ -794,7 +794,7 @@ class MainWindow(QMainWindow):
         self.bite_point.layout.addWidget(self.content['bite_point']['pedal_device'], 3, 1)
 
         self.content['bite_point']['pedal_bind'] = QPushButton()
-        self.content['bite_point']['pedal_bind'].setFixedSize(70, 25)
+        self.content['bite_point']['pedal_bind'].setFixedSize(100, 25)
         self.content['bite_point']['pedal_bind'].setText(lang['bind'])
         self.bite_point.layout.addWidget(self.content['bite_point']['pedal_bind'], 3, 2)
         self.content['bite_point']['pedal_bind'].clicked.connect(lambda: self.bind_start("bite_point","pedal"))
@@ -812,7 +812,7 @@ class MainWindow(QMainWindow):
         self.bite_point.layout.addWidget(self.content['bite_point']['up_device'], 4, 1)
 
         self.content['bite_point']['up_bind'] = QPushButton()
-        self.content['bite_point']['up_bind'].setFixedSize(70, 25)
+        self.content['bite_point']['up_bind'].setFixedSize(100, 25)
         self.content['bite_point']['up_bind'].setText(lang['bind'])
         self.bite_point.layout.addWidget(self.content['bite_point']['up_bind'], 4, 2)
         self.content['bite_point']['up_bind'].clicked.connect(lambda: self.bind_start("bite_point","up"))
@@ -830,7 +830,7 @@ class MainWindow(QMainWindow):
         self.bite_point.layout.addWidget(self.content['bite_point']['down_device'], 5, 1)
 
         self.content['bite_point']['down_bind'] = QPushButton()
-        self.content['bite_point']['down_bind'].setFixedSize(70, 25)
+        self.content['bite_point']['down_bind'].setFixedSize(100, 25)
         self.content['bite_point']['down_bind'].setText(lang['bind'])
         self.bite_point.layout.addWidget(self.content['bite_point']['down_bind'], 5, 2)
         self.content['bite_point']['down_bind'].clicked.connect(lambda: self.bind_start("bite_point","down"))
@@ -848,7 +848,7 @@ class MainWindow(QMainWindow):
         self.bite_point.layout.addWidget(self.content['bite_point']['switch_device'], 6, 1)
 
         self.content['bite_point']['switch_bind'] = QPushButton()
-        self.content['bite_point']['switch_bind'].setFixedSize(70, 25)
+        self.content['bite_point']['switch_bind'].setFixedSize(100, 25)
         self.content['bite_point']['switch_bind'].setText(lang['bind'])
         self.bite_point.layout.addWidget(self.content['bite_point']['switch_bind'], 6, 2)
         self.content['bite_point']['switch_bind'].clicked.connect(lambda: self.bind_start("bite_point","switch"))
