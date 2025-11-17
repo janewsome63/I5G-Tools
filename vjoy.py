@@ -31,7 +31,11 @@ status = {
     "busy": False,
 }
 
-j = vjoy.VJoyDevice(1)
+try:
+    j = vjoy.VJoyDevice(1)
+except:
+    raise TypeError("\n\n**vjoy set up failed**\n- Check to make sure vjoy is running\n- Check if an instance of this app is already running\n")
+
 
 def set(axis, pct):
     #print("vjoy set check1")
