@@ -6,6 +6,7 @@ from string import capwords
 from turtle import config_dict
 from ast import literal_eval as eval
 import ctypes
+import sys
 
 import devices as dev
 import variables as var
@@ -30,6 +31,7 @@ def read_config():
                     var.settings[section.lower()][item] = setting
         while not var.status['devices_loaded']:
             sleep(0.1)
+        bind_errors = []
         for function in var.bindings:
             if function != "status":
                 for control in var.bindings[function]:
@@ -38,7 +40,17 @@ def read_config():
                             dev.device_info[var.bindings[function][control]['guid']]
                         except:
                             var.bindings[function][control] = {"guid": 0, "type": "none", "num": 0}
-                            ctypes.windll.user32.MessageBoxW(0, "The controller for " + str(function) + " " + str(control) + " was not detected. This input has been unbound and reset.", "Bound input device not detected!", 0)
+                            bind_errors.append([str(function), str(control)])
+        if not bind_errors == []:
+            text = "The following inputs could not be bound because its bound controller could not be found. If the app is used, these will all be unbound.\n\n"
+            for binding in bind_errors:
+                text += binding[0] + "  " + binding[1] + "\n"
+            text += "\n\nPressing OK will open the app and immediately unbind these inputs.\nPressing Cancel will close the app now if you want to plug in the controller before using the app.\nProceed?"
+            response = ctypes.windll.user32.MessageBoxW(0, text, "Bound input device not detected!", 1)
+            if response == 1:
+                return
+            if response == 2:
+                sys.exit(0)
 
     else:
         write_config()
