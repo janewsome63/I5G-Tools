@@ -5,10 +5,14 @@ from os import write
 from string import capwords
 from turtle import config_dict
 from ast import literal_eval as eval
+import ctypes
 
 import devices as dev
 import variables as var
 from time import sleep
+
+def Mbox(title, text, style):
+    return 
 
 def read_config():
     if os.path.exists(var.backend['config']):
@@ -34,6 +38,8 @@ def read_config():
                             dev.device_info[var.bindings[function][control]['guid']]
                         except:
                             var.bindings[function][control] = {"guid": 0, "type": "none", "num": 0}
+                            ctypes.windll.user32.MessageBoxW(0, "The controller for " + str(function) + " " + str(control) + " was not detected. This input has been unbound and reset.", "Bound input device not detected!", 0)
+
     else:
         write_config()
 
