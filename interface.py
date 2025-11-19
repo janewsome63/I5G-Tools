@@ -42,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.10a",
+    "version": "v0.1.0b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -73,6 +73,7 @@ lang = {
     "bite_point": "Clutch",
     "engine_warming": "Throttle",
     "settings": "Settings",
+    "settings_filename": "Current Settings File:",
 }
 
 ui = {
@@ -174,8 +175,8 @@ class MainWindow(QMainWindow):
             },
             "settings": {},
             }
-
-        # --------Weight Jacker Tab--------#
+        
+                # --------Weight Jacker Tab--------#
         self.weight_jacker.layout = QGridLayout()
 
         self.content['weight_jacker']['lcd'] = QLCDNumber()
@@ -207,14 +208,12 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['increment'] = QSpinBox()
         self.content['weight_jacker']['increment'].setFixedSize(70, 25)
         self.content['weight_jacker']['increment'].setRange(1, 20)
-        self.content['weight_jacker']['increment'].setValue(var.settings['weight_jacker']['increment'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['weight_jacker']['increment'].valueChanged.connect(lambda: self.increment("weight_jacker"))
 
         self.content['weight_jacker']['switch'] = QSpinBox()
         self.content['weight_jacker']['switch'].setFixedSize(70, 25)
         self.content['weight_jacker']['switch'].setRange(-20, 20)
-        self.content['weight_jacker']['switch'].setValue(var.settings['weight_jacker']['switch_value'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['weight_jacker']['switch'].valueChanged.connect(lambda: self.switch("weight_jacker"))
 
@@ -232,10 +231,6 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['increment_mode'].setFixedSize(100, 25)
         self.content['weight_jacker']['increment_mode'].addItem(lang['continuous'])
         self.content['weight_jacker']['increment_mode'].addItem(lang['single'])
-        if var.settings['weight_jacker']['continuous']:
-            self.content['weight_jacker']['increment_mode'].setCurrentText(lang['continuous'])
-        else:
-            self.content['weight_jacker']['increment_mode'].setCurrentText(lang['single'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['increment_mode'], 2, 1)
         self.content['weight_jacker']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("weight_jacker"))
 
@@ -243,10 +238,6 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['switch_mode'].setFixedSize(70, 25)
         self.content['weight_jacker']['switch_mode'].addItem(lang['hold'])
         self.content['weight_jacker']['switch_mode'].addItem(lang['toggle'])
-        if var.settings['weight_jacker']['toggle']:
-            self.content['weight_jacker']['switch_mode'].setCurrentText(lang['toggle'])
-        else:
-            self.content['weight_jacker']['switch_mode'].setCurrentText(lang['hold'])
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_mode'], 2, 2)
         self.content['weight_jacker']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("weight_jacker"))
 
@@ -258,7 +249,6 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['up_device'] = QLineEdit()
         self.content['weight_jacker']['up_device'].setFixedHeight(25)
         self.content['weight_jacker']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['weight_jacker']['up_device'].setText(dev.format("weight_jacker", "up"))
         self.content['weight_jacker']['up_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['up_device'], 3, 1)
 
@@ -276,7 +266,6 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['down_device'] = QLineEdit()
         self.content['weight_jacker']['down_device'].setFixedHeight(25)
         self.content['weight_jacker']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['weight_jacker']['down_device'].setText(dev.format("weight_jacker", "down"))
         self.content['weight_jacker']['down_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['down_device'], 4, 1)
 
@@ -295,7 +284,6 @@ class MainWindow(QMainWindow):
         self.content['weight_jacker']['switch_device'] = QLineEdit()
         self.content['weight_jacker']['switch_device'].setFixedHeight(25)
         self.content['weight_jacker']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['weight_jacker']['switch_device'].setText(dev.format("weight_jacker", "switch"))
         self.content['weight_jacker']['switch_device'].setReadOnly(True)
         self.weight_jacker.layout.addWidget(self.content['weight_jacker']['switch_device'], 5, 1)
 
@@ -339,14 +327,12 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['increment'] = QSpinBox()
         self.content['front_roll_bar']['increment'].setFixedSize(70, 25)
         self.content['front_roll_bar']['increment'].setRange(1, 5)
-        self.content['front_roll_bar']['increment'].setValue(var.settings['front_roll_bar']['increment'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['increment'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['front_roll_bar']['increment'].valueChanged.connect(lambda: self.increment("front_roll_bar"))
 
         self.content['front_roll_bar']['switch'] = QSpinBox()
         self.content['front_roll_bar']['switch'].setFixedSize(70, 25)
         self.content['front_roll_bar']['switch'].setRange(1, 6)
-        self.content['front_roll_bar']['switch'].setValue(var.settings['front_roll_bar']['switch_value'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch'], 2, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['front_roll_bar']['switch'].valueChanged.connect(lambda: self.switch("front_roll_bar"))
 
@@ -364,10 +350,6 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['increment_mode'].setFixedSize(100, 25)
         self.content['front_roll_bar']['increment_mode'].addItem(lang['continuous'])
         self.content['front_roll_bar']['increment_mode'].addItem(lang['single'])
-        if var.settings['front_roll_bar']['continuous']:
-            self.content['front_roll_bar']['increment_mode'].setCurrentText(lang['continuous'])
-        else:
-            self.content['front_roll_bar']['increment_mode'].setCurrentText(lang['single'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['increment_mode'], 3, 1)
         self.content['front_roll_bar']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("front_roll_bar"))
 
@@ -375,10 +357,6 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['switch_mode'].setFixedSize(70, 25)
         self.content['front_roll_bar']['switch_mode'].addItem(lang['hold'])
         self.content['front_roll_bar']['switch_mode'].addItem(lang['toggle'])
-        if var.settings['front_roll_bar']['toggle']:
-            self.content['front_roll_bar']['switch_mode'].setCurrentText(lang['toggle'])
-        else:
-            self.content['front_roll_bar']['switch_mode'].setCurrentText(lang['hold'])
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch_mode'], 3, 2)
         self.content['front_roll_bar']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("front_roll_bar"))
 
@@ -390,7 +368,6 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['up_device'] = QLineEdit()
         self.content['front_roll_bar']['up_device'].setFixedHeight(25)
         self.content['front_roll_bar']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['front_roll_bar']['up_device'].setText(dev.format("front_roll_bar", "up"))
         self.content['front_roll_bar']['up_device'].setReadOnly(True)
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['up_device'], 4, 1)
 
@@ -408,7 +385,6 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['down_device'] = QLineEdit()
         self.content['front_roll_bar']['down_device'].setFixedHeight(25)
         self.content['front_roll_bar']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['front_roll_bar']['down_device'].setText(dev.format("front_roll_bar", "down"))
         self.content['front_roll_bar']['down_device'].setReadOnly(True)
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['down_device'], 5, 1)
 
@@ -426,7 +402,6 @@ class MainWindow(QMainWindow):
         self.content['front_roll_bar']['switch_device'] = QLineEdit()
         self.content['front_roll_bar']['switch_device'].setFixedHeight(25)
         self.content['front_roll_bar']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['front_roll_bar']['switch_device'].setText(dev.format("front_roll_bar", "switch"))
         self.content['front_roll_bar']['switch_device'].setReadOnly(True)
         self.front_roll_bar.layout.addWidget(self.content['front_roll_bar']['switch_device'], 6, 1)
 
@@ -470,14 +445,12 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['increment'] = QSpinBox()
         self.content['rear_roll_bar']['increment'].setFixedSize(70, 25)
         self.content['rear_roll_bar']['increment'].setRange(1, 5)
-        self.content['rear_roll_bar']['increment'].setValue(var.settings['rear_roll_bar']['increment'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['increment'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['rear_roll_bar']['increment'].valueChanged.connect(lambda: self.increment("rear_roll_bar"))
 
         self.content['rear_roll_bar']['switch'] = QSpinBox()
         self.content['rear_roll_bar']['switch'].setFixedSize(70, 25)
         self.content['rear_roll_bar']['switch'].setRange(1, 6)
-        self.content['rear_roll_bar']['switch'].setValue(var.settings['rear_roll_bar']['switch_value'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch'], 2, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['rear_roll_bar']['switch'].valueChanged.connect(lambda: self.switch("rear_roll_bar"))
 
@@ -495,10 +468,6 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['increment_mode'].setFixedSize(100, 25)
         self.content['rear_roll_bar']['increment_mode'].addItem(lang['continuous'])
         self.content['rear_roll_bar']['increment_mode'].addItem(lang['single'])
-        if var.settings['rear_roll_bar']['continuous']:
-            self.content['rear_roll_bar']['increment_mode'].setCurrentText(lang['continuous'])
-        else:
-            self.content['rear_roll_bar']['increment_mode'].setCurrentText(lang['single'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['increment_mode'], 3, 1)
         self.content['rear_roll_bar']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("rear_roll_bar"))
 
@@ -506,10 +475,6 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['switch_mode'].setFixedSize(70, 25)
         self.content['rear_roll_bar']['switch_mode'].addItem(lang['hold'])
         self.content['rear_roll_bar']['switch_mode'].addItem(lang['toggle'])
-        if var.settings['rear_roll_bar']['toggle']:
-            self.content['rear_roll_bar']['switch_mode'].setCurrentText(lang['toggle'])
-        else:
-            self.content['rear_roll_bar']['switch_mode'].setCurrentText(lang['hold'])
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch_mode'], 3, 2)
         self.content['rear_roll_bar']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("rear_roll_bar"))
 
@@ -521,7 +486,6 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['up_device'] = QLineEdit()
         self.content['rear_roll_bar']['up_device'].setFixedHeight(25)
         self.content['rear_roll_bar']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['rear_roll_bar']['up_device'].setText(dev.format("rear_roll_bar", "up"))
         self.content['rear_roll_bar']['up_device'].setReadOnly(True)
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['up_device'], 4, 1)
 
@@ -539,7 +503,6 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['down_device'] = QLineEdit()
         self.content['rear_roll_bar']['down_device'].setFixedHeight(25)
         self.content['rear_roll_bar']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['rear_roll_bar']['down_device'].setText(dev.format("rear_roll_bar", "down"))
         self.content['rear_roll_bar']['down_device'].setReadOnly(True)
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['down_device'], 5, 1)
 
@@ -557,7 +520,6 @@ class MainWindow(QMainWindow):
         self.content['rear_roll_bar']['switch_device'] = QLineEdit()
         self.content['rear_roll_bar']['switch_device'].setFixedHeight(25)
         self.content['rear_roll_bar']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['rear_roll_bar']['switch_device'].setText(dev.format("rear_roll_bar", "switch"))
         self.content['rear_roll_bar']['switch_device'].setReadOnly(True)
         self.rear_roll_bar.layout.addWidget(self.content['rear_roll_bar']['switch_device'], 6, 1)
 
@@ -601,14 +563,12 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['increment'] = QSpinBox()
         self.content['fuel_map']['increment'].setFixedSize(70, 25)
         self.content['fuel_map']['increment'].setRange(1, 7)
-        self.content['fuel_map']['increment'].setValue(var.settings['fuel_map']['increment'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['fuel_map']['increment'].valueChanged.connect(lambda: self.increment("fuel_map"))
 
         self.content['fuel_map']['switch'] = QSpinBox()
         self.content['fuel_map']['switch'].setFixedSize(70, 25)
         self.content['fuel_map']['switch'].setRange(1, 8)
-        self.content['fuel_map']['switch'].setValue(var.settings['fuel_map']['switch_value'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['fuel_map']['switch'].valueChanged.connect(lambda: self.switch("fuel_map"))
 
@@ -626,10 +586,6 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['increment_mode'].setFixedSize(100, 25)
         self.content['fuel_map']['increment_mode'].addItem(lang['continuous'])
         self.content['fuel_map']['increment_mode'].addItem(lang['single'])
-        if var.settings['fuel_map']['continuous']:
-            self.content['fuel_map']['increment_mode'].setCurrentText(lang['continuous'])
-        else:
-            self.content['fuel_map']['increment_mode'].setCurrentText(lang['single'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['increment_mode'], 2, 1)
         self.content['fuel_map']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("fuel_map"))
 
@@ -637,10 +593,6 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['switch_mode'].setFixedSize(70, 25)
         self.content['fuel_map']['switch_mode'].addItem(lang['hold'])
         self.content['fuel_map']['switch_mode'].addItem(lang['toggle'])
-        if var.settings['fuel_map']['toggle']:
-            self.content['fuel_map']['switch_mode'].setCurrentText(lang['toggle'])
-        else:
-            self.content['fuel_map']['switch_mode'].setCurrentText(lang['hold'])
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch_mode'], 2, 2)
         self.content['fuel_map']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("fuel_map"))
 
@@ -652,7 +604,6 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['up_device'] = QLineEdit()
         self.content['fuel_map']['up_device'].setFixedHeight(25)
         self.content['fuel_map']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['fuel_map']['up_device'].setText(dev.format("fuel_map", "up"))
         self.content['fuel_map']['up_device'].setReadOnly(True)
         self.fuel_map.layout.addWidget(self.content['fuel_map']['up_device'], 3, 1)
 
@@ -670,7 +621,6 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['down_device'] = QLineEdit()
         self.content['fuel_map']['down_device'].setFixedHeight(25)
         self.content['fuel_map']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['fuel_map']['down_device'].setText(dev.format("fuel_map", "down"))
         self.content['fuel_map']['down_device'].setReadOnly(True)
         self.fuel_map.layout.addWidget(self.content['fuel_map']['down_device'], 4, 1)
 
@@ -688,7 +638,6 @@ class MainWindow(QMainWindow):
         self.content['fuel_map']['switch_device'] = QLineEdit()
         self.content['fuel_map']['switch_device'].setFixedHeight(25)
         self.content['fuel_map']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['fuel_map']['switch_device'].setText(dev.format("fuel_map", "switch"))
         self.content['fuel_map']['switch_device'].setReadOnly(True)
         self.fuel_map.layout.addWidget(self.content['fuel_map']['switch_device'], 5, 1)
 
@@ -736,7 +685,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['increment'].setRange(0.1, 5)
         self.content['bite_point']['increment'].setSingleStep(0.1)
         self.content['bite_point']['increment'].setDecimals(1)
-        self.content['bite_point']['increment'].setValue(var.settings['bite_point']['increment'])
         self.bite_point.layout.addWidget(self.content['bite_point']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['bite_point']['increment'].valueChanged.connect(lambda: self.increment("bite_point"))
 
@@ -745,7 +693,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['switch'].setRange(0.0, 100.0)
         self.content['bite_point']['switch'].setSingleStep(0.1)
         self.content['bite_point']['switch'].setDecimals(1)
-        self.content['bite_point']['switch'].setValue(var.settings['bite_point']['switch_value'])
         self.bite_point.layout.addWidget(self.content['bite_point']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['bite_point']['switch'].valueChanged.connect(lambda: self.switch("bite_point"))
 
@@ -763,10 +710,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['increment_mode'].setFixedSize(100, 25)
         self.content['bite_point']['increment_mode'].addItem(lang['continuous'])
         self.content['bite_point']['increment_mode'].addItem(lang['single'])
-        if var.settings['bite_point']['continuous']:
-            self.content['bite_point']['increment_mode'].setCurrentText(lang['continuous'])
-        else:
-            self.content['bite_point']['increment_mode'].setCurrentText(lang['single'])
         self.bite_point.layout.addWidget(self.content['bite_point']['increment_mode'], 2, 1)
         self.content['bite_point']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("bite_point"))
 
@@ -774,10 +717,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['switch_mode'].setFixedSize(70, 25)
         self.content['bite_point']['switch_mode'].addItem(lang['hold'])
         self.content['bite_point']['switch_mode'].addItem(lang['toggle'])
-        if var.settings['bite_point']['toggle']:
-            self.content['bite_point']['switch_mode'].setCurrentText(lang['toggle'])
-        else:
-            self.content['bite_point']['switch_mode'].setCurrentText(lang['hold'])
         self.bite_point.layout.addWidget(self.content['bite_point']['switch_mode'], 2, 2)
         self.content['bite_point']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("bite_point"))
 
@@ -789,7 +728,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['pedal_device'] = QLineEdit()
         self.content['bite_point']['pedal_device'].setFixedHeight(25)
         self.content['bite_point']['pedal_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['bite_point']['pedal_device'].setText(dev.format("bite_point", "pedal"))
         self.content['bite_point']['pedal_device'].setReadOnly(True)
         self.bite_point.layout.addWidget(self.content['bite_point']['pedal_device'], 3, 1)
 
@@ -807,7 +745,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['up_device'] = QLineEdit()
         self.content['bite_point']['up_device'].setFixedHeight(25)
         self.content['bite_point']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['bite_point']['up_device'].setText(dev.format("bite_point", "up"))
         self.content['bite_point']['up_device'].setReadOnly(True)
         self.bite_point.layout.addWidget(self.content['bite_point']['up_device'], 4, 1)
 
@@ -825,7 +762,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['down_device'] = QLineEdit()
         self.content['bite_point']['down_device'].setFixedHeight(25)
         self.content['bite_point']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['bite_point']['down_device'].setText(dev.format("bite_point", "down"))
         self.content['bite_point']['down_device'].setReadOnly(True)
         self.bite_point.layout.addWidget(self.content['bite_point']['down_device'], 5, 1)
 
@@ -843,7 +779,6 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['switch_device'] = QLineEdit()
         self.content['bite_point']['switch_device'].setFixedHeight(25)
         self.content['bite_point']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.content['bite_point']['switch_device'].setText(dev.format("bite_point", "switch"))
         self.content['bite_point']['switch_device'].setReadOnly(True)
         self.bite_point.layout.addWidget(self.content['bite_point']['switch_device'], 6, 1)
 
@@ -870,9 +805,9 @@ class MainWindow(QMainWindow):
 
         self.content['settings']['high_threshold'] = QSpinBox()
         self.content['settings']['high_threshold'].setFixedSize(60, 20)
+        self.settings.layout.addWidget(self.content['settings']['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)
         self.content['settings']['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
-        self.settings.layout.addWidget(self.content['settings']['high_threshold'], 0, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
 
         self.content['settings']['low_threshold_label'] = QLabel()
@@ -882,9 +817,9 @@ class MainWindow(QMainWindow):
 
         self.content['settings']['low_threshold'] = QSpinBox()
         self.content['settings']['low_threshold'].setFixedSize(60, 20)
+        self.settings.layout.addWidget(self.content['settings']['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['low_threshold'].setRange(1, max(int(var.settings['high_threshold']*100)-1,49))
         self.content['settings']['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
-        self.settings.layout.addWidget(self.content['settings']['low_threshold'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
 
         self.content['settings']['axis_samples'] = QLabel()
@@ -895,7 +830,6 @@ class MainWindow(QMainWindow):
         self.content['settings']['axis_samples'] = QSpinBox()
         self.content['settings']['axis_samples'].setFixedSize(60, 20)
         self.content['settings']['axis_samples'].setRange(2, 10)
-        self.content['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
         self.settings.layout.addWidget(self.content['settings']['axis_samples'], 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['axis_samples'].valueChanged.connect(lambda: self.settings_set('axis_samples'))
 
@@ -911,7 +845,6 @@ class MainWindow(QMainWindow):
         self.content['settings']['scale'].addItem("1.00" + "x")
         self.content['settings']['scale'].addItem("1.25" + "x")
         self.content['settings']['scale'].addItem("1.50" + "x")
-        self.content['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
         self.settings.layout.addWidget(self.content['settings']['scale'], 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['scale'].currentTextChanged.connect(self.scale)
 
@@ -923,7 +856,6 @@ class MainWindow(QMainWindow):
         self.content['settings']['timer_first'] = QSpinBox()
         self.content['settings']['timer_first'].setFixedSize(70, 20)
         self.content['settings']['timer_first'].setRange(1, 1000)
-        self.content['settings']['timer_first'].setValue(int(var.settings['timer_first']))
         self.settings.layout.addWidget(self.content['settings']['timer_first'], 4, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
 
@@ -935,15 +867,36 @@ class MainWindow(QMainWindow):
         self.content['settings']['timer_loop'] = QSpinBox()
         self.content['settings']['timer_loop'].setFixedSize(70, 20)
         self.content['settings']['timer_loop'].setRange(1, 1000)
-        self.content['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
         self.settings.layout.addWidget(self.content['settings']['timer_loop'], 5, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         self.content['settings']['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
+
+        self.content['settings']['settings_filename_label'] = QLabel()
+        self.content['settings']['settings_filename_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['settings_filename_label'].setText(lang['settings_filename'])
+        self.settings.layout.addWidget(self.content['settings']['settings_filename_label'], 6, 0)
+
+        self.content['settings']['settings_filename'] = QComboBox()
+        self.content['settings']['settings_filename'].setFixedSize(200, 25)
+        self.settings.layout.addWidget(self.content['settings']['settings_filename'], 6, 1)
+        if var.settings_active:
+            self.content['settings']['settings_filename'].setCurrentText(var.settings_active)
+            self.content['settings']['settings_filename'].addItem(var.settings_active)
+        else:
+            self.content['settings']['settings_filename'].setCurrentText('None')
+            self.content['settings']['settings_filename'].addItem("settings.ini")
+        self.content['settings']['settings_filename'].activated.connect(lambda: self.refresh_settings_list())
+        self.content['settings']['settings_filename'].currentTextChanged.connect(lambda: self.apply_settings(self.content['settings']['settings_filename'].currentText()))
 
         self.settings.setLayout(self.settings.layout)
 
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
         self.setCentralWidget(self.tabs)
+
+
+        self.apply_settings('settings.ini')
+        self.refresh_settings_list()
+
 
         self.index = {
             "weight_jacker": {
@@ -1051,6 +1004,8 @@ class MainWindow(QMainWindow):
                 elif function == "bite_point":
                     # var.status[function]['secondary'] = value/100
                     value = float(value*100)
+                #elif function == "settings":
+                    #self.refresh_settings_list()
                 else:
                     # var.status[function]['secondary'] = (value * step[function]) - step[function]
                     value = int(round((value / step[function]) + 1))
@@ -1076,6 +1031,7 @@ class MainWindow(QMainWindow):
                     value = pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum()
                     self.content[func]['lcd'].display(round(value))
                 self.content[func]['lcd'].update()
+        #self.refresh_settings_list()
 
     @pyqtSlot()
     def calibrate(self):
@@ -1252,6 +1208,107 @@ class MainWindow(QMainWindow):
             ui['thread_pool'].start(self.bind)
         else:
             self.is_running = False
+
+    @pyqtSlot()
+    def refresh_settings_list(self):
+        file = self.content['settings']['settings_filename'].currentText()
+        self.content['settings']['settings_filename'].clear()
+        for name in fn.get_settings_files():
+            self.content['settings']['settings_filename'].addItem(name)
+        self.content['settings']['settings_filename'].setCurrentText(file)
+        var.settings_active = file
+
+    @pyqtSlot()
+    def apply_settings(self, file):
+
+        fn.re_read_config(file)
+        
+
+        self.content['weight_jacker']['increment'].setValue(var.settings['weight_jacker']['increment'])
+        self.content['weight_jacker']['switch'].setValue(var.settings['weight_jacker']['switch_value'])
+        if var.settings['weight_jacker']['continuous']:
+            self.content['weight_jacker']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['weight_jacker']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['weight_jacker']['toggle']:
+            self.content['weight_jacker']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['weight_jacker']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['weight_jacker']['up_device'].setText(dev.format("weight_jacker", "up"))
+        self.content['weight_jacker']['down_device'].setText(dev.format("weight_jacker", "down"))
+        self.content['weight_jacker']['switch_device'].setText(dev.format("weight_jacker", "switch"))
+
+        self.content['front_roll_bar']['increment'].setValue(var.settings['front_roll_bar']['increment'])
+        self.content['front_roll_bar']['switch'].setValue(var.settings['front_roll_bar']['switch_value'])
+        if var.settings['front_roll_bar']['continuous']:
+            self.content['front_roll_bar']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['front_roll_bar']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['front_roll_bar']['toggle']:
+            self.content['front_roll_bar']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['front_roll_bar']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['front_roll_bar']['up_device'].setText(dev.format("front_roll_bar", "up"))
+        self.content['front_roll_bar']['down_device'].setText(dev.format("front_roll_bar", "down"))
+        self.content['front_roll_bar']['switch_device'].setText(dev.format("front_roll_bar", "switch"))
+
+
+        self.content['rear_roll_bar']['increment'].setValue(var.settings['rear_roll_bar']['increment'])
+        self.content['rear_roll_bar']['switch'].setValue(var.settings['rear_roll_bar']['switch_value'])
+        if var.settings['rear_roll_bar']['continuous']:
+            self.content['rear_roll_bar']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['rear_roll_bar']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['rear_roll_bar']['toggle']:
+            self.content['rear_roll_bar']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['rear_roll_bar']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['rear_roll_bar']['up_device'].setText(dev.format("rear_roll_bar", "up"))
+        self.content['rear_roll_bar']['down_device'].setText(dev.format("rear_roll_bar", "down"))
+        self.content['rear_roll_bar']['switch_device'].setText(dev.format("rear_roll_bar", "switch"))
+
+
+        self.content['fuel_map']['increment'].setValue(var.settings['fuel_map']['increment'])
+        self.content['fuel_map']['switch'].setValue(var.settings['fuel_map']['switch_value'])
+        if var.settings['fuel_map']['continuous']:
+            self.content['fuel_map']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['fuel_map']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['fuel_map']['toggle']:
+            self.content['fuel_map']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['fuel_map']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['fuel_map']['up_device'].setText(dev.format("fuel_map", "up"))
+        self.content['fuel_map']['down_device'].setText(dev.format("fuel_map", "down"))
+        self.content['fuel_map']['switch_device'].setText(dev.format("fuel_map", "switch"))
+
+
+        self.content['bite_point']['increment'].setValue(var.settings['bite_point']['increment'])
+        self.content['bite_point']['switch'].setValue(var.settings['bite_point']['switch_value'])
+        if var.settings['bite_point']['continuous']:
+            self.content['bite_point']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['bite_point']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['bite_point']['toggle']:
+            self.content['bite_point']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['bite_point']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['bite_point']['pedal_device'].setText(dev.format("bite_point", "pedal"))
+        self.content['bite_point']['up_device'].setText(dev.format("bite_point", "up"))
+        self.content['bite_point']['down_device'].setText(dev.format("bite_point", "down"))
+        self.content['bite_point']['switch_device'].setText(dev.format("bite_point", "switch"))
+
+
+        self.content['settings']['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)
+        self.content['settings']['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
+        self.content['settings']['low_threshold'].setRange(1, max(int(var.settings['high_threshold']*100)-1,49))
+        self.content['settings']['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
+        self.content['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
+        self.content['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
+        self.content['settings']['timer_first'].setValue(int(var.settings['timer_first']))
+        self.content['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
+        self.content['settings']['settings_filename'].setCurrentText(var.settings_active)
+
 
 
 def main():

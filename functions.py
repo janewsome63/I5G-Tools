@@ -12,9 +12,6 @@ import devices as dev
 import variables as var
 from time import sleep
 
-def Mbox(title, text, style):
-    return 
-
 def read_config():
     if os.path.exists(var.backend['config']):
         config = parse.ConfigParser()
@@ -55,6 +52,13 @@ def read_config():
     else:
         write_config()
 
+def re_read_config(filename):
+    var.settings_active = filename
+    var.backend = {
+        "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + filename,
+    }
+    read_config()
+
 def write_config():
     config = parse.ConfigParser()
 
@@ -78,6 +82,14 @@ def write_config():
 
     with open(var.backend['config'], 'w') as file:
         config.write(file)
+
+def get_settings_files():
+    directory = os.path.split(var.backend['config'])[0]
+    var.settings_list = []
+    for name in os.listdir(path = directory):
+        if name.endswith(".ini"):
+            var.settings_list.append(name)
+    return var.settings_list
 
 def is_bind():
     if var.event['type'] == "hat":
