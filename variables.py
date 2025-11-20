@@ -233,6 +233,8 @@ event = {
 
 settings_active = "settings.ini" #default
 
+settings_old = ""
+
 backend = {
     "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + settings_active,
 }

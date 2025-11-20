@@ -42,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1.1b",
+    "version": "v0.1.2b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -885,6 +885,7 @@ class MainWindow(QMainWindow):
         self.content['settings']['settings_filename_label'].setText(lang['settings_filename'])
         self.settings.layout.addWidget(self.content['settings']['settings_filename_label'], 6, 0)
 
+        self.content['settings']['busy'] = False
         self.content['settings']['settings_filename'] = QComboBox()
         self.content['settings']['settings_filename'].setFixedSize(200, 25)
         self.settings.layout.addWidget(self.content['settings']['settings_filename'], 6, 1)
@@ -1315,15 +1316,19 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def refresh_settings_list(self):
+        self.content['settings']['busy'] = True
         file = self.content['settings']['settings_filename'].currentText()
         self.content['settings']['settings_filename'].clear()
         for name in fn.get_settings_files():
             self.content['settings']['settings_filename'].addItem(name)
         self.content['settings']['settings_filename'].setCurrentText(file)
-        var.settings_active = file
+        self.content['settings']['busy'] = False
+        #var.settings_active = file
 
     @pyqtSlot()
     def apply_settings(self, file):
+        if self.content['settings']['busy']: #if list is getting cleared or current text is being reset during list refresh, skip this function
+            return
 
         fn.re_read_config(file)
         

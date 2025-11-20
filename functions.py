@@ -12,7 +12,10 @@ import devices as dev
 import variables as var
 from time import sleep
 
+startup = True
+
 def read_config():
+    global startup
     if os.path.exists(var.backend['config']):
         config = parse.ConfigParser()
         config.read(var.backend['config'])
@@ -42,18 +45,29 @@ def read_config():
             text = "The following inputs could not be bound because its bound controller could not be found. If the app is used, these will all be unbound.\n\n"
             for binding in bind_errors:
                 text += binding[0] + "  " + binding[1] + "\n"
-            text += "\n\nPressing OK will open the app and immediately unbind these inputs.\nPressing Cancel will close the app now if you want to plug in the controller before using the app.\nProceed?"
+            text += "\n\nPressing OK will open the app and immediately unbind these inputs.\n"
+            if startup:
+                text += "Pressing Cancel will close the app now if you want to plug in the controller before using the app.\nProceed?"
+            else:
+                text += "Pressing Cancel will revert to the last applied settings file.\nProceed?"
             response = ctypes.windll.user32.MessageBoxW(0, text, "Bound input device not detected!", 1)
             if response == 1:
                 return
             if response == 2:
-                sys.exit(0)
+                if startup == True:
+                    sys.exit(0)
+                else:
+                    re_read_config(var.settings_old)
 
     else:
         write_config()
+    startup = False
 
 def re_read_config(filename):
+    if var.settings_old != var.settings_active and filename != var.settings_active:
+        var.settings_old = var.settings_active
     var.settings_active = filename
+    print([filename, var.settings_active, var.settings_old])
     var.backend = {
         "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + filename,
     }
