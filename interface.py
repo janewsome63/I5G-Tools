@@ -42,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1.0b",
+    "version": "v0.1.1b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -74,6 +74,7 @@ lang = {
     "engine_warming": "Throttle",
     "settings": "Settings",
     "settings_filename": "Current Settings File:",
+    "axes_display": "Display",
 }
 
 ui = {
@@ -148,6 +149,7 @@ class MainWindow(QMainWindow):
         self.bite_point = QWidget()
         self.engine_warming = QWidget()
         self.settings = QWidget()
+        self.axes_display = QWidget()
 
         self.tabs.addTab(self.weight_jacker, lang['weight_jacker'])
         self.tabs.addTab(self.front_roll_bar, lang['front_roll_bar'])
@@ -156,6 +158,7 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.bite_point, lang['bite_point'])
         self.tabs.addTab(self.engine_warming, lang['engine_warming'])
         self.tabs.addTab(self.settings, lang['settings'])
+        self.tabs.addTab(self.axes_display, lang['axes_display'])
 
         self.content = {
             "weight_jacker": {
@@ -174,6 +177,13 @@ class MainWindow(QMainWindow):
                 "bite_point": {},
             },
             "settings": {},
+            "axes_display":{
+                "weight_jacker": {},
+                "front_roll_bar": {},
+                "rear_roll_bar": {},
+                "fuel_map": {},
+                "bite_point": {},
+            },
             }
         
                 # --------Weight Jacker Tab--------#
@@ -889,6 +899,94 @@ class MainWindow(QMainWindow):
 
         self.settings.setLayout(self.settings.layout)
 
+        # --------Display Tab--------#
+        self.axes_display.layout = QGridLayout()
+
+
+        self.content['axes_display']['weight_jacker']['label'] = QLabel()
+        self.content['axes_display']['weight_jacker']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['weight_jacker']['label'].setText(lang['weight_jacker'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['label'], 0, 0)
+
+        self.content['axes_display']['weight_jacker']['lcd'] = QLCDNumber()
+        self.content['axes_display']['weight_jacker']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['lcd'], 0, 1)
+
+        self.content['axes_display']['weight_jacker']['axis'] = QProgressBar()
+        self.content['axes_display']['weight_jacker']['axis'].setTextVisible(False)
+        self.content['axes_display']['weight_jacker']['axis'].setMinimum(0)
+        self.content['axes_display']['weight_jacker']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['axis'], 0, 2)
+
+
+        self.content['axes_display']['front_roll_bar']['label'] = QLabel()
+        self.content['axes_display']['front_roll_bar']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['front_roll_bar']['label'].setText(lang['front_roll_bar'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['label'], 1, 0)
+
+        self.content['axes_display']['front_roll_bar']['lcd'] = QLCDNumber()
+        self.content['axes_display']['front_roll_bar']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['lcd'], 1, 1)
+
+        self.content['axes_display']['front_roll_bar']['axis'] = QProgressBar()
+        self.content['axes_display']['front_roll_bar']['axis'].setTextVisible(False)
+        self.content['axes_display']['front_roll_bar']['axis'].setMinimum(0)
+        self.content['axes_display']['front_roll_bar']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['axis'], 1, 2)
+
+
+        self.content['axes_display']['rear_roll_bar']['label'] = QLabel()
+        self.content['axes_display']['rear_roll_bar']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['rear_roll_bar']['label'].setText(lang['rear_roll_bar'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['label'], 2, 0)
+
+        self.content['axes_display']['rear_roll_bar']['lcd'] = QLCDNumber()
+        self.content['axes_display']['rear_roll_bar']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['lcd'], 2, 1)
+
+        self.content['axes_display']['rear_roll_bar']['axis'] = QProgressBar()
+        self.content['axes_display']['rear_roll_bar']['axis'].setTextVisible(False)
+        self.content['axes_display']['rear_roll_bar']['axis'].setMinimum(0)
+        self.content['axes_display']['rear_roll_bar']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['axis'], 2, 2)
+
+
+        self.content['axes_display']['fuel_map']['label'] = QLabel()
+        self.content['axes_display']['fuel_map']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['fuel_map']['label'].setText(lang['fuel_map'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['label'], 3, 0)
+
+        self.content['axes_display']['fuel_map']['lcd'] = QLCDNumber()
+        self.content['axes_display']['fuel_map']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['lcd'], 3, 1)
+
+        self.content['axes_display']['fuel_map']['axis'] = QProgressBar()
+        self.content['axes_display']['fuel_map']['axis'].setTextVisible(False)
+        self.content['axes_display']['fuel_map']['axis'].setMinimum(0)
+        self.content['axes_display']['fuel_map']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['axis'], 3, 2)
+
+
+        self.content['axes_display']['bite_point']['label'] = QLabel()
+        self.content['axes_display']['bite_point']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['bite_point']['label'].setText(lang['bite_point'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['label'], 4, 0)
+
+        self.content['axes_display']['bite_point']['lcd'] = QLCDNumber()
+        self.content['axes_display']['bite_point']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['lcd'], 4, 1)
+
+        self.content['axes_display']['bite_point']['axis'] = QProgressBar()
+        self.content['axes_display']['bite_point']['axis'].setTextVisible(False)
+        self.content['axes_display']['bite_point']['axis'].setMinimum(0)
+        self.content['axes_display']['bite_point']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['axis'], 4, 2)
+
+
+        self.axes_display.setLayout(self.axes_display.layout)
+
+
+
         self.layout.addWidget(self.tabs)
         self.setLayout(self.layout)
         self.setCentralWidget(self.tabs)
@@ -1021,16 +1119,22 @@ class MainWindow(QMainWindow):
                 #print("display check1: ", func, pct)
                 self.content[func]['axis'].setValue(int(pct * 100))
                 self.content[func]['axis'].update()
+                self.content['axes_display'][func]['axis'].setValue(int(pct * 100))
+                self.content['axes_display'][func]['axis'].update()
 
                 if func == 'bite_point':
                     if (pct*100)%1 == 0:
                         self.content[func]['lcd'].display(str(round(pct*100)) + ".0") # bad hack to get the lcd to always display one decimal place
+                        self.content['axes_display'][func]['lcd'].display(str(round(pct*100)) + ".0")
                     else:
                         self.content[func]['lcd'].display(round(pct*100, 1))
+                        self.content['axes_display'][func]['lcd'].display(round(pct*100, 1))
                 else:
                     value = pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum()
                     self.content[func]['lcd'].display(round(value))
+                    self.content['axes_display'][func]['lcd'].display(round(value))
                 self.content[func]['lcd'].update()
+                self.content['axes_display'][func]['lcd'].update()
         #self.refresh_settings_list()
 
     @pyqtSlot()
