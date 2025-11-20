@@ -42,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1.2b",
+    "version": "v0.1.3b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -78,7 +78,7 @@ lang = {
 }
 
 ui = {
-    "width": 505,
+    "width": 575,
     "height": 250,
     "timer": QTimer(),
     "thread_pool": QThreadPool(),

@@ -149,9 +149,9 @@ def format(function, control):
             num = str(var.bindings[function][control]['num'])
             axis_dir = var.bindings[function][control]['value'] >= var.settings['high_threshold']
             dev_pretty = name + " - " + type + " " + num
-            if axis_dir and function != 'bite_point':
+            if axis_dir and control != 'pedal':
                 dev_pretty += "+"
-            elif function != 'bite_point':
+            elif control != 'pedal':
                 dev_pretty += "-"
         else:
             name = device_info[var.bindings[function][control]['guid']]['name']
