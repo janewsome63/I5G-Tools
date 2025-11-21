@@ -42,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1.3b",
+    "version": "v0.1.4b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -124,6 +124,12 @@ var.settings = {
         "increment": 1,
         "switch_value": 50,
     },
+    "engine_warming": {
+        "continuous": False,
+        "toggle": False,
+        "increment": 1,
+        "switch_value": 50,
+    },
 }
 
 class MainWindow(QMainWindow):
@@ -176,6 +182,9 @@ class MainWindow(QMainWindow):
             "bite_point": {
                 "bite_point": {},
             },
+            "engine_warming": {
+                "engine_warming": {},
+            },
             "settings": {},
             "axes_display":{
                 "weight_jacker": {},
@@ -183,6 +192,7 @@ class MainWindow(QMainWindow):
                 "rear_roll_bar": {},
                 "fuel_map": {},
                 "bite_point": {},
+                "engine_warming": {},
             },
             }
         
@@ -661,7 +671,6 @@ class MainWindow(QMainWindow):
 
         # --------Bite Point Tab--------#
         self.bite_point.layout = QGridLayout()
-        # self.bite_point.layout.addWidget(QLabel("Bite Point"), 0, 0)
 
         self.content['bite_point']['lcd'] = QLCDNumber()
         self.content['bite_point']['lcd'].display(0)
@@ -802,7 +811,142 @@ class MainWindow(QMainWindow):
 
         # --------Engine Warming Tab--------#
         self.engine_warming.layout = QGridLayout()
-        self.engine_warming.layout.addWidget(QLabel("Engine Warming"), 0, 0)
+        
+        self.content['engine_warming']['lcd'] = QLCDNumber()
+        self.content['engine_warming']['lcd'].display(0)
+        self.content['engine_warming']['lcd'].setSmallDecimalPoint(False)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['lcd'], 0, 0)
+
+        self.content['engine_warming']['axis'] = QProgressBar()
+        self.content['engine_warming']['axis'].setTextVisible(False)
+        self.content['engine_warming']['axis'].setMinimum(0)
+        self.content['engine_warming']['axis'].setMaximum(100)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['axis'], 0, 1)
+
+        self.content['engine_warming']['calibrate'] = QPushButton()
+        self.content['engine_warming']['calibrate'].setFixedSize(100, 25)
+        self.content['engine_warming']['calibrate'].setText(lang['calibrate'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['calibrate'], 0, 2)
+        self.content['engine_warming']['calibrate'].clicked.connect(lambda: self.calibrate_start("engine_warming"))
+
+        self.content['engine_warming']['increment_label'] = QLabel()
+        self.content['engine_warming']['increment_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['increment_label'].setText(lang['increment'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['increment_label'], 1, 0)
+
+        self.content['engine_warming']['switch_label'] = QLabel()
+        self.content['engine_warming']['switch_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['engine_warming']['switch_label'].setText(lang['switch_value'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch_label'], 1, 1)
+
+        self.content['engine_warming']['increment'] = QDoubleSpinBox()
+        self.content['engine_warming']['increment'].setFixedSize(70, 25)
+        self.content['engine_warming']['increment'].setRange(0.1, 5)
+        self.content['engine_warming']['increment'].setSingleStep(0.1)
+        self.content['engine_warming']['increment'].setDecimals(1)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['increment'].valueChanged.connect(lambda: self.increment("engine_warming"))
+
+        self.content['engine_warming']['switch'] = QDoubleSpinBox()
+        self.content['engine_warming']['switch'].setFixedSize(70, 25)
+        self.content['engine_warming']['switch'].setRange(0.0, 100.0)
+        self.content['engine_warming']['switch'].setSingleStep(0.1)
+        self.content['engine_warming']['switch'].setDecimals(1)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['switch'].valueChanged.connect(lambda: self.switch("engine_warming"))
+
+        self.content['engine_warming']['increment_mode_label'] = QLabel()
+        self.content['engine_warming']['increment_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['engine_warming']['increment_mode_label'].setText(lang['increment_mode'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['increment_mode_label'], 2, 0)
+
+        self.content['engine_warming']['switch_mode_label'] = QLabel()
+        self.content['engine_warming']['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['engine_warming']['switch_mode_label'].setText(lang['switch_mode'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch_mode_label'], 2, 1)
+
+        self.content['engine_warming']['increment_mode'] = QComboBox()
+        self.content['engine_warming']['increment_mode'].setFixedSize(100, 25)
+        self.content['engine_warming']['increment_mode'].addItem(lang['continuous'])
+        self.content['engine_warming']['increment_mode'].addItem(lang['single'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['increment_mode'], 2, 1)
+        self.content['engine_warming']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("engine_warming"))
+
+        self.content['engine_warming']['switch_mode'] = QComboBox()
+        self.content['engine_warming']['switch_mode'].setFixedSize(70, 25)
+        self.content['engine_warming']['switch_mode'].addItem(lang['hold'])
+        self.content['engine_warming']['switch_mode'].addItem(lang['toggle'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch_mode'], 2, 2)
+        self.content['engine_warming']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("engine_warming"))
+
+        self.content['engine_warming']['pedal_label'] = QLabel()
+        self.content['engine_warming']['pedal_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['pedal_label'].setText(lang['pedal'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['pedal_label'], 3, 0)
+
+        self.content['engine_warming']['pedal_device'] = QLineEdit()
+        self.content['engine_warming']['pedal_device'].setFixedHeight(25)
+        self.content['engine_warming']['pedal_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['engine_warming']['pedal_device'].setReadOnly(True)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['pedal_device'], 3, 1)
+
+        self.content['engine_warming']['pedal_bind'] = QPushButton()
+        self.content['engine_warming']['pedal_bind'].setFixedSize(100, 25)
+        self.content['engine_warming']['pedal_bind'].setText(lang['bind'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['pedal_bind'], 3, 2)
+        self.content['engine_warming']['pedal_bind'].clicked.connect(lambda: self.bind_start("engine_warming","pedal"))
+
+        self.content['engine_warming']['up_label'] = QLabel()
+        self.content['engine_warming']['up_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['up_label'].setText(lang['up'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['up_label'], 4, 0)
+
+        self.content['engine_warming']['up_device'] = QLineEdit()
+        self.content['engine_warming']['up_device'].setFixedHeight(25)
+        self.content['engine_warming']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['engine_warming']['up_device'].setReadOnly(True)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['up_device'], 4, 1)
+
+        self.content['engine_warming']['up_bind'] = QPushButton()
+        self.content['engine_warming']['up_bind'].setFixedSize(100, 25)
+        self.content['engine_warming']['up_bind'].setText(lang['bind'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['up_bind'], 4, 2)
+        self.content['engine_warming']['up_bind'].clicked.connect(lambda: self.bind_start("engine_warming","up"))
+
+        self.content['engine_warming']['down_label'] = QLabel()
+        self.content['engine_warming']['down_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['down_label'].setText(lang['down'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['down_label'], 5, 0)
+
+        self.content['engine_warming']['down_device'] = QLineEdit()
+        self.content['engine_warming']['down_device'].setFixedHeight(25)
+        self.content['engine_warming']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['engine_warming']['down_device'].setReadOnly(True)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['down_device'], 5, 1)
+
+        self.content['engine_warming']['down_bind'] = QPushButton()
+        self.content['engine_warming']['down_bind'].setFixedSize(100, 25)
+        self.content['engine_warming']['down_bind'].setText(lang['bind'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['down_bind'], 5, 2)
+        self.content['engine_warming']['down_bind'].clicked.connect(lambda: self.bind_start("engine_warming","down"))
+
+        self.content['engine_warming']['switch_label'] = QLabel()
+        self.content['engine_warming']['switch_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['engine_warming']['switch_label'].setText(lang['switch'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch_label'], 6, 0)
+
+        self.content['engine_warming']['switch_device'] = QLineEdit()
+        self.content['engine_warming']['switch_device'].setFixedHeight(25)
+        self.content['engine_warming']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['engine_warming']['switch_device'].setReadOnly(True)
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch_device'], 6, 1)
+
+        self.content['engine_warming']['switch_bind'] = QPushButton()
+        self.content['engine_warming']['switch_bind'].setFixedSize(100, 25)
+        self.content['engine_warming']['switch_bind'].setText(lang['bind'])
+        self.engine_warming.layout.addWidget(self.content['engine_warming']['switch_bind'], 6, 2)
+        self.content['engine_warming']['switch_bind'].clicked.connect(lambda: self.bind_start("engine_warming","switch"))
+
         self.engine_warming.setLayout(self.engine_warming.layout)
 
         # --------Settings Tab--------#
@@ -984,6 +1128,22 @@ class MainWindow(QMainWindow):
         self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['axis'], 4, 2)
 
 
+        self.content['axes_display']['engine_warming']['label'] = QLabel()
+        self.content['axes_display']['engine_warming']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['engine_warming']['label'].setText(lang['engine_warming'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['label'], 5, 0)
+
+        self.content['axes_display']['engine_warming']['lcd'] = QLCDNumber()
+        self.content['axes_display']['engine_warming']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['lcd'], 5, 1)
+
+        self.content['axes_display']['engine_warming']['axis'] = QProgressBar()
+        self.content['axes_display']['engine_warming']['axis'].setTextVisible(False)
+        self.content['axes_display']['engine_warming']['axis'].setMinimum(0)
+        self.content['axes_display']['engine_warming']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['axis'], 5, 2)
+
+
         self.axes_display.setLayout(self.axes_display.layout)
 
 
@@ -1088,6 +1248,28 @@ class MainWindow(QMainWindow):
                     "label": self.content['bite_point']['switch_label'],
                 }
             },
+            "engine_warming": {
+                "pedal": {
+                    "bind": self.content['engine_warming']['pedal_bind'],
+                    "device": self.content['engine_warming']['pedal_device'],
+                    "label": self.content['engine_warming']['pedal_label'],
+                },
+                "up": {
+                    "bind": self.content['engine_warming']['up_bind'],
+                    "device": self.content['engine_warming']['up_device'],
+                    "label": self.content['engine_warming']['up_label'],
+                },
+                "down": {
+                    "bind": self.content['engine_warming']['down_bind'],
+                    "device": self.content['engine_warming']['down_device'],
+                    "label": self.content['engine_warming']['down_label'],
+                },
+                "switch": {
+                    "bind": self.content['engine_warming']['switch_bind'],
+                    "device": self.content['engine_warming']['switch_device'],
+                    "label": self.content['engine_warming']['switch_label'],
+                }
+            },
         }
 
         ui['timer'].timeout.connect(self.updater)
@@ -1100,7 +1282,7 @@ class MainWindow(QMainWindow):
                 if function == "weight_jacker":
                     # var.status[function]['secondary'] = (value * step[function]) + 0.5
                     value = int(round((value - 0.5)/step[function]))
-                elif function == "bite_point":
+                elif function == "bite_point" or function == "engine_warming":
                     # var.status[function]['secondary'] = value/100
                     value = float(value*100)
                 #elif function == "settings":
@@ -1123,7 +1305,7 @@ class MainWindow(QMainWindow):
                 self.content['axes_display'][func]['axis'].setValue(int(pct * 100))
                 self.content['axes_display'][func]['axis'].update()
 
-                if func == 'bite_point':
+                if func == 'bite_point' or func == "engine_warming":
                     if (pct*100)%1 == 0:
                         self.content[func]['lcd'].display(str(round(pct*100)) + ".0") # bad hack to get the lcd to always display one decimal place
                         self.content['axes_display'][func]['lcd'].display(str(round(pct*100)) + ".0")
@@ -1178,7 +1360,7 @@ class MainWindow(QMainWindow):
         var.settings[func]['switch_value'] = value
         if func == "weight_jacker":
             var.status[func]['secondary'] = (value * step[func]) + 0.5
-        elif func == "bite_point":
+        elif func == "bite_point" or func == "engine_warming":
             var.status[func]['secondary'] = value/100
         else:
             var.status[func]['secondary'] = (value * step[func]) - step[func]
@@ -1260,7 +1442,7 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                         }
                 elif var.event['type'] == "axis":
-                    if function == 'bite_point' and control == 'pedal':
+                    if (function == 'bite_point' or function == 'engine_warming') and control == 'pedal':
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
@@ -1323,7 +1505,6 @@ class MainWindow(QMainWindow):
             self.content['settings']['settings_filename'].addItem(name)
         self.content['settings']['settings_filename'].setCurrentText(file)
         self.content['settings']['busy'] = False
-        #var.settings_active = file
 
     @pyqtSlot()
     def apply_settings(self, file):
@@ -1406,6 +1587,22 @@ class MainWindow(QMainWindow):
         self.content['bite_point']['up_device'].setText(dev.format("bite_point", "up"))
         self.content['bite_point']['down_device'].setText(dev.format("bite_point", "down"))
         self.content['bite_point']['switch_device'].setText(dev.format("bite_point", "switch"))
+
+
+        self.content['engine_warming']['increment'].setValue(var.settings['engine_warming']['increment'])
+        self.content['engine_warming']['switch'].setValue(var.settings['engine_warming']['switch_value'])
+        if var.settings['engine_warming']['continuous']:
+            self.content['engine_warming']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['engine_warming']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['engine_warming']['toggle']:
+            self.content['engine_warming']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['engine_warming']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['engine_warming']['pedal_device'].setText(dev.format("engine_warming", "pedal"))
+        self.content['engine_warming']['up_device'].setText(dev.format("engine_warming", "up"))
+        self.content['engine_warming']['down_device'].setText(dev.format("engine_warming", "down"))
+        self.content['engine_warming']['switch_device'].setText(dev.format("engine_warming", "switch"))
 
 
         self.content['settings']['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)

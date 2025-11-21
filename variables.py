@@ -96,23 +96,28 @@ bindings = {
             "num": 0,
         },
     },
-    # "engine_warming": {
-    #     "up": {
-    #         "guid": 0,
-    #         "type": "none",
-    #         "num": 0,
-    #     },
-    #     "down": {
-    #         "guid": 0,
-    #         "type": "none",
-    #         "num": 0,
-    #     },
-    #     "switch": {
-    #         "guid": 0,
-    #         "type": "none",
-    #         "num": 0,
-    #     },
-    # },
+    "engine_warming": {
+        "pedal":{
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "up": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "down": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "switch": {
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+    },
 }
 settings = {}
 status = {
@@ -191,7 +196,8 @@ status = {
             "current": 0,
             "running": {
                 "up": False,
-                "down": False
+                "down": False,
+                "pedal": False
             },
             "waiting": False,
         },
