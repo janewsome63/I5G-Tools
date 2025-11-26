@@ -27,8 +27,15 @@ axis_values = {
     "other": 0.0,
 }
 
-status = {
-    "busy": False,
+axis_busy = {
+    "weight_jacker": False,
+    "front_roll_bar": False,
+    "rear_roll_bar": False,
+    "fuel_map": False,
+    "bite_point": False,
+    "engine_warming": False,
+    "brake": False,
+    "other": False,
 }
 
 try:
@@ -39,9 +46,9 @@ except:
 
 def set(axis, pct):
     #print("vjoy set check1")
-    while status['busy']: # no queue, just whoever happens to check at the right time first if there are multiple instances of vjoy.set() in this loop
+    while axis_busy[axis]: # no queue, just whoever happens to check at the right time first if there are multiple instances of vjoy.set() in this loop
         sleep(0.01)
-    status['busy'] = True
+    axis_busy[axis] = True
     switched = var.status[axis]['switched']
     raw = round(pct * 32768)
     if raw <= 0:
@@ -57,7 +64,7 @@ def set(axis, pct):
     else:
         var.status[axis]['primary'] = axis_values[axis]
         #print("new primary: ", var.status[axis]['primary'])
-    status['busy'] = False
+    axis_busy[axis] = False
 
 def calibrate(axis):
     #var.status['calibration'] = True

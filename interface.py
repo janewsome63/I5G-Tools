@@ -42,7 +42,7 @@ import devices as dev
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1.4b",
+    "version": "v0.1.5b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
