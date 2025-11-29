@@ -3,7 +3,6 @@ import sys
 
 import history
 from time import sleep
-import math
 
 from PyQt6.QtCore import (
     QSize,
@@ -40,6 +39,7 @@ import variables as var
 import vjoy
 import devices as dev
 import irsdk
+from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
@@ -85,22 +85,6 @@ ui = {
     "timer": QTimer(),
     "thread_pool": QThreadPool(),
 }
-
-car_settings = {
-    int(99): {              # IR-18
-        "name": "IR-18 Indycar",
-        "weight_jacker": [-20, 20],
-        "front_roll_bar": [1, 6],
-        "rear_roll_bar": [1, 6],
-        "fuel_map": [1, 8],
-    },
-    int(205): {             # IL-15
-        "name": "IL-15 Indy NXT",
-        "front_roll_bar": [1, 5],
-        "rear_roll_bar": [1, 5]
-    }
-}
-
 
 var.settings = {
     "high_threshold": 0.90,
@@ -1302,6 +1286,8 @@ class MainWindow(QMainWindow):
 
         self.ir = irsdk.IRSDK()
         self.ir.startup()
+        self.content['axes_display']['car_id']['car_id'] = "None"
+        self.update_limits()
 
         ui['timer'].timeout.connect(self.updater)
         ui['timer'].start(int((var.settings['frequency'] * 1000) / 10))
@@ -1332,7 +1318,10 @@ class MainWindow(QMainWindow):
             if self.content['axes_display']['car_id']['car_id'] != int(self.ir['DriverInfo']['Drivers'][self.ir['PlayerCarIdx']]['CarID']):
                 self.content['axes_display']['car_id']['car_id'] = int(self.ir['DriverInfo']['Drivers'][self.ir['PlayerCarIdx']]['CarID'])
                 self.update_limits()
-
+        elif self.ir.is_initialized and not self.ir.is_connected and self.content['axes_display']['car_id']['car_id'] != "None":
+            self.ir.shutdown()
+            self.content['axes_display']['car_id']['car_id'] = "None"
+            self.update_limits()
 
     def display(self):
         for func in vjoy.axis_values:
@@ -1547,33 +1536,57 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def update_limits(self):
-        if self.content['axes_display']['car_id']['car_id'] in car_settings:
+        if self.content['axes_display']['car_id']['car_id'] == "None":
+            self.index['car_id'].setText("None")
+            print("Updating car_id to None")
+            self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+        elif self.content['axes_display']['car_id']['car_id'] in car_settings:
             car_id = self.content['axes_display']['car_id']['car_id']
             self.index['car_id'].setText(car_settings[car_id]['name'])
             print("Updating for car_id: " + str(car_id) + " " + car_settings[car_id]['name'])
             if 'weight_jacker' in car_settings[car_id]:
                 min = car_settings[car_id]['weight_jacker'][0]
                 max = car_settings[car_id]['weight_jacker'][1]
-                self.content['weight_jacker']['switch'].setRange(min, max)
-                # if self.content['weight_jacker']['switch'] < min:
-                #     self.content['weight_jacker']['switch'] = min
-                # if self.content['weight_jacker']['switch'] > min:
-                #     self.content['weight_jacker']['switch'] = max
                 step['weight_jacker'] = 1 / (max - min)
+                self.content['weight_jacker']['switch'].setRange(min, max)
+                self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
             if 'front_roll_bar' in car_settings[car_id]:
                 min = car_settings[car_id]['front_roll_bar'][0]
                 max = car_settings[car_id]['front_roll_bar'][1]
+                step['front_roll_bar'] = 1 / (max - min)
                 self.content['front_roll_bar']['switch'].setRange(min, max)
+                self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
             if 'rear_roll_bar' in car_settings[car_id]:
                 min = car_settings[car_id]['rear_roll_bar'][0]
                 max = car_settings[car_id]['rear_roll_bar'][1]
+                step['rear_roll_bar'] = 1 / (max - min)
                 self.content['rear_roll_bar']['switch'].setRange(min, max)
+                self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
             if 'fuel_map' in car_settings[car_id]:
                 min = car_settings[car_id]['fuel_map'][0]
                 max = car_settings[car_id]['fuel_map'][1]
+                step['fuel_map'] = 1 / (max - min)
                 self.content['fuel_map']['switch'].setRange(min, max)
+                self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
         else:
-            print("current_car not in car_settings!")
+            car_id = self.content['axes_display']['car_id']['car_id']
+            self.index['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
+            print("current_car " + str(car_id) + " not in car_settings!")
+            self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
 
     @pyqtSlot()
     def apply_settings(self, file):
