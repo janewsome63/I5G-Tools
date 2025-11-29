@@ -3,7 +3,6 @@ import sys
 
 import history
 from time import sleep
-import math
 
 from PyQt6.QtCore import (
     QSize,
@@ -39,10 +38,12 @@ import functions as fn
 import variables as var
 import vjoy
 import devices as dev
+import irsdk
+from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.1.5b",
+    "version": "v0.2.0b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -75,6 +76,7 @@ lang = {
     "settings": "Settings",
     "settings_filename": "Current Settings File:",
     "axes_display": "Display",
+    "car_id": "Car ID:",
 }
 
 ui = {
@@ -83,7 +85,6 @@ ui = {
     "timer": QTimer(),
     "thread_pool": QThreadPool(),
 }
-
 
 var.settings = {
     "high_threshold": 0.90,
@@ -187,6 +188,7 @@ class MainWindow(QMainWindow):
             },
             "settings": {},
             "axes_display":{
+                "car_id": {},
                 "weight_jacker": {},
                 "front_roll_bar": {},
                 "rear_roll_bar": {},
@@ -1048,100 +1050,115 @@ class MainWindow(QMainWindow):
         self.axes_display.layout = QGridLayout()
 
 
+        self.content['axes_display']['car_id']['label'] = QLabel()
+        self.content['axes_display']['car_id']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['car_id']['label'].setText(lang['car_id'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['car_id']['label'], 0, 0)
+
+        self.content['axes_display']['car_id']['car_id'] = QLabel()
+        self.content['axes_display']['car_id']['car_id'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['car_id']['car_id'].setText("None")
+        self.axes_display.layout.addWidget(self.content['axes_display']['car_id']['car_id'], 0, 1)
+
+        self.content['axes_display']['car_id']['limits'] = QLabel()
+        self.content['axes_display']['car_id']['limits'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['axes_display']['car_id']['limits'].setText("Placeholder")
+        self.axes_display.layout.addWidget(self.content['axes_display']['car_id']['limits'], 0, 2)
+
         self.content['axes_display']['weight_jacker']['label'] = QLabel()
         self.content['axes_display']['weight_jacker']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['weight_jacker']['label'].setText(lang['weight_jacker'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['label'], 0, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['label'], 1, 0)
 
         self.content['axes_display']['weight_jacker']['lcd'] = QLCDNumber()
         self.content['axes_display']['weight_jacker']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['lcd'], 0, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['lcd'], 1, 1)
 
         self.content['axes_display']['weight_jacker']['axis'] = QProgressBar()
         self.content['axes_display']['weight_jacker']['axis'].setTextVisible(False)
         self.content['axes_display']['weight_jacker']['axis'].setMinimum(0)
         self.content['axes_display']['weight_jacker']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['axis'], 0, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['axis'], 1, 2)
 
 
         self.content['axes_display']['front_roll_bar']['label'] = QLabel()
         self.content['axes_display']['front_roll_bar']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['front_roll_bar']['label'].setText(lang['front_roll_bar'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['label'], 1, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['label'], 2, 0)
 
         self.content['axes_display']['front_roll_bar']['lcd'] = QLCDNumber()
         self.content['axes_display']['front_roll_bar']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['lcd'], 1, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['lcd'], 2, 1)
 
         self.content['axes_display']['front_roll_bar']['axis'] = QProgressBar()
         self.content['axes_display']['front_roll_bar']['axis'].setTextVisible(False)
         self.content['axes_display']['front_roll_bar']['axis'].setMinimum(0)
         self.content['axes_display']['front_roll_bar']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['axis'], 1, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['front_roll_bar']['axis'], 2, 2)
 
 
         self.content['axes_display']['rear_roll_bar']['label'] = QLabel()
         self.content['axes_display']['rear_roll_bar']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['rear_roll_bar']['label'].setText(lang['rear_roll_bar'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['label'], 2, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['label'], 3, 0)
 
         self.content['axes_display']['rear_roll_bar']['lcd'] = QLCDNumber()
         self.content['axes_display']['rear_roll_bar']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['lcd'], 2, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['lcd'], 3, 1)
 
         self.content['axes_display']['rear_roll_bar']['axis'] = QProgressBar()
         self.content['axes_display']['rear_roll_bar']['axis'].setTextVisible(False)
         self.content['axes_display']['rear_roll_bar']['axis'].setMinimum(0)
         self.content['axes_display']['rear_roll_bar']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['axis'], 2, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['rear_roll_bar']['axis'], 3, 2)
 
 
         self.content['axes_display']['fuel_map']['label'] = QLabel()
         self.content['axes_display']['fuel_map']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['fuel_map']['label'].setText(lang['fuel_map'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['label'], 3, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['label'], 4, 0)
 
         self.content['axes_display']['fuel_map']['lcd'] = QLCDNumber()
         self.content['axes_display']['fuel_map']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['lcd'], 3, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['lcd'], 4, 1)
 
         self.content['axes_display']['fuel_map']['axis'] = QProgressBar()
         self.content['axes_display']['fuel_map']['axis'].setTextVisible(False)
         self.content['axes_display']['fuel_map']['axis'].setMinimum(0)
         self.content['axes_display']['fuel_map']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['axis'], 3, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['fuel_map']['axis'], 4, 2)
 
 
         self.content['axes_display']['bite_point']['label'] = QLabel()
         self.content['axes_display']['bite_point']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['bite_point']['label'].setText(lang['bite_point'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['label'], 4, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['label'], 5, 0)
 
         self.content['axes_display']['bite_point']['lcd'] = QLCDNumber()
         self.content['axes_display']['bite_point']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['lcd'], 4, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['lcd'], 5, 1)
 
         self.content['axes_display']['bite_point']['axis'] = QProgressBar()
         self.content['axes_display']['bite_point']['axis'].setTextVisible(False)
         self.content['axes_display']['bite_point']['axis'].setMinimum(0)
         self.content['axes_display']['bite_point']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['axis'], 4, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['bite_point']['axis'], 5, 2)
 
 
         self.content['axes_display']['engine_warming']['label'] = QLabel()
         self.content['axes_display']['engine_warming']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['engine_warming']['label'].setText(lang['engine_warming'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['label'], 5, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['label'], 6, 0)
 
         self.content['axes_display']['engine_warming']['lcd'] = QLCDNumber()
         self.content['axes_display']['engine_warming']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['lcd'], 5, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['lcd'], 6, 1)
 
         self.content['axes_display']['engine_warming']['axis'] = QProgressBar()
         self.content['axes_display']['engine_warming']['axis'].setTextVisible(False)
         self.content['axes_display']['engine_warming']['axis'].setMinimum(0)
         self.content['axes_display']['engine_warming']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['axis'], 5, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['axis'], 6, 2)
 
 
         self.axes_display.setLayout(self.axes_display.layout)
@@ -1155,7 +1172,6 @@ class MainWindow(QMainWindow):
 
         self.apply_settings('settings.ini')
         self.refresh_settings_list()
-
 
         self.index = {
             "weight_jacker": {
@@ -1270,7 +1286,13 @@ class MainWindow(QMainWindow):
                     "label": self.content['engine_warming']['switch_label'],
                 }
             },
+            "car_id": self.content['axes_display']['car_id']['car_id']
         }
+
+        self.ir = irsdk.IRSDK()
+        self.ir.startup()
+        self.content['axes_display']['car_id']['car_id'] = "None"
+        self.update_limits()
 
         ui['timer'].timeout.connect(self.updater)
         ui['timer'].start(int((var.settings['frequency'] * 1000) / 10))
@@ -1294,6 +1316,17 @@ class MainWindow(QMainWindow):
                 self.content[function]['switch'].setValue(value)
 
         self.display()
+
+        if not self.ir.is_initialized:
+            self.ir.startup()
+        if self.ir.is_initialized and self.ir.is_connected:
+            if self.content['axes_display']['car_id']['car_id'] != int(self.ir['DriverInfo']['Drivers'][self.ir['PlayerCarIdx']]['CarID']):
+                self.content['axes_display']['car_id']['car_id'] = int(self.ir['DriverInfo']['Drivers'][self.ir['PlayerCarIdx']]['CarID'])
+                self.update_limits()
+        elif self.ir.is_initialized and not self.ir.is_connected and self.content['axes_display']['car_id']['car_id'] != "None":
+            self.ir.shutdown()
+            self.content['axes_display']['car_id']['car_id'] = "None"
+            self.update_limits()
 
     def display(self):
         for func in vjoy.axis_values:
@@ -1505,6 +1538,65 @@ class MainWindow(QMainWindow):
             self.content['settings']['settings_filename'].addItem(name)
         self.content['settings']['settings_filename'].setCurrentText(file)
         self.content['settings']['busy'] = False
+
+    @pyqtSlot()
+    def update_limits(self):
+        if self.content['axes_display']['car_id']['car_id'] == "None":
+            self.index['car_id'].setText("None")
+            print("Updating car_id to None")
+            self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+        elif self.content['axes_display']['car_id']['car_id'] in car_settings:
+            car_id = self.content['axes_display']['car_id']['car_id']
+            self.index['car_id'].setText(car_settings[car_id]['name'])
+            print("Updating for car_id: " + str(car_id) + " " + car_settings[car_id]['name'])
+            if 'weight_jacker' in car_settings[car_id]:
+                min = car_settings[car_id]['weight_jacker'][0]
+                max = car_settings[car_id]['weight_jacker'][1]
+                step['weight_jacker'] = 1 / (max - min)
+                self.content['weight_jacker']['switch'].setRange(min, max)
+                self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+            if 'front_roll_bar' in car_settings[car_id]:
+                min = car_settings[car_id]['front_roll_bar'][0]
+                max = car_settings[car_id]['front_roll_bar'][1]
+                step['front_roll_bar'] = 1 / (max - min)
+                self.content['front_roll_bar']['switch'].setRange(min, max)
+                self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
+            if 'rear_roll_bar' in car_settings[car_id]:
+                min = car_settings[car_id]['rear_roll_bar'][0]
+                max = car_settings[car_id]['rear_roll_bar'][1]
+                step['rear_roll_bar'] = 1 / (max - min)
+                self.content['rear_roll_bar']['switch'].setRange(min, max)
+                self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
+            if 'fuel_map' in car_settings[car_id]:
+                min = car_settings[car_id]['fuel_map'][0]
+                max = car_settings[car_id]['fuel_map'][1]
+                step['fuel_map'] = 1 / (max - min)
+                self.content['fuel_map']['switch'].setRange(min, max)
+                self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: white;")
+            else:
+                self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+        else:
+            car_id = self.content['axes_display']['car_id']['car_id']
+            self.index['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
+            print("current_car " + str(car_id) + " not in car_settings!")
+            self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+        text = "WJ: " + str(self.content['weight_jacker']['switch'].minimum()) + " to " + str(self.content['weight_jacker']['switch'].maximum())
+        text += ", FARB: " + str(self.content['front_roll_bar']['switch'].minimum()) + " to " + str(self.content['front_roll_bar']['switch'].maximum())
+        text += ", RARB: " + str(self.content['rear_roll_bar']['switch'].minimum()) + " to " + str(self.content['rear_roll_bar']['switch'].maximum())
+        text += ", Fuel Map: " + str(self.content['fuel_map']['switch'].minimum()) + " to " + str(self.content['fuel_map']['switch'].maximum())
+        self.content['axes_display']['car_id']['limits'].setText(text)
 
     @pyqtSlot()
     def apply_settings(self, file):
