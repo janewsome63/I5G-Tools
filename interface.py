@@ -1060,6 +1060,11 @@ class MainWindow(QMainWindow):
         self.content['axes_display']['car_id']['car_id'].setText("None")
         self.axes_display.layout.addWidget(self.content['axes_display']['car_id']['car_id'], 0, 1)
 
+        self.content['axes_display']['car_id']['limits'] = QLabel()
+        self.content['axes_display']['car_id']['limits'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['axes_display']['car_id']['limits'].setText("Placeholder")
+        self.axes_display.layout.addWidget(self.content['axes_display']['car_id']['limits'], 0, 2)
+
         self.content['axes_display']['weight_jacker']['label'] = QLabel()
         self.content['axes_display']['weight_jacker']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['weight_jacker']['label'].setText(lang['weight_jacker'])
@@ -1587,6 +1592,11 @@ class MainWindow(QMainWindow):
             self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+        text = "WJ: " + str(self.content['weight_jacker']['switch'].minimum()) + " to " + str(self.content['weight_jacker']['switch'].maximum())
+        text += ", FARB: " + str(self.content['front_roll_bar']['switch'].minimum()) + " to " + str(self.content['front_roll_bar']['switch'].maximum())
+        text += ", RARB: " + str(self.content['rear_roll_bar']['switch'].minimum()) + " to " + str(self.content['rear_roll_bar']['switch'].maximum())
+        text += ", Fuel Map: " + str(self.content['fuel_map']['switch'].minimum()) + " to " + str(self.content['fuel_map']['switch'].maximum())
+        self.content['axes_display']['car_id']['limits'].setText(text)
 
     @pyqtSlot()
     def apply_settings(self, file):
