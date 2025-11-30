@@ -43,7 +43,7 @@ from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.2.0b",
+    "version": "v0.2.1b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -1557,7 +1557,7 @@ class MainWindow(QMainWindow):
                 max = car_settings[car_id]['weight_jacker'][1]
                 step['weight_jacker'] = 1 / (max - min)
                 self.content['weight_jacker']['switch'].setRange(min, max)
-                self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: white;")
+                self.content['axes_display']['weight_jacker']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
             else:
                 self.content['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
             if 'front_roll_bar' in car_settings[car_id]:
@@ -1565,7 +1565,7 @@ class MainWindow(QMainWindow):
                 max = car_settings[car_id]['front_roll_bar'][1]
                 step['front_roll_bar'] = 1 / (max - min)
                 self.content['front_roll_bar']['switch'].setRange(min, max)
-                self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: white;")
+                self.content['axes_display']['front_roll_bar']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
             else:
                 self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
             if 'rear_roll_bar' in car_settings[car_id]:
@@ -1573,7 +1573,7 @@ class MainWindow(QMainWindow):
                 max = car_settings[car_id]['rear_roll_bar'][1]
                 step['rear_roll_bar'] = 1 / (max - min)
                 self.content['rear_roll_bar']['switch'].setRange(min, max)
-                self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: white;")
+                self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
             else:
                 self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
             if 'fuel_map' in car_settings[car_id]:
@@ -1581,7 +1581,7 @@ class MainWindow(QMainWindow):
                 max = car_settings[car_id]['fuel_map'][1]
                 step['fuel_map'] = 1 / (max - min)
                 self.content['fuel_map']['switch'].setRange(min, max)
-                self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: white;")
+                self.content['axes_display']['fuel_map']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
             else:
                 self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
         else:
