@@ -43,7 +43,7 @@ from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.2.1b",
+    "version": "v0.2.2b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -1320,8 +1320,16 @@ class MainWindow(QMainWindow):
         if not self.ir.is_initialized:
             self.ir.startup()
         if self.ir.is_initialized and self.ir.is_connected:
-            if self.content['axes_display']['car_id']['car_id'] != int(self.ir['DriverInfo']['Drivers'][self.ir['PlayerCarIdx']]['CarID']):
-                self.content['axes_display']['car_id']['car_id'] = int(self.ir['DriverInfo']['Drivers'][self.ir['PlayerCarIdx']]['CarID'])
+            length = len(self.ir['DriverInfo']['Drivers'])
+            index = length-1
+            check = True
+            while index >= 0 and check:
+                if self.ir['DriverInfo']['Drivers'][index]['CarID'] == self.ir['PlayerCarIdx']:
+                    check = False
+                else:
+                    index -= 1
+            if self.content['axes_display']['car_id']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
+                self.content['axes_display']['car_id']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                 self.update_limits()
         elif self.ir.is_initialized and not self.ir.is_connected and self.content['axes_display']['car_id']['car_id'] != "None":
             self.ir.shutdown()
