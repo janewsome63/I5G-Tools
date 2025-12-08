@@ -43,7 +43,7 @@ from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.2.2b",
+    "version": "v0.3.0b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -73,6 +73,8 @@ lang = {
     "fuel_map": "Fuel Map",
     "bite_point": "Clutch",
     "engine_warming": "Throttle",
+    "regen": "Regen",
+    "deploy": "Deploy",
     "settings": "Settings",
     "settings_filename": "Current Settings File:",
     "axes_display": "Display",
@@ -131,6 +133,18 @@ var.settings = {
         "increment": 1,
         "switch_value": 50,
     },
+    "regen": {
+        "continuous": False,
+        "toggle": False,
+        "increment": 0.1,
+        "switch_value": 4.0,
+    },
+    "deploy": {
+        "continuous": False,
+        "toggle": False,
+        "increment": 0.1,
+        "switch_value": 4.0,
+    },
 }
 
 class MainWindow(QMainWindow):
@@ -155,6 +169,8 @@ class MainWindow(QMainWindow):
         self.fuel_map = QWidget()
         self.bite_point = QWidget()
         self.engine_warming = QWidget()
+        self.regen = QWidget()
+        self.deploy = QWidget()
         self.settings = QWidget()
         self.axes_display = QWidget()
 
@@ -164,6 +180,8 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.fuel_map, lang['fuel_map'])
         self.tabs.addTab(self.bite_point, lang['bite_point'])
         self.tabs.addTab(self.engine_warming, lang['engine_warming'])
+        self.tabs.addTab(self.regen, lang['regen'])
+        self.tabs.addTab(self.deploy, lang['deploy'])
         self.tabs.addTab(self.settings, lang['settings'])
         self.tabs.addTab(self.axes_display, lang['axes_display'])
 
@@ -186,6 +204,12 @@ class MainWindow(QMainWindow):
             "engine_warming": {
                 "engine_warming": {},
             },
+            "regen": {
+                "regen": {},
+            },
+            "deploy": {
+                "deploy": {},
+            },
             "settings": {},
             "axes_display":{
                 "car_id": {},
@@ -195,6 +219,8 @@ class MainWindow(QMainWindow):
                 "fuel_map": {},
                 "bite_point": {},
                 "engine_warming": {},
+                "regen": {},
+                "deploy": {},
             },
             }
         
@@ -951,6 +977,254 @@ class MainWindow(QMainWindow):
 
         self.engine_warming.setLayout(self.engine_warming.layout)
 
+        # --------Regen Tab--------#
+
+        self.regen.layout = QGridLayout()
+
+        self.content['regen']['lcd'] = QLCDNumber()
+        self.content['regen']['lcd'].display(0)
+        self.regen.layout.addWidget(self.content['regen']['lcd'], 0, 0)
+
+        self.content['regen']['axis'] = QProgressBar()
+        self.content['regen']['axis'].setTextVisible(False)
+        self.content['regen']['axis'].setMinimum(0)
+        self.content['regen']['axis'].setMaximum(100)
+        self.regen.layout.addWidget(self.content['regen']['axis'], 0, 1)
+
+        self.content['regen']['calibrate'] = QPushButton()
+        self.content['regen']['calibrate'].setFixedSize(100, 25)
+        self.content['regen']['calibrate'].setText(lang['calibrate'])
+        self.regen.layout.addWidget(self.content['regen']['calibrate'], 0, 2)
+        self.content['regen']['calibrate'].clicked.connect(lambda: self.calibrate_start("regen"))
+
+        self.content['regen']['increment_label'] = QLabel()
+        self.content['regen']['increment_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['regen']['increment_label'].setText(lang['increment'])
+        self.regen.layout.addWidget(self.content['regen']['increment_label'], 1, 0)
+
+        self.content['regen']['switch_label'] = QLabel()
+        self.content['regen']['switch_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['regen']['switch_label'].setText(lang['switch_value'])
+        self.regen.layout.addWidget(self.content['regen']['switch_label'], 1, 1)
+
+        self.content['regen']['increment'] = QDoubleSpinBox()
+        self.content['regen']['increment'].setFixedSize(70, 25)
+        self.content['regen']['increment'].setRange(0.1, 2.0)
+        self.content['regen']['increment'].setSingleStep(0.1)
+        self.content['regen']['increment'].setDecimals(1)
+        self.regen.layout.addWidget(self.content['regen']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['regen']['increment'].valueChanged.connect(lambda: self.increment("regen"))
+
+        self.content['regen']['switch'] = QDoubleSpinBox()
+        self.content['regen']['switch'].setFixedSize(70, 25)
+        self.content['regen']['switch'].setRange(0.5, 5.0)
+        self.content['regen']['switch'].setSingleStep(0.1)
+        self.content['regen']['switch'].setDecimals(1)
+        self.regen.layout.addWidget(self.content['regen']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['regen']['switch'].valueChanged.connect(lambda: self.switch("regen"))
+
+        self.content['regen']['increment_mode_label'] = QLabel()
+        self.content['regen']['increment_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['regen']['increment_mode_label'].setText(lang['increment_mode'])
+        self.regen.layout.addWidget(self.content['regen']['increment_mode_label'], 2, 0)
+
+        self.content['regen']['switch_mode_label'] = QLabel()
+        self.content['regen']['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['regen']['switch_mode_label'].setText(lang['switch_mode'])
+        self.regen.layout.addWidget(self.content['regen']['switch_mode_label'], 2, 1)
+
+        self.content['regen']['increment_mode'] = QComboBox()
+        self.content['regen']['increment_mode'].setFixedSize(100, 25)
+        self.content['regen']['increment_mode'].addItem(lang['continuous'])
+        self.content['regen']['increment_mode'].addItem(lang['single'])
+        self.regen.layout.addWidget(self.content['regen']['increment_mode'], 2, 1)
+        self.content['regen']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("regen"))
+
+        self.content['regen']['switch_mode'] = QComboBox()
+        self.content['regen']['switch_mode'].setFixedSize(70, 25)
+        self.content['regen']['switch_mode'].addItem(lang['hold'])
+        self.content['regen']['switch_mode'].addItem(lang['toggle'])
+        self.regen.layout.addWidget(self.content['regen']['switch_mode'], 2, 2)
+        self.content['regen']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("regen"))
+
+        self.content['regen']['up_label'] = QLabel()
+        self.content['regen']['up_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['regen']['up_label'].setText(lang['up'])
+        self.regen.layout.addWidget(self.content['regen']['up_label'], 3, 0)
+
+        self.content['regen']['up_device'] = QLineEdit()
+        self.content['regen']['up_device'].setFixedHeight(25)
+        self.content['regen']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['regen']['up_device'].setReadOnly(True)
+        self.regen.layout.addWidget(self.content['regen']['up_device'], 3, 1)
+
+        self.content['regen']['up_bind'] = QPushButton()
+        self.content['regen']['up_bind'].setFixedSize(100, 25)
+        self.content['regen']['up_bind'].setText(lang['bind'])
+        self.regen.layout.addWidget(self.content['regen']['up_bind'], 3, 2)
+        self.content['regen']['up_bind'].clicked.connect(lambda: self.bind_start("regen","up"))
+
+        self.content['regen']['down_label'] = QLabel()
+        self.content['regen']['down_label'].setAlignment(Qt.AlignmentFlag.AlignVCenter.AlignLeft)
+        self.content['regen']['down_label'].setText(lang['down'])
+        self.regen.layout.addWidget(self.content['regen']['down_label'], 4, 0)
+
+        self.content['regen']['down_device'] = QLineEdit()
+        self.content['regen']['down_device'].setFixedHeight(25)
+        self.content['regen']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['regen']['down_device'].setReadOnly(True)
+        self.regen.layout.addWidget(self.content['regen']['down_device'], 4, 1)
+
+        self.content['regen']['down_bind'] = QPushButton()
+        self.content['regen']['down_bind'].setFixedSize(100, 25)
+        self.content['regen']['down_bind'].setText(lang['bind'])
+        self.regen.layout.addWidget(self.content['regen']['down_bind'], 4, 2)
+        self.content['regen']['down_bind'].clicked.connect(lambda: self.bind_start("regen","down"))
+
+        self.content['regen']['switch_label'] = QLabel()
+        self.content['regen']['switch_label'].setFixedHeight(25)
+        self.content['regen']['switch_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['regen']['switch_label'].setText(lang['switch'])
+        self.regen.layout.addWidget(self.content['regen']['switch_label'], 5, 0)
+
+        self.content['regen']['switch_device'] = QLineEdit()
+        self.content['regen']['switch_device'].setFixedHeight(25)
+        self.content['regen']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['regen']['switch_device'].setReadOnly(True)
+        self.regen.layout.addWidget(self.content['regen']['switch_device'], 5, 1)
+
+        self.content['regen']['switch_bind'] = QPushButton()
+        self.content['regen']['switch_bind'].setFixedSize(100, 25)
+        self.content['regen']['switch_bind'].setText(lang['bind'])
+        self.regen.layout.addWidget(self.content['regen']['switch_bind'], 5, 2)
+        self.content['regen']['switch_bind'].clicked.connect(lambda: self.bind_start("regen","switch"))
+
+        self.regen.setLayout(self.regen.layout)
+
+        # --------Deploy Tab--------#
+
+        self.deploy.layout = QGridLayout()
+
+        self.content['deploy']['lcd'] = QLCDNumber()
+        self.content['deploy']['lcd'].display(0)
+        self.deploy.layout.addWidget(self.content['deploy']['lcd'], 0, 0)
+
+        self.content['deploy']['axis'] = QProgressBar()
+        self.content['deploy']['axis'].setTextVisible(False)
+        self.content['deploy']['axis'].setMinimum(0)
+        self.content['deploy']['axis'].setMaximum(100)
+        self.deploy.layout.addWidget(self.content['deploy']['axis'], 0, 1)
+
+        self.content['deploy']['calibrate'] = QPushButton()
+        self.content['deploy']['calibrate'].setFixedSize(100, 25)
+        self.content['deploy']['calibrate'].setText(lang['calibrate'])
+        self.deploy.layout.addWidget(self.content['deploy']['calibrate'], 0, 2)
+        self.content['deploy']['calibrate'].clicked.connect(lambda: self.calibrate_start("deploy"))
+
+        self.content['deploy']['increment_label'] = QLabel()
+        self.content['deploy']['increment_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['deploy']['increment_label'].setText(lang['increment'])
+        self.deploy.layout.addWidget(self.content['deploy']['increment_label'], 1, 0)
+
+        self.content['deploy']['switch_label'] = QLabel()
+        self.content['deploy']['switch_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['deploy']['switch_label'].setText(lang['switch_value'])
+        self.deploy.layout.addWidget(self.content['deploy']['switch_label'], 1, 1)
+
+        self.content['deploy']['increment'] = QDoubleSpinBox()
+        self.content['deploy']['increment'].setFixedSize(70, 25)
+        self.content['deploy']['increment'].setRange(0.1, 2.0)
+        self.content['deploy']['increment'].setSingleStep(0.1)
+        self.content['deploy']['increment'].setDecimals(1)
+        self.deploy.layout.addWidget(self.content['deploy']['increment'], 1, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['deploy']['increment'].valueChanged.connect(lambda: self.increment("deploy"))
+
+        self.content['deploy']['switch'] = QDoubleSpinBox()
+        self.content['deploy']['switch'].setFixedSize(70, 25)
+        self.content['deploy']['switch'].setRange(0.5, 5.0)
+        self.content['deploy']['switch'].setSingleStep(0.1)
+        self.content['deploy']['switch'].setDecimals(1)
+        self.deploy.layout.addWidget(self.content['deploy']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['deploy']['switch'].valueChanged.connect(lambda: self.switch("deploy"))
+
+        self.content['deploy']['increment_mode_label'] = QLabel()
+        self.content['deploy']['increment_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['deploy']['increment_mode_label'].setText(lang['increment_mode'])
+        self.deploy.layout.addWidget(self.content['deploy']['increment_mode_label'], 2, 0)
+
+        self.content['deploy']['switch_mode_label'] = QLabel()
+        self.content['deploy']['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.content['deploy']['switch_mode_label'].setText(lang['switch_mode'])
+        self.deploy.layout.addWidget(self.content['deploy']['switch_mode_label'], 2, 1)
+
+        self.content['deploy']['increment_mode'] = QComboBox()
+        self.content['deploy']['increment_mode'].setFixedSize(100, 25)
+        self.content['deploy']['increment_mode'].addItem(lang['continuous'])
+        self.content['deploy']['increment_mode'].addItem(lang['single'])
+        self.deploy.layout.addWidget(self.content['deploy']['increment_mode'], 2, 1)
+        self.content['deploy']['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode("deploy"))
+
+        self.content['deploy']['switch_mode'] = QComboBox()
+        self.content['deploy']['switch_mode'].setFixedSize(70, 25)
+        self.content['deploy']['switch_mode'].addItem(lang['hold'])
+        self.content['deploy']['switch_mode'].addItem(lang['toggle'])
+        self.deploy.layout.addWidget(self.content['deploy']['switch_mode'], 2, 2)
+        self.content['deploy']['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode("deploy"))
+
+        self.content['deploy']['up_label'] = QLabel()
+        self.content['deploy']['up_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['deploy']['up_label'].setText(lang['up'])
+        self.deploy.layout.addWidget(self.content['deploy']['up_label'], 3, 0)
+
+        self.content['deploy']['up_device'] = QLineEdit()
+        self.content['deploy']['up_device'].setFixedHeight(25)
+        self.content['deploy']['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['deploy']['up_device'].setReadOnly(True)
+        self.deploy.layout.addWidget(self.content['deploy']['up_device'], 3, 1)
+
+        self.content['deploy']['up_bind'] = QPushButton()
+        self.content['deploy']['up_bind'].setFixedSize(100, 25)
+        self.content['deploy']['up_bind'].setText(lang['bind'])
+        self.deploy.layout.addWidget(self.content['deploy']['up_bind'], 3, 2)
+        self.content['deploy']['up_bind'].clicked.connect(lambda: self.bind_start("deploy","up"))
+
+        self.content['deploy']['down_label'] = QLabel()
+        self.content['deploy']['down_label'].setAlignment(Qt.AlignmentFlag.AlignVCenter.AlignLeft)
+        self.content['deploy']['down_label'].setText(lang['down'])
+        self.deploy.layout.addWidget(self.content['deploy']['down_label'], 4, 0)
+
+        self.content['deploy']['down_device'] = QLineEdit()
+        self.content['deploy']['down_device'].setFixedHeight(25)
+        self.content['deploy']['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['deploy']['down_device'].setReadOnly(True)
+        self.deploy.layout.addWidget(self.content['deploy']['down_device'], 4, 1)
+
+        self.content['deploy']['down_bind'] = QPushButton()
+        self.content['deploy']['down_bind'].setFixedSize(100, 25)
+        self.content['deploy']['down_bind'].setText(lang['bind'])
+        self.deploy.layout.addWidget(self.content['deploy']['down_bind'], 4, 2)
+        self.content['deploy']['down_bind'].clicked.connect(lambda: self.bind_start("deploy","down"))
+
+        self.content['deploy']['switch_label'] = QLabel()
+        self.content['deploy']['switch_label'].setFixedHeight(25)
+        self.content['deploy']['switch_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['deploy']['switch_label'].setText(lang['switch'])
+        self.deploy.layout.addWidget(self.content['deploy']['switch_label'], 5, 0)
+
+        self.content['deploy']['switch_device'] = QLineEdit()
+        self.content['deploy']['switch_device'].setFixedHeight(25)
+        self.content['deploy']['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.content['deploy']['switch_device'].setReadOnly(True)
+        self.deploy.layout.addWidget(self.content['deploy']['switch_device'], 5, 1)
+
+        self.content['deploy']['switch_bind'] = QPushButton()
+        self.content['deploy']['switch_bind'].setFixedSize(100, 25)
+        self.content['deploy']['switch_bind'].setText(lang['bind'])
+        self.deploy.layout.addWidget(self.content['deploy']['switch_bind'], 5, 2)
+        self.content['deploy']['switch_bind'].clicked.connect(lambda: self.bind_start("deploy","switch"))
+
+        self.deploy.setLayout(self.deploy.layout)
+
         # --------Settings Tab--------#
         self.settings.layout = QGridLayout()
 
@@ -1161,6 +1435,38 @@ class MainWindow(QMainWindow):
         self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['axis'], 6, 2)
 
 
+        self.content['axes_display']['regen']['label'] = QLabel()
+        self.content['axes_display']['regen']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['regen']['label'].setText(lang['regen'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['regen']['label'], 7, 0)
+
+        self.content['axes_display']['regen']['lcd'] = QLCDNumber()
+        self.content['axes_display']['regen']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['regen']['lcd'], 7, 1)
+
+        self.content['axes_display']['regen']['axis'] = QProgressBar()
+        self.content['axes_display']['regen']['axis'].setTextVisible(False)
+        self.content['axes_display']['regen']['axis'].setMinimum(0)
+        self.content['axes_display']['regen']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['regen']['axis'], 7, 2)
+
+
+        self.content['axes_display']['deploy']['label'] = QLabel()
+        self.content['axes_display']['deploy']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['axes_display']['deploy']['label'].setText(lang['deploy'])
+        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['label'], 7, 0)
+
+        self.content['axes_display']['deploy']['lcd'] = QLCDNumber()
+        self.content['axes_display']['deploy']['lcd'].display(0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['lcd'], 7, 1)
+
+        self.content['axes_display']['deploy']['axis'] = QProgressBar()
+        self.content['axes_display']['deploy']['axis'].setTextVisible(False)
+        self.content['axes_display']['deploy']['axis'].setMinimum(0)
+        self.content['axes_display']['deploy']['axis'].setMaximum(100)
+        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['axis'], 7, 2)
+
+
         self.axes_display.setLayout(self.axes_display.layout)
 
 
@@ -1286,6 +1592,40 @@ class MainWindow(QMainWindow):
                     "label": self.content['engine_warming']['switch_label'],
                 }
             },
+            "regen": {
+                "up": {
+                    "bind": self.content['regen']['up_bind'],
+                    "device": self.content['regen']['up_device'],
+                    "label": self.content['regen']['up_label'],
+                },
+                "down": {
+                    "bind": self.content['regen']['down_bind'],
+                    "device": self.content['regen']['down_device'],
+                    "label": self.content['regen']['down_label'],
+                },
+                "switch": {
+                    "bind": self.content['regen']['switch_bind'],
+                    "device": self.content['regen']['switch_device'],
+                    "label": self.content['regen']['switch_label'],
+                }
+            },
+            "deploy": {
+                "up": {
+                    "bind": self.content['deploy']['up_bind'],
+                    "device": self.content['deploy']['up_device'],
+                    "label": self.content['deploy']['up_label'],
+                },
+                "down": {
+                    "bind": self.content['deploy']['down_bind'],
+                    "device": self.content['deploy']['down_device'],
+                    "label": self.content['deploy']['down_label'],
+                },
+                "switch": {
+                    "bind": self.content['deploy']['switch_bind'],
+                    "device": self.content['deploy']['switch_device'],
+                    "label": self.content['deploy']['switch_label'],
+                }
+            },
             "car_id": self.content['axes_display']['car_id']['car_id']
         }
 
@@ -1309,6 +1649,8 @@ class MainWindow(QMainWindow):
                     value = float(value*100)
                 #elif function == "settings":
                     #self.refresh_settings_list()
+                elif function == "regen" or function == "deploy":
+                    value = value * (self.content[function]['switch'].maximum() - self.content[function]['switch'].minimum()) + self.content[function]['switch'].minimum()
                 else:
                     # var.status[function]['secondary'] = (value * step[function]) - step[function]
                     value = int(round((value / step[function]) + 1))
@@ -1353,8 +1695,16 @@ class MainWindow(QMainWindow):
                     else:
                         self.content[func]['lcd'].display(round(pct*100, 1))
                         self.content['axes_display'][func]['lcd'].display(round(pct*100, 1))
+                elif func == 'regen' or func == "deploy":
+                    value = round(pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum(), 1)
+                    if value%1 == 0:
+                        self.content[func]['lcd'].display(str(round(value)) + ".0") # bad hack to get the lcd to always display one decimal place
+                        self.content['axes_display'][func]['lcd'].display(str(round(value)) + ".0")
+                    else:
+                        self.content[func]['lcd'].display(round(value, 1))
+                        self.content['axes_display'][func]['lcd'].display(round(value, 1))
                 else:
-                    value = pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum()
+                    value = round(pct * (self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum()) + self.content[func]['switch'].minimum(), 1)
                     self.content[func]['lcd'].display(round(value))
                     self.content['axes_display'][func]['lcd'].display(round(value))
                 self.content[func]['lcd'].update()
@@ -1403,6 +1753,8 @@ class MainWindow(QMainWindow):
             var.status[func]['secondary'] = (value * step[func]) + 0.5
         elif func == "bite_point" or func == "engine_warming":
             var.status[func]['secondary'] = value/100
+        elif func == "regen" or func == "deploy":
+            var.status[func]['secondary'] = (value - self.content[func]['switch'].minimum())/(self.content[func]['switch'].maximum() - self.content[func]['switch'].minimum())
         else:
             var.status[func]['secondary'] = (value * step[func]) - step[func]
         if var.status[func]['switched'] == True:
@@ -1556,6 +1908,8 @@ class MainWindow(QMainWindow):
             self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['regen']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['deploy']['label'].setStyleSheet("color: red;")
         elif self.content['axes_display']['car_id']['car_id'] in car_settings:
             car_id = self.content['axes_display']['car_id']['car_id']
             self.index['car_id'].setText(car_settings[car_id]['name'])
@@ -1592,6 +1946,22 @@ class MainWindow(QMainWindow):
                 self.content['axes_display']['fuel_map']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
             else:
                 self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+            if 'regen' in car_settings[car_id]:
+                min = car_settings[car_id]['regen'][0]
+                max = car_settings[car_id]['regen'][1]
+                #step['regen'] = 1 / (max - min)
+                self.content['regen']['switch'].setRange(min, max)
+                self.content['axes_display']['regen']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
+            else:
+                self.content['axes_display']['regen']['label'].setStyleSheet("color: red;")
+            if 'deploy' in car_settings[car_id]:
+                min = car_settings[car_id]['deploy'][0]
+                max = car_settings[car_id]['deploy'][1]
+                #step['deploy'] = 1 / (max - min)
+                self.content['deploy']['switch'].setRange(min, max)
+                self.content['axes_display']['deploy']['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
+            else:
+                self.content['axes_display']['deploy']['label'].setStyleSheet("color: red;")
         else:
             car_id = self.content['axes_display']['car_id']['car_id']
             self.index['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
@@ -1600,10 +1970,14 @@ class MainWindow(QMainWindow):
             self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['regen']['label'].setStyleSheet("color: red;")
+            self.content['axes_display']['deploy']['label'].setStyleSheet("color: red;")
         text = "WJ: " + str(self.content['weight_jacker']['switch'].minimum()) + " to " + str(self.content['weight_jacker']['switch'].maximum())
         text += ", FARB: " + str(self.content['front_roll_bar']['switch'].minimum()) + " to " + str(self.content['front_roll_bar']['switch'].maximum())
         text += ", RARB: " + str(self.content['rear_roll_bar']['switch'].minimum()) + " to " + str(self.content['rear_roll_bar']['switch'].maximum())
         text += ", Fuel Map: " + str(self.content['fuel_map']['switch'].minimum()) + " to " + str(self.content['fuel_map']['switch'].maximum())
+        text += ", Regen: " + str(self.content['regen']['switch'].minimum()) + " to " + str(self.content['regen']['switch'].maximum())
+        text += ", Deploy: " + str(self.content['deploy']['switch'].minimum()) + " to " + str(self.content['deploy']['switch'].maximum())
         self.content['axes_display']['car_id']['limits'].setText(text)
 
     @pyqtSlot()
@@ -1703,6 +2077,36 @@ class MainWindow(QMainWindow):
         self.content['engine_warming']['up_device'].setText(dev.format("engine_warming", "up"))
         self.content['engine_warming']['down_device'].setText(dev.format("engine_warming", "down"))
         self.content['engine_warming']['switch_device'].setText(dev.format("engine_warming", "switch"))
+
+
+        self.content['regen']['increment'].setValue(var.settings['regen']['increment'])
+        self.content['regen']['switch'].setValue(var.settings['regen']['switch_value'])
+        if var.settings['regen']['continuous']:
+            self.content['regen']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['regen']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['regen']['toggle']:
+            self.content['regen']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['regen']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['regen']['up_device'].setText(dev.format("regen", "up"))
+        self.content['regen']['down_device'].setText(dev.format("regen", "down"))
+        self.content['regen']['switch_device'].setText(dev.format("regen", "switch"))
+
+
+        self.content['deploy']['increment'].setValue(var.settings['deploy']['increment'])
+        self.content['deploy']['switch'].setValue(var.settings['deploy']['switch_value'])
+        if var.settings['deploy']['continuous']:
+            self.content['deploy']['increment_mode'].setCurrentText(lang['continuous'])
+        else:
+            self.content['deploy']['increment_mode'].setCurrentText(lang['single'])
+        if var.settings['deploy']['toggle']:
+            self.content['deploy']['switch_mode'].setCurrentText(lang['toggle'])
+        else:
+            self.content['deploy']['switch_mode'].setCurrentText(lang['hold'])
+        self.content['deploy']['up_device'].setText(dev.format("deploy", "up"))
+        self.content['deploy']['down_device'].setText(dev.format("deploy", "down"))
+        self.content['deploy']['switch_device'].setText(dev.format("deploy", "switch"))
 
 
         self.content['settings']['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)

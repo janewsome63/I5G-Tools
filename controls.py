@@ -13,6 +13,8 @@ step = {
     "fuel_map": 1 / (8 - 1),
     "clutch": 1 / (201 - 1),
     "throttle": 1 / (201 - 1),
+    "regen": 1 / (5.0 - 0.5),
+    "deploy": 1 / (5.0 - 0.5),
 }
 
 def check_pressed(bind):

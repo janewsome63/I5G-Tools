@@ -12,8 +12,9 @@ axis_ref = {
     "fuel_map": vjoy.HID_USAGE_RX,
     "bite_point": vjoy.HID_USAGE_RY,
     "engine_warming": vjoy.HID_USAGE_RZ,
-    "brake": vjoy.HID_USAGE_SL0,
-    "other": vjoy.HID_USAGE_SL1,
+    "regen": vjoy.HID_USAGE_SL0,
+    "deploy": vjoy.HID_USAGE_SL1,
+    "brake": vjoy.HID_USAGE_WHL,
 }
 
 axis_values = {
@@ -23,8 +24,9 @@ axis_values = {
     "fuel_map": 0.0,
     "bite_point": 0.0,
     "engine_warming": 0.0,
+    "regen": 0.0,
+    "deploy": 0.0,
     "brake": 0.0,
-    "other": 0.0,
 }
 
 axis_busy = {
@@ -34,8 +36,9 @@ axis_busy = {
     "fuel_map": False,
     "bite_point": False,
     "engine_warming": False,
+    "regen": False,
+    "deploy": False,
     "brake": False,
-    "other": False,
 }
 
 try:
@@ -56,6 +59,7 @@ def set(axis, pct):
     elif raw > 32768:
         raw = 32768
 
+    print("try set using: ", axis)
     j.set_axis(axis_ref[axis], raw)
     axis_values[axis] = round(raw / 32768, 3)
     if switched:
@@ -94,8 +98,9 @@ def intialize():
     set("fuel_map", 0.0)
     set("bite_point", 0.0)
     set("engine_warming", 0.0)
+    set("regen", 0.25)
+    set("deploy", 0.25)
     set("brake", 0.0)
-    set("other", 0.0)
 
 def find_instance():
     for device in dev.device_info:
