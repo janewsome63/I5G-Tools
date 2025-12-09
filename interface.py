@@ -82,8 +82,8 @@ lang = {
 }
 
 ui = {
-    "width": 575,
-    "height": 250,
+    "width": 725,
+    "height": 310,
     "timer": QTimer(),
     "thread_pool": QThreadPool(),
 }
@@ -137,13 +137,13 @@ var.settings = {
         "continuous": False,
         "toggle": False,
         "increment": 0.1,
-        "switch_value": 4.0,
+        "switch_value": 1.0,
     },
     "deploy": {
         "continuous": False,
         "toggle": False,
         "increment": 0.1,
-        "switch_value": 4.0,
+        "switch_value": 1.0,
     },
 }
 
@@ -1017,7 +1017,7 @@ class MainWindow(QMainWindow):
 
         self.content['regen']['switch'] = QDoubleSpinBox()
         self.content['regen']['switch'].setFixedSize(70, 25)
-        self.content['regen']['switch'].setRange(0.5, 5.0)
+        self.content['regen']['switch'].setRange(0.1, 1.0)
         self.content['regen']['switch'].setSingleStep(0.1)
         self.content['regen']['switch'].setDecimals(1)
         self.regen.layout.addWidget(self.content['regen']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -1141,7 +1141,7 @@ class MainWindow(QMainWindow):
 
         self.content['deploy']['switch'] = QDoubleSpinBox()
         self.content['deploy']['switch'].setFixedSize(70, 25)
-        self.content['deploy']['switch'].setRange(0.5, 5.0)
+        self.content['deploy']['switch'].setRange(0.1, 1.0)
         self.content['deploy']['switch'].setSingleStep(0.1)
         self.content['deploy']['switch'].setDecimals(1)
         self.deploy.layout.addWidget(self.content['deploy']['switch'], 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
@@ -1337,6 +1337,7 @@ class MainWindow(QMainWindow):
         self.content['axes_display']['car_id']['limits'] = QLabel()
         self.content['axes_display']['car_id']['limits'].setAlignment(Qt.AlignmentFlag.AlignRight)
         self.content['axes_display']['car_id']['limits'].setText("Placeholder")
+        self.content['axes_display']['car_id']['limits'].setWordWrap(True)
         self.axes_display.layout.addWidget(self.content['axes_display']['car_id']['limits'], 0, 2)
 
         self.content['axes_display']['weight_jacker']['label'] = QLabel()
@@ -1346,6 +1347,7 @@ class MainWindow(QMainWindow):
 
         self.content['axes_display']['weight_jacker']['lcd'] = QLCDNumber()
         self.content['axes_display']['weight_jacker']['lcd'].display(0)
+        self.content['axes_display']['weight_jacker']['lcd'].setSegmentStyle(self.content['weight_jacker']['lcd'].segmentStyle())
         self.axes_display.layout.addWidget(self.content['axes_display']['weight_jacker']['lcd'], 1, 1)
 
         self.content['axes_display']['weight_jacker']['axis'] = QProgressBar()
@@ -1454,17 +1456,17 @@ class MainWindow(QMainWindow):
         self.content['axes_display']['deploy']['label'] = QLabel()
         self.content['axes_display']['deploy']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.content['axes_display']['deploy']['label'].setText(lang['deploy'])
-        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['label'], 7, 0)
+        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['label'], 8, 0)
 
         self.content['axes_display']['deploy']['lcd'] = QLCDNumber()
         self.content['axes_display']['deploy']['lcd'].display(0)
-        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['lcd'], 7, 1)
+        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['lcd'], 8, 1)
 
         self.content['axes_display']['deploy']['axis'] = QProgressBar()
         self.content['axes_display']['deploy']['axis'].setTextVisible(False)
         self.content['axes_display']['deploy']['axis'].setMinimum(0)
         self.content['axes_display']['deploy']['axis'].setMaximum(100)
-        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['axis'], 7, 2)
+        self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['axis'], 8, 2)
 
 
         self.axes_display.setLayout(self.axes_display.layout)
