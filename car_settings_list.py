@@ -145,6 +145,8 @@ car_settings = {
         "front_roll_bar": [1, 6],
         "rear_roll_bar": [1, 6],
         "fuel_map": [1, 8],
+        "regen": [0.5, 5.0],
+        "deploy": [0.5, 5.0],
         # "brake_bias": "?"
     },
     # int(105): {              # Formula Renault 3.5

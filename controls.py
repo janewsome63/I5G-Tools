@@ -13,6 +13,8 @@ step = {
     "fuel_map": 1 / (8 - 1),
     "clutch": 1 / (201 - 1),
     "throttle": 1 / (201 - 1),
+    "regen": 1 / (1.0 - 0.1),
+    "deploy": 1 / (1.0 - 0.1),
 }
 
 def check_pressed(bind):
@@ -54,7 +56,7 @@ def increment(bind, function, control):
             offset = step[function] * var.settings[function]['increment'] * -1
         else:
             offset = 0.0
-    #print("offset: ", offset)
+    # print("offset: ", offset)
     if check_pressed(bind):
 
         if var.status[function]['switched']:
@@ -135,16 +137,16 @@ def controls():
                             value = entry['value']
                             if var.status[function]['thread']['running'][control] == False:
                                 var.status[function]['thread']['running'][control] = True
-                                print("start thread: ", function, control, value)
+                                # print("start thread: ", function, control, value)
                                 var.status[function]['primary'] = value
                                 if not var.status[function]['switched']:
-                                    print("pedal set: ", function, value)
+                                    # print("pedal set: ", function, value)
                                     vjoy.set(function, value)
                                 var.status[function]['thread']['running'][control] = False
                     elif control == "up" or control == "down":
                         if var.status[function]['thread']['running'][control] == False:
                             var.status[function]['thread']['running'][control] = True
-                            print("start thread: ", function, control)
+                            # print("start thread: ", function, control)
                             fn.start_thread(lambda: increment(bind, function, control))
                             #increment(bind, function, control)
                             #var.status[function]['thread']['running'] = None
@@ -158,7 +160,7 @@ def controls():
                     if control == "up" or control == "down":
                         if var.status[function]['thread']['running'][control] == False:
                             var.status[function]['thread']['running'][control] = True
-                            print("start thread: ", function, control)
+                            # print("start thread: ", function, control)
                             fn.start_thread(lambda: increment(bind, function, control))
                             #increment(bind, function, control)
                             #var.status[function]['thread']['running'] = None
