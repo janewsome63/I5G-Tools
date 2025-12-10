@@ -118,40 +118,40 @@ bindings = {
             "num": 0,
         },
     },
-    "regen": {
-        "up": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "down": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "switch": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-    },
-    "deploy": {
-        "up": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "down": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-        "switch": {
-            "guid": 0,
-            "type": "none",
-            "num": 0,
-        },
-    },
+    # "regen": {
+    #     "up": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "down": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "switch": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    # },
+    # "deploy": {
+    #     "up": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "down": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    #     "switch": {
+    #         "guid": 0,
+    #         "type": "none",
+    #         "num": 0,
+    #     },
+    # },
 }
 settings = {}
 status = {
@@ -249,32 +249,32 @@ status = {
             "waiting": False,
         },
     },
-    "regen": {
-        "primary": 0.25,
-        "secondary": 0.9,
-        "switched": False,
-        "thread": {
-            "current": 0,
-            "running": {
-                "up": False,
-                "down": False
-            },
-            "waiting": False,
-        },
-    },
-    "deploy": {
-        "primary": 0.25,
-        "secondary": 0.9,
-        "switched": False,
-        "thread": {
-            "current": 0,
-            "running": {
-                "up": False,
-                "down": False
-            },
-            "waiting": False,
-        },
-    },
+    # "regen": {
+    #     "primary": 0.25,
+    #     "secondary": 0.9,
+    #     "switched": False,
+    #     "thread": {
+    #         "current": 0,
+    #         "running": {
+    #             "up": False,
+    #             "down": False
+    #         },
+    #         "waiting": False,
+    #     },
+    # },
+    # "deploy": {
+    #     "primary": 0.25,
+    #     "secondary": 0.9,
+    #     "switched": False,
+    #     "thread": {
+    #         "current": 0,
+    #         "running": {
+    #             "up": False,
+    #             "down": False
+    #         },
+    #         "waiting": False,
+    #     },
+    # },
 }
 
 event = {

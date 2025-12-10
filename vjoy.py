@@ -67,9 +67,10 @@ def set(axis, pct):
     raw = round(pct * 32768)
     if raw <= 0:
         raw = 1
+        pct = 0.0
     elif raw > 32768:
         raw = 32768
-
+        pct = 1.0
     # print("try set using: ", axis, pct)
     j.set_axis(axis_ref[axis], raw)
     axis_values[axis] = pct
@@ -109,8 +110,8 @@ def intialize():
     set("fuel_map", 0.0)
     set("bite_point", 0.0)
     set("engine_warming", 0.0)
-    set("regen", 4/9) # 0.5 in sim
-    set("deploy", 4/9) # 0.5 in sim
+    # set("regen", 4/9) # 0.5 in sim
+    # set("deploy", 4/9) # 0.5 in sim
     set("brake", 0.0)
 
 def find_instance():

@@ -13,22 +13,47 @@ import variables as var
 from time import sleep
 
 startup = True
+rewrite = False
 
 def read_config():
     global startup
+    global rewrite
     if os.path.exists(var.backend['config']):
         config = parse.ConfigParser()
         config.read(var.backend['config'])
+        section_errors = []
         for section in config.sections():
             for item in config[section]:
                 setting = eval(config[section][item])
 
                 if section == "GENERAL":
                     var.settings[item] = setting
-                elif item == "up" or item == "down" or item == "switch" or item == "pedal":
-                    var.bindings[section.lower()][item] = setting
+                elif section.lower() in var.bindings: # ignore unknown sections, for example if loading a settings file with axes an old version doesn't have yet
+                    if item == "up" or item == "down" or item == "switch" or item == "pedal":
+                        var.bindings[section.lower()][item] = setting
+                    else:
+                        var.settings[section.lower()][item] = setting
                 else:
-                    var.settings[section.lower()][item] = setting
+                    if not section in section_errors:
+                        section_errors.append(section)
+        if not section_errors == [] and not rewrite:
+            text = "There are sections in the settings file that are not recognized by this version of the program. The unknown sections have the following names:\n\n"
+            for section_error in section_errors:
+                text += section_error + "\n"
+            text += "\nIf this settings file is used, any settings related to the unrecognized sections listed above will be deleted.\n\nPressing OK will open the app and delete all settings related to the unrecognized sections.\n"
+            if startup:
+                text += "Pressing Cancel will close the app now if you want to manually backup the settings file before opening this app again.\nProceed?"
+            else:
+                text += "Pressing Cancel will revert to the last applied settings file.\nProceed?"
+            response = ctypes.windll.user32.MessageBoxW(0, text, "I5G Tools  -  Unknown sections in settings file!", 1)
+            # if response == 1: # OK pressed, do not intervene with reading and writing settings at this time
+            if response == 2:
+                if startup == True:
+                    sys.exit(0)
+                else:
+                    rewrite = True # set this for later when config is reread
+                    re_read_config(var.settings_old)
+                    return # do not go further and overwrite bindings from the old settings file with the new bad settings file
         while not var.status['devices_loaded']:
             sleep(0.1)
         bind_errors = []
@@ -50,7 +75,7 @@ def read_config():
                 text += "Pressing Cancel will close the app now if you want to plug in the controller before using the app.\nProceed?"
             else:
                 text += "Pressing Cancel will revert to the last applied settings file.\nProceed?"
-            response = ctypes.windll.user32.MessageBoxW(0, text, "Bound input device not detected!", 1)
+            response = ctypes.windll.user32.MessageBoxW(0, text, "I5G Tools  -  Bound input device not detected!", 1)
             if response == 1:
                 return
             if response == 2:
@@ -58,7 +83,9 @@ def read_config():
                     sys.exit(0)
                 else:
                     re_read_config(var.settings_old)
-
+        if rewrite:
+            write_config()
+            rewrite = False
     else:
         write_config()
     startup = False
