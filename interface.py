@@ -43,7 +43,7 @@ from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.3.1b",
+    "version": "v0.3.2b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -1668,7 +1668,7 @@ class MainWindow(QMainWindow):
             index = length-1
             check = True
             while index >= 0 and check:
-                if self.ir['DriverInfo']['Drivers'][index]['CarID'] == self.ir['PlayerCarIdx']:
+                if self.ir['DriverInfo']['Drivers'][index]['CarIdx'] == self.ir['PlayerCarIdx']:
                     check = False
                 else:
                     index -= 1
@@ -1972,8 +1972,8 @@ class MainWindow(QMainWindow):
             self.content['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
             self.content['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
-            self.content['axes_display']['regen']['label'].setStyleSheet("color: red;")
-            self.content['axes_display']['deploy']['label'].setStyleSheet("color: red;")
+            # self.content['axes_display']['regen']['label'].setStyleSheet("color: red;")
+            # self.content['axes_display']['deploy']['label'].setStyleSheet("color: red;")
         text = "WJ: " + str(self.content['weight_jacker']['switch'].minimum()) + " to " + str(self.content['weight_jacker']['switch'].maximum())
         text += ", FARB: " + str(self.content['front_roll_bar']['switch'].minimum()) + " to " + str(self.content['front_roll_bar']['switch'].maximum())
         text += ", RARB: " + str(self.content['rear_roll_bar']['switch'].minimum()) + " to " + str(self.content['rear_roll_bar']['switch'].maximum())
