@@ -43,7 +43,7 @@ from car_settings_list import car_settings
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.3.2b",
+    "version": "v0.4.0b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -75,14 +75,17 @@ lang = {
     "engine_warming": "Throttle",
     "regen": "Regen",
     "deploy": "Deploy",
+    "deploy_lim": "Deploy Limit:",
     "settings": "Settings",
     "settings_filename": "Current Settings File:",
     "axes_display": "Display",
     "car_id": "Car ID:",
+    "soc": "SoC",
+    "hybrid": "Hybrid"
 }
 
 ui = {
-    "width": 575,
+    "width": 625,
     "height": 250,
     "timer": QTimer(),
     "thread_pool": QThreadPool(),
@@ -169,10 +172,11 @@ class MainWindow(QMainWindow):
         self.fuel_map = QWidget()
         self.bite_point = QWidget()
         self.engine_warming = QWidget()
-        self.regen = QWidget()
-        self.deploy = QWidget()
+        # self.regen = QWidget()
+        # self.deploy = QWidget()
         self.settings = QWidget()
         self.axes_display = QWidget()
+        self.hybrid = QWidget()
 
         self.tabs.addTab(self.weight_jacker, lang['weight_jacker'])
         self.tabs.addTab(self.front_roll_bar, lang['front_roll_bar'])
@@ -184,6 +188,7 @@ class MainWindow(QMainWindow):
         # self.tabs.addTab(self.deploy, lang['deploy'])
         self.tabs.addTab(self.settings, lang['settings'])
         self.tabs.addTab(self.axes_display, lang['axes_display'])
+        self.tabs.addTab(self.hybrid, lang['soc'])
 
         self.content = {
             "weight_jacker": {
@@ -221,6 +226,10 @@ class MainWindow(QMainWindow):
                 "engine_warming": {},
                 # "regen": {},
                 # "deploy": {},
+            },
+            "hybrid": {
+                "soc": {},
+                "deploy_lim": {},
             },
             }
         
@@ -1436,6 +1445,8 @@ class MainWindow(QMainWindow):
         self.content['axes_display']['engine_warming']['axis'].setMaximum(100)
         self.axes_display.layout.addWidget(self.content['axes_display']['engine_warming']['axis'], 6, 2)
 
+        self.axes_display.setLayout(self.axes_display.layout)
+
 
         # self.content['axes_display']['regen']['label'] = QLabel()
         # self.content['axes_display']['regen']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -1468,13 +1479,47 @@ class MainWindow(QMainWindow):
         # self.content['axes_display']['deploy']['axis'].setMaximum(100)
         # self.axes_display.layout.addWidget(self.content['axes_display']['deploy']['axis'], 8, 2)
 
+        # --------Hybrid Tab--------#
+        self.hybrid.layout = QGridLayout()
 
-        self.axes_display.setLayout(self.axes_display.layout)
+        self.hybrid.setLayout(self.hybrid.layout)
 
+        self.content['hybrid']['soc']['label'] = QLabel()
+        self.content['hybrid']['soc']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['hybrid']['soc']['label'].setText(lang['soc'])
+        self.hybrid.layout.addWidget(self.content['hybrid']['soc']['label'], 0, 0)
+        self.content['hybrid']['soc']['label'].setStyleSheet("color: red;")
 
+        self.content['hybrid']['soc']['lcd'] = QLCDNumber()
+        self.content['hybrid']['soc']['lcd'].display(str(0.00))
+        self.hybrid.layout.addWidget(self.content['hybrid']['soc']['lcd'], 0, 1)
+
+        self.content['hybrid']['soc']['axis'] = QProgressBar()
+        self.content['hybrid']['soc']['axis'].setTextVisible(False)
+        self.content['hybrid']['soc']['axis'].setMinimum(0)
+        self.content['hybrid']['soc']['axis'].setMaximum(100)
+        self.hybrid.layout.addWidget(self.content['hybrid']['soc']['axis'], 0, 2)
+
+        self.content['hybrid']['deploy_lim']['label'] = QLabel()
+        self.content['hybrid']['deploy_lim']['label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['hybrid']['deploy_lim']['label'].setText(lang['deploy_lim'])
+        self.hybrid.layout.addWidget(self.content['hybrid']['deploy_lim']['label'], 1, 0)
+        self.content['hybrid']['deploy_lim']['label'].setStyleSheet("color: red;")
+
+        self.content['hybrid']['deploy_lim']['lcd'] = QLCDNumber()
+        self.content['hybrid']['deploy_lim']['lcd'].display(str(0.00))
+        self.hybrid.layout.addWidget(self.content['hybrid']['deploy_lim']['lcd'], 1, 1)
+
+        self.content['hybrid']['deploy_lim']['axis'] = QProgressBar()
+        self.content['hybrid']['deploy_lim']['axis'].setTextVisible(False)
+        self.content['hybrid']['deploy_lim']['axis'].setMinimum(0)
+        self.content['hybrid']['deploy_lim']['axis'].setMaximum(100)
+        self.hybrid.layout.addWidget(self.content['hybrid']['deploy_lim']['axis'], 1, 2)
+
+        self.hybrid.setLayout(self.hybrid.layout)
 
         self.layout.addWidget(self.tabs)
-        self.setLayout(self.layout)
+        # self.setLayout(self.layout)
         self.setCentralWidget(self.tabs)
 
 
@@ -1678,6 +1723,12 @@ class MainWindow(QMainWindow):
         elif self.ir.is_initialized and not self.ir.is_connected and self.content['axes_display']['car_id']['car_id'] != "None":
             self.ir.shutdown()
             self.content['axes_display']['car_id']['car_id'] = "None"
+            for entry in self.content['hybrid']:
+                self.content['hybrid'][entry]['axis'].setValue(0)
+                self.content['hybrid'][entry]['axis'].update()
+                self.content['hybrid'][entry]['lcd'].display(str(0.00))
+                self.content['hybrid'][entry]['lcd'].update()
+                self.content['hybrid'][entry]['label'].setStyleSheet("color: red;")
             self.update_limits()
 
     def display(self):
@@ -1711,6 +1762,24 @@ class MainWindow(QMainWindow):
                     self.content['axes_display'][func]['lcd'].display(round(value))
                 self.content[func]['lcd'].update()
                 self.content['axes_display'][func]['lcd'].update()
+        if (self.content['axes_display']['car_id']['car_id'] in car_settings) and 'hybrid' in car_settings[self.content['axes_display']['car_id']['car_id']]:
+            for entry in self.content['hybrid']:
+                self.content['hybrid'][entry]['label'].setStyleSheet(QLabel.styleSheet(self.index['car_id']))
+                if self.ir['IsOnTrackCar'] and (car_settings[self.content['axes_display']['car_id']['car_id']]['hybrid'] == True): # and hybrid in car_settings
+                    if entry == 'soc':
+                        pct = self.ir['EnergyERSBatteryPct']
+                    elif entry == 'deploy_lim':
+                        pct = self.ir['EnergyMGU_KLapDeployPct']
+                    self.content['hybrid'][entry]['axis'].setValue(int(pct*100))
+                    self.content['hybrid'][entry]['axis'].update()
+                    self.content['hybrid'][entry]['lcd'].display(str(round(pct*100,1)))
+                    self.content['hybrid'][entry]['lcd'].update()
+                else:
+                    self.content['hybrid'][entry]['axis'].setValue(0)
+                    self.content['hybrid'][entry]['axis'].update()
+                    self.content['hybrid'][entry]['lcd'].display(str(0.00))
+                    self.content['hybrid'][entry]['lcd'].update()
+                    self.content['hybrid'][entry]['label'].setStyleSheet("color: red;")
         #self.refresh_settings_list()
 
     @pyqtSlot()

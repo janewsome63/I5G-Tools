@@ -145,8 +145,9 @@ car_settings = {
         "front_roll_bar": [1, 6],
         "rear_roll_bar": [1, 6],
         "fuel_map": [1, 8],
-        "regen": [0.5, 5.0],
-        "deploy": [0.5, 5.0],
+        "hybrid": True,
+        # "regen": [0.5, 1.0],
+        # "deploy": [0.1, 1.0],
         # "brake_bias": "?"
     },
     # int(105): {              # Formula Renault 3.5
@@ -181,11 +182,9 @@ car_settings = {
     #     "name": "Chevrolet Corvette C8.R GTE",
     #     "?"
     # },
-    # int(128): {             # P217
-    #     "name": "Dallara P217 LMP2"
-    #     "TC1": 
-    #     "TC2": 
-    # },
+    int(128): {             # P217
+        "name": "Dallara P217 LMP2"
+    },
     # int(129): {             # iR-01
     #     "name": "Dallara iR-01",
     #     "?"
@@ -234,10 +233,12 @@ car_settings = {
     #     "name": "Hyundai Veloster N TCR",
     #     "?"
     # },
-    # int(159): {             # BMW M Hybrid
-    #     "name": "BMW M Hybrid V8 GTP",
-    #     "?"
-    # },
+    int(159): {             # BMW M Hybrid
+        "name": "BMW M Hybrid V8 GTP",
+        "front_roll_bar": [1, 5],
+        "rear_roll_bar": [1, 5],
+        "hybrid": True,
+    },
     # int(164): {             # Late Model Stock
     #     "name": "Late Model Stock",
     #     "?"
@@ -246,18 +247,28 @@ car_settings = {
     #     "name": "Ligier JS P320 LMP3",
     #     "?"
     # },
-    # int(168): {             # V-Series.R GTP
-    #     "name": "Cadillac V-Series.R GTP",
-    #     "?"
-    # },
-    # int(170): {             # ARX-06
-    #     "name": "Acura ARX-06 GTP",
-    #     "?"
-    # },
+    int(168): {             # V-Series.R GTP
+        "name": "Cadillac V-Series.R GTP",
+        "front_roll_bar": [1, 5],
+        "rear_roll_bar": [1, 5],
+        "hybrid": True
+    },
+    int(170): {             # ARX-06
+        "name": "Acura ARX-06 GTP",
+        "front_roll_bar": [1, 5],
+        "rear_roll_bar": [1, 5],
+        "hybrid": True
+    },
     # int(173): {             # Ferrari 296 GT3
     #     "name": "Ferrari 296 GT3",
     #     "?"
     # },
+    int(174): {             # Porsche 963 GTP
+        "name": "Porsche 963 GTP",
+        "front_roll_bar": [1, 13],
+        "rear_roll_bar": [1, 16],
+        "hybrid": True
+    },
     # int(176): {             # R8 LMS EVO II GT3
     #     "name": "Audi R8 LMS EVO II GT3",
     #     "?"
@@ -302,10 +313,13 @@ car_settings = {
     #     "name": "BMW M2 CS Racing",
     #     "?"
     # },
-    # int(196): {             # Ferrari 499P
-    #     "name": "Ferrari 499P LMH",
-    #     "?"
-    # },
+    int(196): {             # Ferrari 499P
+        "name": "Ferrari 499P LMH",
+        "front_roll_bar": [1, 5],
+        "rear_roll_bar": [1, 5],
+        "hybrid": True
+        # "?"
+    },
     # int(198): {             # Chevy ARCA
     #     "name": "ARCA Chevrolet SS"
     #     "?"
