@@ -40,10 +40,11 @@ import vjoy
 import devices as dev
 import irsdk
 from car_settings_list import car_settings
+import sound_fx as sfx
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.0b",
+    "version": "v0.4.1b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -81,7 +82,8 @@ lang = {
     "axes_display": "Display",
     "car_id": "Car ID:",
     "soc": "SoC",
-    "hybrid": "Hybrid"
+    "hybrid": "Hybrid",
+    "sound_label": "Sound:",
 }
 
 ui = {
@@ -1327,6 +1329,18 @@ class MainWindow(QMainWindow):
         self.content['settings']['settings_filename'].activated.connect(lambda: self.refresh_settings_list())
         self.content['settings']['settings_filename'].currentTextChanged.connect(lambda: self.apply_settings(self.content['settings']['settings_filename'].currentText()))
 
+        self.content['settings']['sound_label'] = QLabel()
+        self.content['settings']['sound_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['sound_label'].setText(lang['sound_label'])
+        self.settings.layout.addWidget(self.content['settings']['sound_label'], 7, 0)
+
+        self.content['settings']['sound'] = QComboBox()
+        self.content['settings']['sound'].setFixedSize(200, 25)
+        self.settings.layout.addWidget(self.content['settings']['sound'], 7, 1)
+        self.content['settings']['sound'].addItem("Yes")
+        self.content['settings']['sound'].addItem("No")
+        self.content['settings']['sound'].setCurrentText("No")
+
         self.settings.setLayout(self.settings.layout)
 
         # --------Display Tab--------#
@@ -1681,6 +1695,10 @@ class MainWindow(QMainWindow):
         self.content['axes_display']['car_id']['car_id'] = "None"
         self.update_limits()
 
+        self.lastval = {
+            'soc': 1.0,
+        }
+
         ui['timer'].timeout.connect(self.updater)
         ui['timer'].start(int((var.settings['frequency'] * 1000) / 10))
 
@@ -1780,6 +1798,15 @@ class MainWindow(QMainWindow):
                     self.content['hybrid'][entry]['lcd'].display(str(0.00))
                     self.content['hybrid'][entry]['lcd'].update()
                     self.content['hybrid'][entry]['label'].setStyleSheet("color: red;")
+                if entry == 'soc' and self.content['settings']['sound'].currentText() == "Yes":
+                    value = self.content['hybrid'][entry]['axis'].value()
+                    if value <= 0.10*100 and self.lastval['soc'] > 0.10*100: # make this adjustable later
+                        print("call play low")
+                        fn.start_thread(sfx.play('low'))
+                    if value >= 0.90*100 and self.lastval['soc'] < 0.90*100: # make this adjustable later
+                        print("call play high")
+                        fn.start_thread(sfx.play('high'))
+                    self.lastval['soc'] = value
         #self.refresh_settings_list()
 
     @pyqtSlot()

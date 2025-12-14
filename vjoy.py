@@ -102,7 +102,6 @@ def calibrate(axis):
     #var.status['calibration'] = False
 
 def intialize():
-    sleep(1.0)
     j.update()
     set("weight_jacker", 0.5)
     set("front_roll_bar", 1.0)

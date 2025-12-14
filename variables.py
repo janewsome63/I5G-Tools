@@ -292,4 +292,8 @@ backend = {
     "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + settings_active,
 }
 
+sound_folder = {
+    "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools\\Sound FX\\"
+}
+
 settings_list = []
