@@ -95,9 +95,7 @@ def re_read_config(filename):
         var.settings_old = var.settings_active
     var.settings_active = filename
     print([filename, var.settings_active, var.settings_old])
-    var.backend = {
-        "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + filename,
-    }
+    var.backend['config'] = os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + filename
     read_config()
 
 def write_config():
@@ -180,6 +178,13 @@ def is_bind():
                                     "control": control})
     print(result)
     return result
+
+def check_uid(irsdk):
+    if irsdk.is_connected:
+        if irsdk['DriverInfo']['DriverUserID'] not in var.backend['whitelist']:
+            response = ctypes.windll.user32.MessageBoxW(0, "You've not been authorized to use this program.", "I5G Tools  -  Unauthorized user!", 0)
+            if response == 1:
+                sys.exit(0)
 
 def reset_bind_thresh(thresh, value):
     if not (thresh == 'low_threshold' or thresh == 'high_threshold'):

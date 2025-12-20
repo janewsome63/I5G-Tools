@@ -1692,6 +1692,7 @@ class MainWindow(QMainWindow):
 
         self.ir = irsdk.IRSDK()
         self.ir.startup()
+        fn.check_uid(self.ir)
         self.content['axes_display']['car_id']['car_id'] = "None"
         self.update_limits()
 
@@ -1726,6 +1727,7 @@ class MainWindow(QMainWindow):
 
         if not self.ir.is_initialized:
             self.ir.startup()
+            fn.check_uid(self.ir)
         if self.ir.is_initialized and self.ir.is_connected:
             length = len(self.ir['DriverInfo']['Drivers'])
             index = length-1
