@@ -44,7 +44,7 @@ import sound_fx as sfx
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.3b",
+    "version": "v0.4.4b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",

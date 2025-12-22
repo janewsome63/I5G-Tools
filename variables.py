@@ -290,7 +290,7 @@ settings_old = ""
 
 backend = {
     "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + settings_active,
-    "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 288105, 509505),
+    "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505),
 }
 
 sound_folder = {
