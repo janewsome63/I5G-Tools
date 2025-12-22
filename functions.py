@@ -28,7 +28,7 @@ def read_config():
 
                 if section == "GENERAL":
                     var.settings[item] = setting
-                elif section.lower() in var.bindings: # ignore unknown sections, for example if loading a settings file with axes an old version doesn't have yet
+                elif section.lower() in var.bindings or section.lower() == 'audio': # ignore unknown sections, for example if loading a settings file with axes an old version doesn't have yet
                     if item == "up" or item == "down" or item == "switch" or item == "pedal":
                         var.bindings[section.lower()][item] = setting
                     else:

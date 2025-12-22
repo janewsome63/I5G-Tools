@@ -44,7 +44,7 @@ import sound_fx as sfx
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.1b",
+    "version": "v0.4.3b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -84,6 +84,7 @@ lang = {
     "soc": "SoC",
     "hybrid": "Hybrid",
     "sound_label": "Sound:",
+    "volume_label": "Volume:",
 }
 
 ui = {
@@ -150,6 +151,10 @@ var.settings = {
     #     "increment": 0.1,
     #     "switch_value": 1.0,
     # },
+    "audio": {
+        "on": False,
+        "volume": 0.5,
+    }
 }
 
 class MainWindow(QMainWindow):
@@ -1340,6 +1345,18 @@ class MainWindow(QMainWindow):
         self.content['settings']['sound'].addItem("Yes")
         self.content['settings']['sound'].addItem("No")
         self.content['settings']['sound'].setCurrentText("No")
+        self.content['settings']['sound'].currentIndexChanged.connect(lambda: self.settings_set('sound'))
+
+        self.content['settings']['volume_label'] = QLabel()
+        self.content['settings']['volume_label'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['volume_label'].setText(lang['volume_label'])
+        self.settings.layout.addWidget(self.content['settings']['volume_label'], 8, 0)
+
+        self.content['settings']['volume'] = QSpinBox()
+        self.content['settings']['volume'].setFixedSize(70, 25)
+        self.content['settings']['volume'].setRange(0, 100)
+        self.settings.layout.addWidget(self.content['settings']['volume'], 8, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        self.content['settings']['volume'].valueChanged.connect(lambda: self.settings_set('volume'))
 
         self.settings.setLayout(self.settings.layout)
 
@@ -1697,7 +1714,8 @@ class MainWindow(QMainWindow):
         self.update_limits()
 
         self.lastval = {
-            'soc': 1.0,
+            'soc': None,
+            'deploy_lim': None,
         }
 
         ui['timer'].timeout.connect(self.updater)
@@ -1800,15 +1818,25 @@ class MainWindow(QMainWindow):
                     self.content['hybrid'][entry]['lcd'].display(str(0.00))
                     self.content['hybrid'][entry]['lcd'].update()
                     self.content['hybrid'][entry]['label'].setStyleSheet("color: red;")
+                    self.lastval['soc'] = None
+                    self.lastval['deploy_lim'] = None
                 if entry == 'soc' and self.content['settings']['sound'].currentText() == "Yes":
                     value = self.content['hybrid'][entry]['axis'].value()
-                    if value <= 0.10*100 and self.lastval['soc'] > 0.10*100: # make this adjustable later
-                        print("call play low")
-                        fn.start_thread(sfx.play('low'))
-                    if value >= 0.90*100 and self.lastval['soc'] < 0.90*100: # make this adjustable later
-                        print("call play high")
-                        fn.start_thread(sfx.play('high'))
+                    if self.lastval[entry] != None:
+                        if value <= 0.10*100 and self.lastval['soc'] > 0.10*100: # make this adjustable later
+                            print("call play low")
+                            fn.start_thread(sfx.play('low'))
+                        if value >= 0.90*100 and self.lastval['soc'] < 0.90*100: # make this adjustable later
+                            print("call play high")
+                            fn.start_thread(sfx.play('high'))
                     self.lastval['soc'] = value
+                if entry == 'deploy_lim' and self.content['settings']['sound'].currentText() == "Yes":
+                    value = self.content['hybrid'][entry]['axis'].value()
+                    if self.lastval[entry] != None:
+                        if value >= 1.0*100 and self.lastval['deploy_lim'] < 1.0*100: # make this adjustable later maybe?
+                            print("call play deploy limit")
+                            fn.start_thread(sfx.play('limit'))
+                    self.lastval['deploy_lim'] = value
         #self.refresh_settings_list()
 
     @pyqtSlot()
@@ -1881,7 +1909,10 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def settings_set(self, func):
-        value = self.content['settings'][func].value()
+        if func == 'sound':
+            value = self.content['settings'][func].currentText()
+        else:
+            value = self.content['settings'][func].value()
         if func == 'high_threshold':
             if value/100 > var.settings['low_threshold']:
                 self.content['settings']['low_threshold'].setRange(1, value-1)
@@ -1894,6 +1925,12 @@ class MainWindow(QMainWindow):
                 fn.reset_bind_thresh(func, value/100)
                 var.settings[func] = value/100
                 fn.write_config()
+        elif func == 'sound':
+            var.settings['audio']['on'] = (value == "Yes")
+            fn.write_config()
+        elif func == 'volume':
+            var.settings['audio']['volume'] = value/100
+            fn.write_config()
         else:
             var.settings[func] = value
             fn.write_config()
@@ -2218,6 +2255,11 @@ class MainWindow(QMainWindow):
         self.content['settings']['timer_first'].setValue(int(var.settings['timer_first']))
         self.content['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
         self.content['settings']['settings_filename'].setCurrentText(var.settings_active)
+        if var.settings['audio']['on']:
+            self.content['settings']['sound'].setCurrentText('Yes')
+        else:
+            self.content['settings']['sound'].setCurrentText('No')
+        self.content['settings']['volume'].setValue(int(var.settings['audio']['volume']*100))
 
 
 
