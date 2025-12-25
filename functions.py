@@ -162,7 +162,7 @@ def is_bind():
             for control in var.bindings[function]:
                 if event['type'] == "axis" and var.bindings[function][control] != None:
                     #if event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and event['value'] == var.bindings[function][control]['value']:
-                    if (function == 'bite_point' or function == 'engine_warming') and event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and var.bindings[function][control]['type'] == "axis":
+                    if (function == 'clutch' or function == 'throttle') and event['guid'] == var.bindings[function][control]['guid'] and event['num'] == var.bindings[function][control]['num'] and var.bindings[function][control]['type'] == "axis":
                         result.append({ "function": function, 
                                         "control": control,
                                         "value": var.event['value']})
@@ -193,7 +193,7 @@ def reset_bind_thresh(thresh, value):
     for function in var.bindings:
         if function != 'status':
             for control in var.bindings[function]:
-                if var.bindings[function][control] != None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'bite_point' or function == 'engine_warming') and control == 'pedal'):
+                if var.bindings[function][control] != None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
                     if (var.bindings[function][control]['value'] == var.settings['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['low_threshold'] and thresh == 'low_threshold'):
                         var.bindings[function][control]['value'] = value
 

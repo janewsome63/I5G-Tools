@@ -42,7 +42,7 @@ def check_pressed(bind):
 
 def increment(bind, function, control):
     #print("increment function print1: ", bind, function, control)
-    if function == 'bite_point' or function == 'engine_warming':
+    if function == 'clutch' or function == 'throttle':
         if control == "up":
             offset = var.settings[function]['increment']/100
         elif control == "down":
@@ -63,7 +63,7 @@ def increment(bind, function, control):
             vjoy.set(function, var.status[function]['secondary'] + offset)
             #print("secondary")
         else:
-            if function == 'bite_point' or function == 'engine_warming':
+            if function == 'clutch' or function == 'throttle':
                 var.status[function]['secondary'] = var.status[function]['secondary'] + offset
             else:
                 vjoy.set(function, var.status[function]['primary'] + offset)
@@ -81,7 +81,7 @@ def increment(bind, function, control):
                     if var.status[function]['switched']:
                         vjoy.set(function, var.status[function]['secondary'] + offset)
                     else:
-                        if function == 'bite_point' or function == 'engine_warming':
+                        if function == 'clutch' or function == 'throttle':
                             var.status[function]['secondary'] = var.status[function]['secondary'] + offset
                         else:
                             vjoy.set(function, var.status[function]['primary'] + offset)
@@ -131,7 +131,7 @@ def controls():
 
                 bind = var.bindings[function][control]
                 #print("bind: ", bind)
-                if function == 'bite_point' or function == 'engine_warming':
+                if function == 'clutch' or function == 'throttle':
                     if control == "pedal":
                         if 'value' in entry:
                             value = entry['value']

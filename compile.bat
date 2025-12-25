@@ -6,13 +6,13 @@ shift
 
 @RD /S /Q ".\dist"
 
-pyinstaller --onefile %arg% --name I5G-Tools --icon icon.ico --add-data="icon.ico;."
+pyinstaller main.spec
 
 xcopy ".\LICENSE" ".\dist"
 
 xcopy ".\README.md" ".\dist"
 
-REM rename ".\dist\main.exe" I5G-Tools.exe
+rename ".\dist\I5G-Tools*.exe" I5G-Tools.exe
 
 mkdir .\dist\installer
 

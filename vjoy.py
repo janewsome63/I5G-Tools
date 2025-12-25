@@ -10,8 +10,8 @@ axis_ref = {
     "front_roll_bar": vjoy.HID_USAGE_Y,
     "rear_roll_bar": vjoy.HID_USAGE_Z,
     "fuel_map": vjoy.HID_USAGE_RX,
-    "bite_point": vjoy.HID_USAGE_RY,
-    "engine_warming": vjoy.HID_USAGE_RZ,
+    "clutch": vjoy.HID_USAGE_RY,
+    "throttle": vjoy.HID_USAGE_RZ,
     "regen": vjoy.HID_USAGE_SL0,
     "deploy": vjoy.HID_USAGE_SL1,
     "brake": vjoy.HID_USAGE_WHL,
@@ -22,8 +22,8 @@ axis_values = {
     "front_roll_bar": 1.0,
     "rear_roll_bar": 0.0,
     "fuel_map": 0.0,
-    "bite_point": 0.0,
-    "engine_warming": 0.0,
+    "clutch": 0.0,
+    "throttle": 0.0,
     "regen": 0.0,
     "deploy": 0.0,
     "brake": 0.0,
@@ -34,8 +34,8 @@ axis_busy = {
     "front_roll_bar": False,
     "rear_roll_bar": False,
     "fuel_map": False,
-    "bite_point": False,
-    "engine_warming": False,
+    "clutch": False,
+    "throttle": False,
     "regen": False,
     "deploy": False,
     "brake": False,
@@ -107,8 +107,8 @@ def intialize():
     set("front_roll_bar", 1.0)
     set("rear_roll_bar", 0.0)
     set("fuel_map", 0.0)
-    set("bite_point", 0.0)
-    set("engine_warming", 0.0)
+    set("clutch", 0.0)
+    set("throttle", 0.0)
     # set("regen", 4/9) # 0.5 in sim
     # set("deploy", 4/9) # 0.5 in sim
     set("brake", 0.0)
