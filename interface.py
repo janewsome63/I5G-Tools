@@ -1,5 +1,3 @@
-from tkinter import Spinbox
-
 import devices as dev
 import functions as fn
 import history
@@ -22,9 +20,9 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         if getattr(sys, 'frozen', False):
-            path = sys._MEIPASS
+            applicationPath = sys._MEIPASS
         elif __file__:
-            path = os.path.dirname(__file__)
+            applicationPath = os.path.dirname(__file__)
 
         self.store = {
             "width": 626,
@@ -39,7 +37,7 @@ class MainWindow(QMainWindow):
 
         self.layout = QVBoxLayout()
         self.setFixedSize(QSize(self.store['width'], self.store['height']))
-        self.setWindowIcon(QIcon(os.path.join(path, "icon.ico")))
+        self.setWindowIcon(QIcon(os.path.join(applicationPath, "icon.ico")))
         self.setWindowTitle(var.lang['title'] + " " + var.lang['version'])
 
         self.store['content'] = {}
@@ -467,8 +465,8 @@ class MainWindow(QMainWindow):
                     check = False
                 else:
                     index -= 1
-            if self.store['content']['axes_display']['car_id']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
-                self.store['content']['axes_display']['car_id']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
+            if self.store['content']['axes_display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
+                self.store['content']['axes_display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                 self.update_limits()
         elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id']['car_id'] != "None":
             self.ir.shutdown()
@@ -767,41 +765,41 @@ class MainWindow(QMainWindow):
                 max = car_settings[car_id]['weight_jacker'][1]
                 step['weight_jacker'] = 1 / (max - min)
                 self.store['content']['weight_jacker']['switch'].setRange(min, max)
-                self.store['content']['axes_display']['weight_jacker']['label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
-                self.store['content']['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+                self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
             if 'front_roll_bar' in car_settings[car_id]:
                 min = car_settings[car_id]['front_roll_bar'][0]
                 max = car_settings[car_id]['front_roll_bar'][1]
                 step['front_roll_bar'] = 1 / (max - min)
                 self.store['content']['front_roll_bar']['switch'].setRange(min, max)
-                self.store['content']['axes_display']['front_roll_bar']['label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
-                self.store['content']['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
+                self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
             if 'rear_roll_bar' in car_settings[car_id]:
                 min = car_settings[car_id]['rear_roll_bar'][0]
                 max = car_settings[car_id]['rear_roll_bar'][1]
                 step['rear_roll_bar'] = 1 / (max - min)
                 self.store['content']['rear_roll_bar']['switch'].setRange(min, max)
-                self.store['content']['axes_display']['rear_roll_bar']['label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
-                self.store['content']['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
+                self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
             if 'fuel_map' in car_settings[car_id]:
                 min = car_settings[car_id]['fuel_map'][0]
                 max = car_settings[car_id]['fuel_map'][1]
                 step['fuel_map'] = 1 / (max - min)
                 self.store['content']['fuel_map']['switch'].setRange(min, max)
-                self.store['content']['axes_display']['fuel_map']['label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['axes_display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
-                self.store['content']['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+                self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
         else:
             car_id = self.store['content']['axes_display']['car_id']['car_id']
             self.store['index']['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
             print("current_car " + str(car_id) + " not in car_settings!")
             self.store['content']['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
-            self.store['content']['axes_display']['front_roll_bar']['label'].setStyleSheet("color: red;")
-            self.store['content']['axes_display']['rear_roll_bar']['label'].setStyleSheet("color: red;")
-            self.store['content']['axes_display']['fuel_map']['label'].setStyleSheet("color: red;")
+            self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
+            self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+            self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
         text = "WJ: " + str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
         text += ", FARB: " + str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
         text += ", RARB: " + str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))

@@ -4,15 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.2b - Add rudimentary whitelist">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.5b - Begin reorganization work and bugfixing. Heavily refactored interface.py, renamed 'bite_point' to 'clutch' and 'engine_warming' to 'throttle'.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controls.py" beforeDir="false" afterPath="$PROJECT_DIR$/controls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vjoy.py" beforeDir="false" afterPath="$PROJECT_DIR$/vjoy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,7 +63,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.Run.executor": "Run",
+    "Python.Run.executor": "Debug",
     "Python.devices.executor": "Run",
     "Python.functions.executor": "Run",
     "Python.interface.executor": "Run",
@@ -410,7 +404,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766211641783</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="v0.4.5b - Begin reorganization work and bugfixing. Heavily refactored interface.py, renamed 'bite_point' to 'clutch' and 'engine_warming' to 'throttle'.">
+      <option name="closed" value="true" />
+      <created>1766639854060</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1766639854060</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -425,7 +427,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Working on input device detection" />
     <MESSAGE value="Change from pyglet to pygame" />
     <MESSAGE value="Started vjoy integration" />
     <MESSAGE value="vJoy functions" />
@@ -450,6 +451,7 @@
     <MESSAGE value="v0.4.7a - Add window icon, fix reversing when switching between toggle and hold while toggled, tweak UI sizes and lang" />
     <MESSAGE value="v0.4.8a - Remove mistakenly added import, fix icon not loading when compiled" />
     <MESSAGE value="v0.4.2b - Add rudimentary whitelist" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.4.2b - Add rudimentary whitelist" />
+    <MESSAGE value="v0.4.5b - Begin reorganization work and bugfixing. Heavily refactored interface.py, renamed 'bite_point' to 'clutch' and 'engine_warming' to 'throttle'." />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.4.5b - Begin reorganization work and bugfixing. Heavily refactored interface.py, renamed 'bite_point' to 'clutch' and 'engine_warming' to 'throttle'." />
   </component>
 </project>
