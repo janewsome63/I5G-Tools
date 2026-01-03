@@ -538,7 +538,7 @@ class MainWindow(QMainWindow):
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
                 self.lastval['deploy_lim'] = None
             if self.store['content']['settings']['sound'].currentText() == "Yes":
-                if self.lastval[entry] != None:
+                if self.lastval['soc'] != None: # 'soc' and 'deploy_lim' will always either both be a number or both be None at the same time
                     if self.store['content']['hybrid']['soc_axis'].value() <= 0.10*100 and self.lastval['soc'] > 0.10*100: # make this adjustable later
                         print("call play low")
                         fn.start_thread(sfx.play('low'))

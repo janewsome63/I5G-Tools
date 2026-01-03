@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-added_files = [('sfx/*.mp3', 'sfx')]
+added_files = [('sfx/*.mp3', 'sfx'), ('icon.ico', '.')]
 
 a = Analysis(
     ['main.pyw'],
@@ -23,7 +23,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='I5G-Tools-v0.4.6b',
+    name='I5G-Tools-v0.4.7b',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
