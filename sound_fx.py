@@ -2,36 +2,38 @@ import os
 import variables as var
 import pygame as p
 import sys
-
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+import shutil
 
 p.mixer.init()
-sound_file_low = resource_path("sfx\\777-pull-up.mp3")
-sound_file_high = resource_path("sfx\\777-wind-shear.mp3")
-sound_file_limit = resource_path("sfx\\ac7-ammo-zero.mp3")
 
-print("sound file low ", sound_file_low)
-print("sound file high ", sound_file_high)
-print("sound file limit ", sound_file_limit)
+sounds = {}
+
+try:
+    resources = sys._MEIPASS
+except:
+    resources = os.path.abspath(".")
+
+for sound in var.settings['sound']:
+    if sound != "path":
+        source = resources + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound'][sound]
+        sounds[sound] = var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound'][sound]
+        if not os.path.exists(sounds[sound]):
+            shutil.copyfile(source, sounds[sound])
 
 def play(notif):
+    folder = var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\"
     if notif == "low":
-        print("low sound")
-        p.mixer.music.load(sound_file_low)
-        p.mixer.music.set_volume(var.settings['audio']['volume'])
-        p.mixer.music.play()
+        if os.path.exists(folder + var.settings['sound']['hybrid_low']):
+            p.mixer.music.load(folder + var.settings['sound']['hybrid_low'])
+            p.mixer.music.set_volume(var.settings['local']['volume'])
+            p.mixer.music.play()
     elif notif == "high":
-        print("high sound")
-        p.mixer.music.load(sound_file_high)
-        p.mixer.music.set_volume(var.settings['audio']['volume'])
-        p.mixer.music.play()
+        if os.path.exists(folder + var.settings['sound']['hybrid_high']):
+            p.mixer.music.load(folder + var.settings['sound']['hybrid_high'])
+            p.mixer.music.set_volume(var.settings['local']['volume'])
+            p.mixer.music.play()
     elif notif == "limit":
-        print("deploy limit sound")
-        p.mixer.music.load(sound_file_limit)
-        p.mixer.music.set_volume(var.settings['audio']['volume'])
-        p.mixer.music.play()
+        if os.path.exists(folder + var.settings['sound']['hybrid_limit']):
+            p.mixer.music.load(folder + var.settings['sound']['hybrid_limit'])
+            p.mixer.music.set_volume(var.settings['local']['volume'])
+            p.mixer.music.play()

@@ -1,8 +1,9 @@
+import copy
 import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.6b",
+    "version": "v0.4.8b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -36,13 +37,34 @@ lang = {
     "deploy": "Deploy",
     "deploy_lim": "Deploy Limit:",
     "settings": "Settings",
-    "settings_filename": "Current Settings File:",
+    "create": "Create",
+    "delete": "Delete",
+    "profile_create": "Create Profile:",
+    "profile_select": "Select Profile:",
     "axes_display": "Display",
     "car_id": "Car ID:",
     "soc": "SoC",
     "hybrid": "Hybrid",
     "sound_label": "Sound:",
     "volume_label": "Volume:",
+    "section_errors": {
+        "title": "I5G Tools  -  Unknown sections in settings file!",
+        "intro": "There are sections in the settings file that are not recognized by this version of the program. The unknown sections have the following names:\n\n",
+        "outro": "\nIf this settings file is used, any settings related to the unrecognized sections listed above will be deleted.\n\n"
+                 "Pressing OK will open the app and delete all settings related to the unrecognized sections.\n"
+                 "Pressing Cancel will close the app now if you want to manually backup the settings file before opening this app again.\nProceed?",
+    }
+}
+
+step = {
+    "weight_jacker": 1 / (41 - 1),
+    "front_roll_bar": 1 / (6 - 1),
+    "rear_roll_bar": 1 / (6 - 1),
+    "fuel_map": 1 / (8 - 1),
+    "clutch": 1 / (201 - 1),
+    "throttle": 1 / (201 - 1),
+    "regen": 1 / (1.0 - 0.5),
+    "deploy": 1 / (1.0 - 0.1),
 }
 
 bindings = {
@@ -53,16 +75,19 @@ bindings = {
     },
     "weight_jacker": {
         "up": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "down": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "switch": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
@@ -70,16 +95,19 @@ bindings = {
     },
     "front_roll_bar": {
         "up": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "down": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "switch": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
@@ -87,16 +115,19 @@ bindings = {
     },
     "rear_roll_bar": {
         "up": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "down": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "switch": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
@@ -104,16 +135,19 @@ bindings = {
     },
     "fuel_map": {
         "up": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "down": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "switch": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
@@ -121,43 +155,51 @@ bindings = {
     },
     "clutch": {
         "pedal": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "up": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "down": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "switch": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
     },
     "throttle": {
-        "pedal":{
+        "pedal": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "up": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "down": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
         },
         "switch": {
+            "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
@@ -165,14 +207,35 @@ bindings = {
     },
 }
 
+bindings_cache = copy.deepcopy(bindings)
+
 settings = {
-    "high_threshold": 0.90,
-    "low_threshold": 0.10,
     "frequency": 0.1,
     "scale": 1.25,
     "axis_samples": 2,
     "timer_loop": 150,
     "timer_first": 300,
+    "config": "global.ini",
+    "path": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools",
+
+    "sound": {
+        "path": "sfx",
+        "hybrid_high": "high.mp3",
+        "hybrid_low": "low.mp3",
+        "hybrid_limit": "limit.mp3",
+    },
+
+    "profile": {
+        "current": "Default",
+        "path": "profiles",
+    },
+
+    "local": {
+        "high_threshold": 0.90,
+        "low_threshold": 0.10,
+        "audio": False,
+        "volume": 0.5,
+    },
 
     "weight_jacker": {
         "continuous": True,
@@ -210,15 +273,13 @@ settings = {
         "increment": 0.1,
         "switch_value": 50,
     },
-    "audio": {
-        "on": False,
-        "volume": 0.5,
-    }
 }
 
 status = {
     "calibration": False,
     "devices_loaded": False,
+    "profile_prev": "None",
+    "profile_list": [],
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,
@@ -311,32 +372,6 @@ status = {
             "waiting": False,
         },
     },
-    # "regen": {
-    #     "primary": 0.25,
-    #     "secondary": 0.9,
-    #     "switched": False,
-    #     "thread": {
-    #         "current": 0,
-    #         "running": {
-    #             "up": False,
-    #             "down": False
-    #         },
-    #         "waiting": False,
-    #     },
-    # },
-    # "deploy": {
-    #     "primary": 0.25,
-    #     "secondary": 0.9,
-    #     "switched": False,
-    #     "thread": {
-    #         "current": 0,
-    #         "running": {
-    #             "up": False,
-    #             "down": False
-    #         },
-    #         "waiting": False,
-    #     },
-    # },
 }
 
 event = {
@@ -346,17 +381,8 @@ event = {
     "value": None,
 }
 
-settings_active = "settings.ini" #default
-
-settings_old = ""
-
 backend = {
-    "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools" + "\\" + settings_active,
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505),
 }
 
-sound_folder = {
-    "config": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools\\Sound FX\\"
-}
-
-settings_list = []
+profile_list = []

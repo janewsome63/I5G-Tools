@@ -1,21 +1,33 @@
-from time import sleep
-
 import devices as dev
 import functions as fn
+import history
 import variables as var
 import vjoy
-import history
+from time import sleep
 
-step = {
-    "weight_jacker": 1 / (41 - 1),
-    "front_roll_bar": 1 / (6 - 1),
-    "rear_roll_bar": 1 / (6 - 1),
-    "fuel_map": 1 / (8 - 1),
-    "clutch": 1 / (201 - 1),
-    "throttle": 1 / (201 - 1),
-    "regen": 1 / (1.0 - 0.5),
-    "deploy": 1 / (1.0 - 0.1),
-}
+def controls():
+    check = fn.is_bind()
+    if check:
+        for entry in check:
+            function = entry['function']
+            control = entry['control']
+            if 'value' in entry:
+                value = entry['value']
+            else:
+                value = None
+
+            if not var.status['calibration'] and not var.bindings['status']['active']:
+                bind = var.bindings[function][control]
+                if control == "pedal":
+                    pedal(function, value)
+                elif control == "up" or control == "down":
+                    if not var.status[function]['thread']['running'][control]:
+                        var.status[function]['thread']['running'][control] = True
+                        fn.start_thread(lambda: increment(bind, function, control))
+                elif control == "switch":
+                    if not var.status[function]['thread']['waiting']:
+                        var.status[function]['thread']['waiting'] = True
+                        fn.start_thread(lambda: switch(bind, function))
 
 def check_pressed(bind):
     if bind['type'] == "button":
@@ -24,9 +36,9 @@ def check_pressed(bind):
         else:
             pressed = False
     elif bind['type'] == "axis":
-        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['high_threshold']:
+        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['local']['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['local']['high_threshold']:
             pressed = True
-        elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['low_threshold']:
+        elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['local']['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['local']['low_threshold']:
             pressed = True
         else:
             pressed = False
@@ -51,9 +63,9 @@ def increment(bind, function, control):
             offset = 0.0
     else:
         if control == "up":
-            offset = step[function] * var.settings[function]['increment']
+            offset = var.step[function] * var.settings[function]['increment']
         elif control == "down":
-            offset = step[function] * var.settings[function]['increment'] * -1
+            offset = var.step[function] * var.settings[function]['increment'] * -1
         else:
             offset = 0.0
     # print("offset: ", offset)
@@ -118,56 +130,8 @@ def switch(bind, function):
                 vjoy.set(function, var.status[function]['secondary'])
     var.status[function]['thread']['waiting'] = False
 
-def controls():
-    check = fn.is_bind()
-    #print(check)
-    if check:
-        #print("check pass")
-        for entry in check:
-            function = entry['function']
-            control = entry['control']
-            #print("entry, function, control: ", entry, function, control)
-            if not var.status['calibration'] and not var.bindings['status']['active']:
-
-                bind = var.bindings[function][control]
-                #print("bind: ", bind)
-                if function == 'clutch' or function == 'throttle':
-                    if control == "pedal":
-                        if 'value' in entry:
-                            value = entry['value']
-                            if var.status[function]['thread']['running'][control] == False:
-                                var.status[function]['thread']['running'][control] = True
-                                # print("start thread: ", function, control, value)
-                                var.status[function]['primary'] = value
-                                if not var.status[function]['switched']:
-                                    # print("pedal set: ", function, value)
-                                    vjoy.set(function, value)
-                                var.status[function]['thread']['running'][control] = False
-                    elif control == "up" or control == "down":
-                        if var.status[function]['thread']['running'][control] == False:
-                            var.status[function]['thread']['running'][control] = True
-                            # print("start thread: ", function, control)
-                            fn.start_thread(lambda: increment(bind, function, control))
-                            #increment(bind, function, control)
-                            #var.status[function]['thread']['running'] = None
-                        # else:
-                        #     print("thread running check failed: ", var.status[function['thread']['running']])
-                    elif control == "switch":
-                        if not var.status[function]['thread']['waiting']:
-                            var.status[function]['thread']['waiting'] = True
-                            fn.start_thread(lambda: switch(bind, function))
-                else:
-                    if control == "up" or control == "down":
-                        if var.status[function]['thread']['running'][control] == False:
-                            var.status[function]['thread']['running'][control] = True
-                            # print("start thread: ", function, control)
-                            fn.start_thread(lambda: increment(bind, function, control))
-                            #increment(bind, function, control)
-                            #var.status[function]['thread']['running'] = None
-                        # else:
-                        #     print("thread running check failed: ", var.status[function['thread']['running']])
-
-                    elif control == "switch":
-                        if not var.status[function]['thread']['waiting']:
-                            var.status[function]['thread']['waiting'] = True
-                            fn.start_thread(lambda: switch(bind, function))
+def pedal(function, value):
+    if value is not None:
+        var.status[function]['primary'] = value
+        if not var.status[function]['switched']:
+            vjoy.set(function, value)

@@ -20,7 +20,7 @@ def add(guid, num, value):
     #print("add1 ", length, hist)
     if length == var.settings['axis_samples'] and not (hist[var.settings['axis_samples']-1] == -1):
         start = 0 #index to start shifting values in hist[]
-        if (hist[0] < var.settings['high_threshold'] and value >= var.settings['high_threshold']) or (hist[0] > var.settings['low_threshold'] and value <= var.settings['low_threshold']): #if the history crosses a threshold barrier in the correct direction, do not overwrite the oldest entry in hist[] to preserve that information
+        if (hist[0] < var.settings['local']['high_threshold'] and value >= var.settings['local']['high_threshold']) or (hist[0] > var.settings['local']['low_threshold'] and value <= var.settings['local']['low_threshold']): #if the history crosses a threshold barrier in the correct direction, do not overwrite the oldest entry in hist[] to preserve that information
             start = 1
         for ind in range(start, var.settings['axis_samples']-1):
             hist[ind] = hist[ind+1]

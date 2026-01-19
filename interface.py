@@ -8,13 +8,13 @@ import sys
 import variables as var
 import vjoy
 from car_settings_list import car_settings
-from controls import step
 from PyQt6.QtCore import (pyqtSlot, QSize, Qt, QThreadPool, QTimer)
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayout, QLabel, QLCDNumber, QLineEdit,
     QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget)
 from time import sleep
 
+# noinspection PyUnresolvedReferences,PyProtectedMember
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -23,16 +23,20 @@ class MainWindow(QMainWindow):
             applicationPath = sys._MEIPASS
         elif __file__:
             applicationPath = os.path.dirname(__file__)
+        else:
+            applicationPath = "C:\\"
 
         self.store = {
             "width": 626,
             "height": 250,
             "running": False,
-            "settings_busy": False,
+            "profile_busy": False,
             "content": {},
             "index": {},
             "timer": QTimer(),
             "thread_pool": QThreadPool(),
+            "axis": None,
+            "pct": None,
         }
 
         self.layout = QVBoxLayout()
@@ -62,8 +66,8 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.tabs['obj'])
         self.setCentralWidget(self.tabs['obj'])
 
-        self.apply_settings('settings.ini')
-        self.refresh_settings_list()
+        self.apply_settings(var.settings['profile']['current'])
+        self.refresh_profile_list()
 
         self.store['index']['car_id'] = self.store['content']['axes_display']['car_id']
 
@@ -74,8 +78,8 @@ class MainWindow(QMainWindow):
         self.update_limits()
 
         self.lastval = {
-            'soc': None,
-            'deploy_lim': None,
+            'soc': 999.0,
+            'deploy_lim': 999.0,
         }
 
         self.store['timer'].timeout.connect(self.updater)
@@ -86,8 +90,8 @@ class MainWindow(QMainWindow):
             "binds": ["up", "down", "switch"],
             "decimals": 0,
             "range": {
-                "increment": [1, int((1 / step[function]) + 1)],
-                "switch": [1, int((1 / step[function]) + 1)],
+                "increment": [1, int((1 / var.step[function]) + 1)],
+                "switch": [1, int((1 / var.step[function]) + 1)],
             },
             "step": 1,
         }
@@ -95,12 +99,12 @@ class MainWindow(QMainWindow):
         if type == "input":
             local_store['binds'].append("pedal")
             local_store['decimals'] = 1
-            local_store['range']['increment'] = [0.1, ((1 / step[function]) / 2)]
-            local_store['range']['switch'] = [0.0, ((1 / step[function]) / 2)]
+            local_store['range']['increment'] = [0.1, ((1 / var.step[function]) / 2)]
+            local_store['range']['switch'] = [0.0, ((1 / var.step[function]) / 2)]
             local_store['step'] = 0.1
 
         if function == "weight_jacker":
-            local_store['range']['increment'] = [1, int(1 / step[function])]
+            local_store['range']['increment'] = [1, int(1 / var.step[function])]
             local_store['range']['switch'] = [-20, 20]
 
         self.tabs[function].layout = QGridLayout()
@@ -165,7 +169,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['pedal_bind'] = QPushButton()
             self.store['content'][function]['pedal_bind'].setFixedSize(100, 25)
             self.store['content'][function]['pedal_bind'].setText(var.lang['bind'])
-            self.store['content'][function]['pedal_bind'].clicked.connect(lambda: self.bind_start(function, "pedal"))
+            self.store['content'][function]['pedal_bind'].clicked.connect(lambda: self.bind_start(function, "pedal", True))
 
         self.store['content'][function]['up_label'] = QLabel()
         self.store['content'][function]['up_label'].setText(var.lang['up'])
@@ -335,8 +339,8 @@ class MainWindow(QMainWindow):
 
             self.store['content'][function]['high_threshold'] = QSpinBox()
             self.store['content'][function]['high_threshold'].setFixedSize(60, 20)
-            self.store['content'][function]['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)
-            self.store['content'][function]['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
+            self.store['content'][function]['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
+            self.store['content'][function]['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
             self.store['content'][function]['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
 
             self.store['content'][function]['low_threshold_label'] = QLabel()
@@ -344,8 +348,8 @@ class MainWindow(QMainWindow):
 
             self.store['content'][function]['low_threshold'] = QSpinBox()
             self.store['content'][function]['low_threshold'].setFixedSize(60, 20)
-            self.store['content'][function]['low_threshold'].setRange(1, max(int(var.settings['high_threshold']*100)-1,49))
-            self.store['content'][function]['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
+            self.store['content'][function]['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
+            self.store['content'][function]['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
             self.store['content'][function]['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
 
             self.store['content'][function]['axis_samples_label'] = QLabel()
@@ -384,19 +388,32 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['timer_loop'].setRange(1, 1000)
             self.store['content'][function]['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
 
-            self.store['content'][function]['settings_filename_label'] = QLabel()
-            self.store['content'][function]['settings_filename_label'].setText(var.lang['settings_filename'])
+            self.store['content'][function]['profile_create_label'] = QLabel()
+            self.store['content'][function]['profile_create_label'].setText(var.lang['profile_create'])
 
-            self.store['content'][function]['settings_filename'] = QComboBox()
-            self.store['content'][function]['settings_filename'].setFixedSize(200, 25)
-            if var.settings_active:
-                self.store['content'][function]['settings_filename'].setCurrentText(var.settings_active)
-                self.store['content'][function]['settings_filename'].addItem(var.settings_active)
-            else:
-                self.store['content'][function]['settings_filename'].setCurrentText('None')
-                self.store['content'][function]['settings_filename'].addItem("settings.ini")
-            self.store['content'][function]['settings_filename'].activated.connect(lambda: self.refresh_settings_list())
-            self.store['content'][function]['settings_filename'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content'][function]['settings_filename'].currentText()))
+            self.store['content'][function]['profile_create_name'] = QLineEdit()
+            self.store['content'][function]['profile_create_name'].setFixedSize(100, 25)
+            self.store['content'][function]['profile_create_name'].setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+            self.store['content'][function]['profile_create'] = QPushButton()
+            self.store['content'][function]['profile_create'].setFixedSize(100, 25)
+            self.store['content'][function]['profile_create'].setText(var.lang['create'])
+            self.store['content'][function]['profile_create'].clicked.connect(lambda: self.create_profile(self.store['content'][function]['profile_create_name'].text()))
+
+            self.store['content'][function]['profile_select_label'] = QLabel()
+            self.store['content'][function]['profile_select_label'].setText(var.lang['profile_select'])
+
+            self.store['content'][function]['profile_select'] = QComboBox()
+            self.store['content'][function]['profile_select'].setFixedSize(100, 25)
+            self.store['content'][function]['profile_select'].addItem(var.settings['profile']['current'])
+            self.store['content'][function]['profile_select'].setCurrentText(var.settings['profile']['current'])
+            self.store['content'][function]['profile_select'].activated.connect(lambda: self.refresh_profile_list())
+            self.store['content'][function]['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content'][function]['profile_select'].currentText()))
+
+            self.store['content'][function]['profile_delete'] = QPushButton()
+            self.store['content'][function]['profile_delete'].setFixedSize(100, 25)
+            self.store['content'][function]['profile_delete'].setText(var.lang['delete'])
+            self.store['content'][function]['profile_delete'].clicked.connect(lambda: self.delete_profile(self.store['content'][function]['profile_select'].currentText()))
 
             self.store['content'][function]['sound_label'] = QLabel()
             self.store['content'][function]['sound_label'].setText(var.lang['sound_label'])
@@ -418,16 +435,20 @@ class MainWindow(QMainWindow):
 
         row, column = 0, 0
         for element in self.store['content'][function]:
-            self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
-            column += 1
-            if function == "settings":
-                if column > 1:
-                    column = 0
-                    row += 1
+            if element == "profile_create" or element == "profile_delete":
+                self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             else:
-                if column > 2:
-                    column = 0
-                    row += 1
+                self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
+            if element != "profile_create_name" and element != "profile_select":
+                column += 1
+                if function == "settings":
+                    if column > 1:
+                        column = 0
+                        row += 1
+                else:
+                    if column > 2:
+                        column = 0
+                        row += 1
         del row, column
         self.tabs[function].setLayout(self.tabs[function].layout)
 
@@ -436,18 +457,18 @@ class MainWindow(QMainWindow):
             if function in self.store['content']:
                 value = var.status[function]['secondary']
                 if function == "weight_jacker":
-                    # var.status[function]['secondary'] = (value * step[function]) + 0.5
-                    value = int(round((value - 0.5)/step[function]))
+                    # var.status[function]['secondary'] = (value * var.step[function]) + 0.5
+                    value = int(round((value - 0.5)/var.step[function]))
                 elif function == "clutch" or function == "throttle":
                     # var.status[function]['secondary'] = value/100
                     value = float(value*100)
                 #elif function == "settings":
-                    #self.refresh_settings_list()
+                    #self.refresh_profile_list()
                 elif function == "regen" or function == "deploy":
                     value = value * (self.store['content'][function]['switch'].maximum() - self.store['content'][function]['switch'].minimum()) + self.store['content'][function]['switch'].minimum()
                 else:
-                    # var.status[function]['secondary'] = (value * step[function]) - step[function]
-                    value = int(round((value / step[function]) + 1))
+                    # var.status[function]['secondary'] = (value * var.step[function]) - var.step[function]
+                    value = int(round((value / var.step[function]) + 1))
 
                 self.store['content'][function]['switch'].setValue(value)
 
@@ -468,22 +489,36 @@ class MainWindow(QMainWindow):
             if self.store['content']['axes_display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
                 self.store['content']['axes_display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                 self.update_limits()
-        elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id']['car_id'] != "None":
+        elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
             self.ir.shutdown()
-            self.store['content']['axes_display']['car_id']['car_id'] = "None"
-            for entry in self.store['content']['hybrid']:
-                self.store['content']['hybrid'][entry]['axis'].setValue(0)
-                self.store['content']['hybrid'][entry]['axis'].update()
-                self.store['content']['hybrid'][entry]['lcd'].display(str(0.00))
-                self.store['content']['hybrid'][entry]['lcd'].update()
-                self.store['content']['hybrid'][entry]['label'].setStyleSheet("color: red;")
+            self.store['content']['axes_display']['car_id'] = "None"
+            self.store['content']['hybrid']['soc_axis'].setValue(0)
+            self.store['content']['hybrid']['soc_axis'].update()
+            self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
+            self.store['content']['hybrid']['deploy_lim_axis'].update()
+            self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
+            self.store['content']['hybrid']['soc_lcd'].update()
+            self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
+            self.store['content']['hybrid']['deploy_lim_lcd'].update()
+            self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+            self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
             self.update_limits()
+
+        for type in self.tabs['types']:
+            for function in self.tabs['types'][type]:
+                if type == "adjustment" or type == "input":
+                    if type == "input":
+                        controls = ("pedal", "up", "down", "switch")
+                    else:
+                        controls = ("up", "down", "switch")
+                    for control in controls:
+                        self.update_label(function, control)
 
     def display(self):
         for func in vjoy.axis_values:
             if func in self.store['content']: #only because not every tab has been developed yet...
                 pct = vjoy.axis_values[func]
-                #print("display check1: ", func, pct)
+                # print("display check1: ", func, pct)
                 self.store['content'][func]['axis'].setValue(int(pct * 100))
                 self.store['content'][func]['axis'].update()
                 self.store['content']['axes_display'][func + '_axis'].setValue(int(pct * 100))
@@ -530,22 +565,23 @@ class MainWindow(QMainWindow):
                 self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
                 self.store['content']['hybrid']['soc_lcd'].update()
                 self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
-                self.lastval['soc'] = None
+                self.lastval['soc'] = 999.0
                 self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
                 self.store['content']['hybrid']['deploy_lim_axis'].update()
                 self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
                 self.store['content']['hybrid']['deploy_lim_lcd'].update()
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
-                self.lastval['deploy_lim'] = None
+                self.lastval['deploy_lim'] = 999.0
             if self.store['content']['settings']['sound'].currentText() == "Yes":
-                if self.lastval[entry] != None:
-                    if self.store['content']['hybrid']['soc_axis'].value() <= 0.10*100 and self.lastval['soc'] > 0.10*100: # make this adjustable later
+                if self.lastval['soc'] != 999.0:
+                    if self.store['content']['hybrid']['soc_axis'].value() <= 0.10*100 < self.lastval['soc']: # make this adjustable later
                         print("call play low")
                         fn.start_thread(sfx.play('low'))
-                    if self.store['content']['hybrid']['soc_axis'].value() >= 0.90*100 and self.lastval['soc'] < 0.90*100: # make this adjustable later
+                    if self.store['content']['hybrid']['soc_axis'].value() >= 0.90*100 > self.lastval['soc']: # make this adjustable later
                         print("call play high")
                         fn.start_thread(sfx.play('high'))
-                    if self.store['content']['hybrid']['deploy_lim_axis'].value() >= 1.0*100 and self.lastval['deploy_lim'] < 1.0*100: # make this adjustable later maybe?
+                if self.lastval['deploy_lim'] != 999.0:
+                    if self.store['content']['hybrid']['deploy_lim_axis'].value() >= 1.0*100 > self.lastval['deploy_lim']: # make this adjustable later maybe?
                         print("call play deploy limit")
                         fn.start_thread(sfx.play('limit'))
                 self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
@@ -553,29 +589,29 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def calibrate(self):
-        if self.axis in self.store['content']:
-            self.store['content'][self.axis]['calibrate'].setText(var.lang['calibrating'])
+        if self.store['axis'] in self.store['content']:
+            self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrating'])
         else:
             print("Warning: calibrate()")
 
-        vjoy.calibrate(self.axis)
-        while self.store['running'] == True:
+        vjoy.calibrate(self.store['axis'])
+        while self.store['running']:
             sleep(0.1)
-        self.store['content'][self.axis]['calibrate'].setText(var.lang['calibrate'])
-        vjoy.set(self.axis,self.pct)
+        self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
+        vjoy.set(self.store['axis'], self.store['pct'])
         var.status['calibration'] = False
 
     @pyqtSlot()
     def calibrate_start(self, func):
-        self.axis = func
+        self.store['axis'] = func
         if not self.store['running']:
             self.store['running'] = True
             var.status['calibration'] = True
             sleep(0.1) #wait for loops to stop
             if not var.status[func]['switched']:
-                self.pct = var.status[func]['primary']
+                self.store['pct'] = var.status[func]['primary']
             elif var.status[func]['switched']:
-                self.pct = var.status[func]['secondary']
+                self.store['pct'] = var.status[func]['secondary']
             self.store['thread_pool'].start(self.calibrate)
         else:
             self.store['running'] = False
@@ -583,21 +619,21 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def increment(self, func):
         var.settings[func]['increment'] = self.store['content'][func]['increment'].value()
-        fn.write_config()
+        fn.write_profile()
 
     @pyqtSlot()
     def switch(self, func):
         value = self.store['content'][func]['switch'].value()
         var.settings[func]['switch_value'] = value
         if func == "weight_jacker":
-            var.status[func]['secondary'] = (value * step[func]) + 0.5
+            var.status[func]['secondary'] = (value * var.step[func]) + 0.5
         elif func == "clutch" or func == "throttle":
             var.status[func]['secondary'] = value/100
         else:
-            var.status[func]['secondary'] = (value * step[func]) - step[func]
-        if var.status[func]['switched'] == True:
+            var.status[func]['secondary'] = (value * var.step[func]) - var.step[func]
+        if var.status[func]['switched']:
             vjoy.set(func, var.status[func]['secondary'])
-        fn.write_config()
+        fn.write_profile()
 
     @pyqtSlot()
     def increment_mode(self, func):
@@ -605,7 +641,7 @@ class MainWindow(QMainWindow):
             var.settings[func]['continuous'] = True
         elif self.store['content'][func]['increment_mode'].currentText() == "Single":
             var.settings[func]['continuous'] = False
-        fn.write_config()
+        fn.write_profile()
 
     @pyqtSlot()
     def switch_mode(self, func):
@@ -615,7 +651,7 @@ class MainWindow(QMainWindow):
             var.status[func]['switched'] = False
             vjoy.set(func, var.status[func]['primary'])
             var.settings[func]['toggle'] = False
-        fn.write_config()
+        fn.write_profile()
 
     @pyqtSlot()
     def settings_set(self, func):
@@ -624,23 +660,23 @@ class MainWindow(QMainWindow):
         else:
             value = self.store['content']['settings'][func].value()
         if func == 'high_threshold':
-            if value/100 > var.settings['low_threshold']:
+            if value/100 > var.settings['local']['low_threshold']:
                 self.store['content']['settings']['low_threshold'].setRange(1, value-1)
                 fn.reset_bind_thresh(func, value/100)
-                var.settings[func] = value/100
-                fn.write_config()
+                var.settings['local'][func] = value/100
+                fn.write_profile()
         elif func == 'low_threshold':
-            if value/100 < var.settings['high_threshold']:
+            if value/100 < var.settings['local']['high_threshold']:
                 self.store['content']['settings']['high_threshold'].setRange(value+1, 99)
                 fn.reset_bind_thresh(func, value/100)
-                var.settings[func] = value/100
-                fn.write_config()
+                var.settings['local'][func] = value/100
+                fn.write_profile()
         elif func == 'sound':
-            var.settings['audio']['on'] = (value == "Yes")
-            fn.write_config()
+            var.settings['local']['audio'] = (value == "Yes")
+            fn.write_profile()
         elif func == 'volume':
-            var.settings['audio']['volume'] = value/100
-            fn.write_config()
+            var.settings['local']['volume'] = value/100
+            fn.write_profile()
         else:
             var.settings[func] = value
             fn.write_config()
@@ -660,7 +696,6 @@ class MainWindow(QMainWindow):
         control = var.bindings['status']['control']
         history.clear()
 
-        print(self.store['index']['throttle']['pedal'])
         self.store['index'][function][control]['bind'].setText(var.lang['binding'])
 
         var.event = {
@@ -669,43 +704,44 @@ class MainWindow(QMainWindow):
             "num": 0,
             "value": None,
         }
-        var.bindings[function][control] = None
+        var.bindings[function][control] = {}
         while not var.bindings[function][control]:
-            if self.store['running'] == False:
-                var.bindings[function][control] = {"guid": 0, "type": "none", "num": 0}
+            if not self.store['running']:
+                var.bindings[function][control] = {"label": "None", "guid": 0, "type": "none", "num": 0}
 
             if var.event['guid'] != 0:
                 if var.event['type'] == "button":
-                    if var.event['value'] != False:
+                    if var.event['value'] and not var.bindings['status']['input']:
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
                         }
                 elif var.event['type'] == "axis":
-                    if (function == 'clutch' or function == 'throttle') and control == 'pedal':
+                    if var.bindings['status']['input']:
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
+                            "input": True,
                         }
                     else:
-                        if var.event['value'] >= var.settings['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                        if var.event['value'] >= var.settings['local']['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
                             var.bindings[function][control] = {
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
                                 "num": var.event['num'],
-                                "value": var.settings['high_threshold']
+                                "value": var.settings['local']['high_threshold']
                             }
-                        if var.event['value'] <= var.settings['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                        if var.event['value'] <= var.settings['local']['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
                             var.bindings[function][control] = {
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
                                 "num": var.event['num'],
-                                "value": var.settings['low_threshold']
+                                "value": var.settings['local']['low_threshold']
                             }
                 elif var.event['type'] == "hat":
-                    if var.event['value'] != "none":
+                    if var.event['value'] != "none" and not var.bindings['status']['input']:
                         var.bindings[function][control] = {
                             "guid": var.event['guid'],
                             "type": var.event['type'],
@@ -716,21 +752,23 @@ class MainWindow(QMainWindow):
 
         self.store['index'][function][control]['bind'].setText(var.lang['bind'])
 
-        self.store['index'][function][control]['device'].setText(dev.format(function, control))
+        self.store['index'][function][control]['device'].setText(dev.format_device(function, control))
 
         var.bindings['status'] = {
             "active": False,
             "function": None,
             "control": None,
+            "input": None,
         }
-        fn.write_config()
+        fn.write_profile()
         self.store['running'] = False
 
     @pyqtSlot()
-    def bind_start(self, func, ctrl):
+    def bind_start(self, func, ctrl, input=False):
         var.bindings['status'] = {
             "function": func,
             "control": ctrl,
+            "input": input,
         }
         if not self.store['running']:
             self.store['thread_pool'].start(self.bind)
@@ -738,14 +776,27 @@ class MainWindow(QMainWindow):
             self.store['running'] = False
 
     @pyqtSlot()
-    def refresh_settings_list(self):
-        self.store['settings_busy'] = True
-        file = self.store['content']['settings']['settings_filename'].currentText()
-        self.store['content']['settings']['settings_filename'].clear()
-        for name in fn.get_settings_files():
-            self.store['content']['settings']['settings_filename'].addItem(name)
-        self.store['content']['settings']['settings_filename'].setCurrentText(file)
-        self.store['settings_busy'] = False
+    def refresh_profile_list(self):
+        self.store['profile_busy'] = True
+        file = self.store['content']['settings']['profile_select'].currentText()
+        self.store['content']['settings']['profile_select'].clear()
+        for name in fn.get_profiles():
+            self.store['content']['settings']['profile_select'].addItem(name)
+        self.store['content']['settings']['profile_select'].setCurrentText(file)
+        self.store['profile_busy'] = False
+
+    @pyqtSlot()
+    def create_profile(self, name):
+        if name not in fn.get_profiles():
+            fn.write_profile(name)
+        self.refresh_profile_list()
+        self.store['content']['settings']['profile_select'].setCurrentText(name)
+
+    @pyqtSlot()
+    def delete_profile(self, name):
+        fn.delete_profile(name)
+        self.refresh_profile_list()
+        self.store['content']['settings']['profile_select'].setCurrentIndex(0)
 
     @pyqtSlot()
     def update_limits(self):
@@ -763,7 +814,7 @@ class MainWindow(QMainWindow):
             if 'weight_jacker' in car_settings[car_id]:
                 min = car_settings[car_id]['weight_jacker'][0]
                 max = car_settings[car_id]['weight_jacker'][1]
-                step['weight_jacker'] = 1 / (max - min)
+                var.step['weight_jacker'] = 1 / (max - min)
                 self.store['content']['weight_jacker']['switch'].setRange(min, max)
                 self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
@@ -771,7 +822,7 @@ class MainWindow(QMainWindow):
             if 'front_roll_bar' in car_settings[car_id]:
                 min = car_settings[car_id]['front_roll_bar'][0]
                 max = car_settings[car_id]['front_roll_bar'][1]
-                step['front_roll_bar'] = 1 / (max - min)
+                var.step['front_roll_bar'] = 1 / (max - min)
                 self.store['content']['front_roll_bar']['switch'].setRange(min, max)
                 self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
@@ -779,7 +830,7 @@ class MainWindow(QMainWindow):
             if 'rear_roll_bar' in car_settings[car_id]:
                 min = car_settings[car_id]['rear_roll_bar'][0]
                 max = car_settings[car_id]['rear_roll_bar'][1]
-                step['rear_roll_bar'] = 1 / (max - min)
+                var.step['rear_roll_bar'] = 1 / (max - min)
                 self.store['content']['rear_roll_bar']['switch'].setRange(min, max)
                 self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
@@ -787,16 +838,16 @@ class MainWindow(QMainWindow):
             if 'fuel_map' in car_settings[car_id]:
                 min = car_settings[car_id]['fuel_map'][0]
                 max = car_settings[car_id]['fuel_map'][1]
-                step['fuel_map'] = 1 / (max - min)
+                var.step['fuel_map'] = 1 / (max - min)
                 self.store['content']['fuel_map']['switch'].setRange(min, max)
                 self.store['content']['axes_display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
             else:
                 self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
         else:
-            car_id = self.store['content']['axes_display']['car_id']['car_id']
+            car_id = self.store['content']['axes_display']['car_id']
             self.store['index']['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
             print("current_car " + str(car_id) + " not in car_settings!")
-            self.store['content']['axes_display']['weight_jacker']['label'].setStyleSheet("color: red;")
+            self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
             self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
             self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
             self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
@@ -807,116 +858,53 @@ class MainWindow(QMainWindow):
         self.store['content']['axes_display']['car_id_limits'].setText(text)
 
     @pyqtSlot()
+    def update_label(self, function, control):
+        try:
+            if var.bindings[function][control]:
+                if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
+                    self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
+                else:
+                    self.store['content'][function][control + '_device'].setStyleSheet("color: black;")
+                self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
+        except KeyError as error:
+            print(error)
+
+    @pyqtSlot()
     def apply_settings(self, file):
-        if self.store['settings_busy']: #if list is getting cleared or current text is being reset during list refresh, skip this function
+        if self.store['profile_busy']: #if list is getting cleared or current text is being reset during list refresh, skip this function
             return
 
-        fn.re_read_config(file)
+        fn.read_profile(file)
+        fn.write_config()
 
-        self.store['content']['weight_jacker']['increment'].setValue(var.settings['weight_jacker']['increment'])
-        self.store['content']['weight_jacker']['switch'].setValue(var.settings['weight_jacker']['switch_value'])
-        if var.settings['weight_jacker']['continuous']:
-            self.store['content']['weight_jacker']['increment_mode'].setCurrentText(var.lang['continuous'])
-        else:
-            self.store['content']['weight_jacker']['increment_mode'].setCurrentText(var.lang['single'])
-        if var.settings['weight_jacker']['toggle']:
-            self.store['content']['weight_jacker']['switch_mode'].setCurrentText(var.lang['toggle'])
-        else:
-            self.store['content']['weight_jacker']['switch_mode'].setCurrentText(var.lang['hold'])
-        self.store['content']['weight_jacker']['up_device'].setText(dev.format("weight_jacker", "up"))
-        self.store['content']['weight_jacker']['down_device'].setText(dev.format("weight_jacker", "down"))
-        self.store['content']['weight_jacker']['switch_device'].setText(dev.format("weight_jacker", "switch"))
+        for type in self.tabs['types']:
+            for function in self.tabs['types'][type]:
+                if type == "adjustment" or type == "input":
+                    self.store['content'][function]['increment'].setValue(var.settings[function]['increment'])
+                    self.store['content'][function]['switch'].setValue(var.settings[function]['switch_value'])
+                    if var.settings[function]['continuous']:
+                        self.store['content'][function]['increment_mode'].setCurrentText(var.lang['continuous'])
+                    else:
+                        self.store['content'][function]['increment_mode'].setCurrentText(var.lang['single'])
+                    if var.settings[function]['toggle']:
+                        self.store['content'][function]['switch_mode'].setCurrentText(var.lang['toggle'])
+                    else:
+                        self.store['content'][function]['switch_mode'].setCurrentText(var.lang['hold'])
 
-        self.store['content']['front_roll_bar']['increment'].setValue(var.settings['front_roll_bar']['increment'])
-        self.store['content']['front_roll_bar']['switch'].setValue(var.settings['front_roll_bar']['switch_value'])
-        if var.settings['front_roll_bar']['continuous']:
-            self.store['content']['front_roll_bar']['increment_mode'].setCurrentText(var.lang['continuous'])
-        else:
-            self.store['content']['front_roll_bar']['increment_mode'].setCurrentText(var.lang['single'])
-        if var.settings['front_roll_bar']['toggle']:
-            self.store['content']['front_roll_bar']['switch_mode'].setCurrentText(var.lang['toggle'])
-        else:
-            self.store['content']['front_roll_bar']['switch_mode'].setCurrentText(var.lang['hold'])
-        self.store['content']['front_roll_bar']['up_device'].setText(dev.format("front_roll_bar", "up"))
-        self.store['content']['front_roll_bar']['down_device'].setText(dev.format("front_roll_bar", "down"))
-        self.store['content']['front_roll_bar']['switch_device'].setText(dev.format("front_roll_bar", "switch"))
-
-
-        self.store['content']['rear_roll_bar']['increment'].setValue(var.settings['rear_roll_bar']['increment'])
-        self.store['content']['rear_roll_bar']['switch'].setValue(var.settings['rear_roll_bar']['switch_value'])
-        if var.settings['rear_roll_bar']['continuous']:
-            self.store['content']['rear_roll_bar']['increment_mode'].setCurrentText(var.lang['continuous'])
-        else:
-            self.store['content']['rear_roll_bar']['increment_mode'].setCurrentText(var.lang['single'])
-        if var.settings['rear_roll_bar']['toggle']:
-            self.store['content']['rear_roll_bar']['switch_mode'].setCurrentText(var.lang['toggle'])
-        else:
-            self.store['content']['rear_roll_bar']['switch_mode'].setCurrentText(var.lang['hold'])
-        self.store['content']['rear_roll_bar']['up_device'].setText(dev.format("rear_roll_bar", "up"))
-        self.store['content']['rear_roll_bar']['down_device'].setText(dev.format("rear_roll_bar", "down"))
-        self.store['content']['rear_roll_bar']['switch_device'].setText(dev.format("rear_roll_bar", "switch"))
-
-
-        self.store['content']['fuel_map']['increment'].setValue(var.settings['fuel_map']['increment'])
-        self.store['content']['fuel_map']['switch'].setValue(var.settings['fuel_map']['switch_value'])
-        if var.settings['fuel_map']['continuous']:
-            self.store['content']['fuel_map']['increment_mode'].setCurrentText(var.lang['continuous'])
-        else:
-            self.store['content']['fuel_map']['increment_mode'].setCurrentText(var.lang['single'])
-        if var.settings['fuel_map']['toggle']:
-            self.store['content']['fuel_map']['switch_mode'].setCurrentText(var.lang['toggle'])
-        else:
-            self.store['content']['fuel_map']['switch_mode'].setCurrentText(var.lang['hold'])
-        self.store['content']['fuel_map']['up_device'].setText(dev.format("fuel_map", "up"))
-        self.store['content']['fuel_map']['down_device'].setText(dev.format("fuel_map", "down"))
-        self.store['content']['fuel_map']['switch_device'].setText(dev.format("fuel_map", "switch"))
-
-
-        self.store['content']['clutch']['increment'].setValue(var.settings['clutch']['increment'])
-        self.store['content']['clutch']['switch'].setValue(var.settings['clutch']['switch_value'])
-        if var.settings['clutch']['continuous']:
-            self.store['content']['clutch']['increment_mode'].setCurrentText(var.lang['continuous'])
-        else:
-            self.store['content']['clutch']['increment_mode'].setCurrentText(var.lang['single'])
-        if var.settings['clutch']['toggle']:
-            self.store['content']['clutch']['switch_mode'].setCurrentText(var.lang['toggle'])
-        else:
-            self.store['content']['clutch']['switch_mode'].setCurrentText(var.lang['hold'])
-        self.store['content']['clutch']['pedal_device'].setText(dev.format("clutch", "pedal"))
-        self.store['content']['clutch']['up_device'].setText(dev.format("clutch", "up"))
-        self.store['content']['clutch']['down_device'].setText(dev.format("clutch", "down"))
-        self.store['content']['clutch']['switch_device'].setText(dev.format("clutch", "switch"))
-
-
-        self.store['content']['throttle']['increment'].setValue(var.settings['throttle']['increment'])
-        self.store['content']['throttle']['switch'].setValue(var.settings['throttle']['switch_value'])
-        if var.settings['throttle']['continuous']:
-            self.store['content']['throttle']['increment_mode'].setCurrentText(var.lang['continuous'])
-        else:
-            self.store['content']['throttle']['increment_mode'].setCurrentText(var.lang['single'])
-        if var.settings['throttle']['toggle']:
-            self.store['content']['throttle']['switch_mode'].setCurrentText(var.lang['toggle'])
-        else:
-            self.store['content']['throttle']['switch_mode'].setCurrentText(var.lang['hold'])
-        self.store['content']['throttle']['pedal_device'].setText(dev.format("throttle", "pedal"))
-        self.store['content']['throttle']['up_device'].setText(dev.format("throttle", "up"))
-        self.store['content']['throttle']['down_device'].setText(dev.format("throttle", "down"))
-        self.store['content']['throttle']['switch_device'].setText(dev.format("throttle", "switch"))
-
-        self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['low_threshold']*100)+1,51), 99)
-        self.store['content']['settings']['high_threshold'].setValue(int(var.settings['high_threshold'] * 100))
-        self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['high_threshold']*100)-1,49))
-        self.store['content']['settings']['low_threshold'].setValue(int(var.settings['low_threshold'] * 100))
+        self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
+        self.store['content']['settings']['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
+        self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
+        self.store['content']['settings']['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
         self.store['content']['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
         self.store['content']['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
         self.store['content']['settings']['timer_first'].setValue(int(var.settings['timer_first']))
         self.store['content']['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
-        self.store['content']['settings']['settings_filename'].setCurrentText(var.settings_active)
-        if var.settings['audio']['on']:
+        self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
+        if var.settings['local']['audio']:
             self.store['content']['settings']['sound'].setCurrentText('Yes')
         else:
             self.store['content']['settings']['sound'].setCurrentText('No')
-        self.store['content']['settings']['volume'].setValue(int(var.settings['audio']['volume']*100))
+        self.store['content']['settings']['volume'].setValue(int(var.settings['local']['volume']*100))
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])
@@ -926,4 +914,5 @@ def main():
     window = MainWindow()
     window.show()
     window.update()
+    # app.setStyle('Fusion')
     app.exec()

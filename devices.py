@@ -11,7 +11,7 @@ from time import sleep
 devices = []
 device_info = {}
 
-def add_device(index):
+def add_device(index, startup):
     device = p.joystick.Joystick(index)
     if "vJoy" not in device.get_name():
         guid = device.get_guid()
@@ -36,6 +36,8 @@ def add_device(index):
             for h in range(device.get_numhats()):
                 device_info[guid]['hats'][h] = device.get_hat(h)
         print(device_info[guid])
+        if not startup:
+            fn.read_profile(var.settings['profile']['current'])
 
 
 def remove_device(instance):
@@ -47,6 +49,7 @@ def remove_device(instance):
         if device_info[guid]['instance'] == instance:
             del device_info[guid]
             break
+    fn.read_profile(var.settings['profile']['current'])
 
 
 def log_event(index, type, num, value):
@@ -99,10 +102,10 @@ def device_detection():
     os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
     p.init()
     p.joystick.init()
-    screen = p.display.set_mode((0, 0), flags=p.HIDDEN)
+    p.display.set_mode((0, 0), flags=p.HIDDEN)
 
     for i in range(p.joystick.get_count()):
-        add_device(i)
+        add_device(i, True)
 
     var.status['devices_loaded'] = True
     running = True
@@ -114,7 +117,7 @@ def device_detection():
                 running = False
 
             if e.type == p.JOYDEVICEADDED:
-                add_device(e.device_index)
+                add_device(e.device_index, False)
             elif e.type == p.JOYDEVICEREMOVED:
                 remove_device(e.instance_id)
 
@@ -133,7 +136,7 @@ def device_detection():
 
     p.quit()
 
-def format(function, control):
+def format_device(function, control):
     if var.bindings[function][control]:
         if var.bindings[function][control]['type'] == "none":
             dev_pretty = "None"
@@ -147,7 +150,7 @@ def format(function, control):
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])
             num = str(var.bindings[function][control]['num'])
-            axis_dir = var.bindings[function][control]['value'] >= var.settings['high_threshold']
+            axis_dir = var.bindings[function][control]['value'] >= var.settings['local']['high_threshold']
             dev_pretty = name + " - " + type + " " + num
             if axis_dir and control != 'pedal':
                 dev_pretty += "+"
@@ -158,6 +161,9 @@ def format(function, control):
             type = capwords(var.bindings[function][control]['type'])
             num = str(var.bindings[function][control]['num'])
             dev_pretty = name + " - " + type + " " + num
-        return dev_pretty
+
+        var.bindings[function][control]['label'] = dev_pretty
+
+        return var.bindings[function][control]['label']
     else:
         return 'None'
