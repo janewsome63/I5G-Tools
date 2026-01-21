@@ -748,6 +748,15 @@ class MainWindow(QMainWindow):
                             "num": var.event['num'],
                             "dir": var.event['value'],
                         }
+                elif var.event['type'] == "key" and var.event['value']:
+                    if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
+                        if var.event['value'] and not var.bindings['status']['input']:
+                            var.bindings[function][control] = {
+                                "guid": var.event['guid'],
+                                "type": var.event['type'],
+                                "num": var.event['num'],
+                                "value": var.event['value'],
+                            }
             sleep(0.001)
 
         self.store['index'][function][control]['bind'].setText(var.lang['bind'])

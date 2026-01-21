@@ -7,9 +7,21 @@ import functions as fn
 import variables as var
 import history
 from time import sleep
+import keyboard
 
 devices = []
-device_info = {}
+device_info = {
+    "-1": {
+        "guid": None,
+        "name": "Keyboard",
+        "index": -1,
+        "instance": None,
+        "initialized": True,
+        "keys": {
+            "0": ""
+        },
+    },
+}
 
 def add_device(index, startup):
     device = p.joystick.Joystick(index)
@@ -39,7 +51,6 @@ def add_device(index, startup):
         if not startup:
             fn.read_profile(var.settings['profile']['current'])
 
-
 def remove_device(instance):
     for i, device in enumerate(devices):
         if device.get_instance_id() == instance:
@@ -53,7 +64,10 @@ def remove_device(instance):
 
 
 def log_event(index, type, num, value):
-    guid = p.joystick.Joystick(index).get_guid()
+    if index != -1:
+        guid = p.joystick.Joystick(index).get_guid()
+    else:
+        guid = "-1"
     if guid in device_info:
         if type == "button":
             if "buttons" in device_info[guid] and num in device_info[guid]['buttons']:
@@ -88,7 +102,8 @@ def log_event(index, type, num, value):
                 else:
                     value = "none"
                 device_info[guid]['hats'][num] = value
-
+        elif type == "key":
+            device_info[guid]['keys'][num] = value
         var.event = {
             "guid": guid,
             "type": type,
@@ -115,7 +130,6 @@ def device_detection():
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-
             if e.type == p.JOYDEVICEADDED:
                 add_device(e.device_index, False)
             elif e.type == p.JOYDEVICEREMOVED:
@@ -132,6 +146,19 @@ def device_detection():
             elif e.type == p.JOYHATMOTION:
                 log_event(e.joy, "hat", e.hat, e.value)
                 fn.start_thread(con.controls)
+
+        try:
+            key = keyboard.get_hotkey_name()
+        except AttributeError:
+            key = ""
+
+        if not key:
+            key = None
+
+        if key != var.status['key_prev']:
+            log_event(-1, "key", 0, key)
+            fn.start_thread(con.controls)
+        var.status['key_prev'] = key
         sleep(0.001)
 
     p.quit()
@@ -140,22 +167,27 @@ def format_device(function, control):
     if var.bindings[function][control]:
         if var.bindings[function][control]['type'] == "none":
             dev_pretty = "None"
-        elif "dir" in var.bindings[function][control]:
+        elif var.bindings[function][control]['type'] == "hat":
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])
             num = str(var.bindings[function][control]['num'])
             dir = capwords(var.bindings[function][control]['dir'])
             dev_pretty = name + " - " + type + " " + num + " " + dir
-        elif "value" in var.bindings[function][control]:
+        elif var.bindings[function][control]['type'] == "axis":
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])
             num = str(var.bindings[function][control]['num'])
             axis_dir = var.bindings[function][control]['value'] >= var.settings['local']['high_threshold']
             dev_pretty = name + " - " + type + " " + num
-            if axis_dir and control != 'pedal':
-                dev_pretty += "+"
-            elif control != 'pedal':
-                dev_pretty += "-"
+            if control != 'pedal':
+                if axis_dir:
+                    dev_pretty += "+"
+                else:
+                    dev_pretty += "-"
+        elif var.bindings[function][control]['type'] == "key":
+            name = device_info[var.bindings[function][control]['guid']]['name']
+            value = var.bindings[function][control]['value']
+            dev_pretty = name + " - " + value.upper()
         else:
             name = device_info[var.bindings[function][control]['guid']]['name']
             type = capwords(var.bindings[function][control]['type'])

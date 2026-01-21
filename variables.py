@@ -3,7 +3,7 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.8b",
+    "version": "v0.4.9b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -278,6 +278,7 @@ settings = {
 status = {
     "calibration": False,
     "devices_loaded": False,
+    "key_prev": None,
     "profile_prev": "None",
     "profile_list": [],
     "weight_jacker": {

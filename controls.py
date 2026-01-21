@@ -47,6 +47,11 @@ def check_pressed(bind):
             pressed = True
         else:
             pressed = False
+    elif bind['type'] == "key":
+        if bind['value'] == dev.device_info[bind['guid']]['keys'][bind['num']]:
+            pressed = True
+        else:
+            pressed = False
     else:
         pressed = False
 

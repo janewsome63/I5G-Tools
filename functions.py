@@ -169,14 +169,7 @@ def get_profiles():
     return var.status['profile_list']
 
 def is_bind():
-    if var.event['type'] == "hat":
-        event = {
-            "guid": var.event['guid'],
-            "type": var.event['type'],
-            "num": var.event['num'],
-            "dir": var.event['value']
-        }
-    elif var.event['type'] == "axis":
+    if var.event['type'] == "axis":
         event = {
             "guid": var.event['guid'],
             "type": var.event['type'],
@@ -187,6 +180,20 @@ def is_bind():
             event['value'] = var.settings['local']['high_threshold']
         elif event['value'] < var.settings['local']['low_threshold']:
             event['value'] = var.settings['local']['low_threshold']
+    elif var.event['type'] == "hat":
+        event = {
+            "guid": var.event['guid'],
+            "type": var.event['type'],
+            "num": var.event['num'],
+            "dir": var.event['value']
+        }
+    elif var.event['type'] == "key":
+        event = {
+            "guid": var.event['guid'],
+            "type": var.event['type'],
+            "num": var.event['num'],
+            "value": var.event['value']
+        }
     else:
         event = {
             "guid": var.event['guid'],
@@ -206,7 +213,7 @@ def is_bind():
                 if "input" in bind:
                     if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
                         result.append({"function": function, "control": control, "value": var.event['value']})
-                elif event == bind or "dir" in bind:
+                elif event == bind:
                     result.append({"function": function, "control": control})
 
     if not result:

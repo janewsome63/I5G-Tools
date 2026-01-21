@@ -4,19 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.6b - Fixed missed variable renames which were causing a crash on connection to game">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controls.py" beforeDir="false" afterPath="$PROJECT_DIR$/controls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/history.py" beforeDir="false" afterPath="$PROJECT_DIR$/history.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.pyw" beforeDir="false" afterPath="$PROJECT_DIR$/main.pyw" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sfx/777-pull-up.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/sfx/high.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sfx/777-wind-shear.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/sfx/low.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sfx/ac7-ammo-zero.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/sfx/limit.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sound_fx.py" beforeDir="false" afterPath="$PROJECT_DIR$/sound_fx.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,7 +65,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.Run.executor": "Debug",
+    "Python.Run.executor": "Run",
     "Python.devices.executor": "Run",
     "Python.functions.executor": "Run",
     "Python.interface.executor": "Run",
@@ -89,7 +82,7 @@
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
-  <component name="RunManager" selected="Shell Script.Compile">
+  <component name="RunManager" selected="Python.Run">
     <configuration name="Run" type="PythonConfigurationType" factoryName="Python">
       <module name="I5G-Tools" />
       <option name="ENV_FILES" value="" />
@@ -429,7 +422,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767418100417</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running.">
+      <option name="closed" value="true" />
+      <created>1768804783809</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1768804783809</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -444,7 +445,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Started vjoy integration" />
     <MESSAGE value="vJoy functions" />
     <MESSAGE value="Starting control binding work" />
     <MESSAGE value="Work on binding and control detection" />
@@ -469,6 +469,7 @@
     <MESSAGE value="v0.4.2b - Add rudimentary whitelist" />
     <MESSAGE value="v0.4.5b - Begin reorganization work and bugfixing. Heavily refactored interface.py, renamed 'bite_point' to 'clutch' and 'engine_warming' to 'throttle'." />
     <MESSAGE value="v0.4.6b - Fixed missed variable renames which were causing a crash on connection to game" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.4.6b - Fixed missed variable renames which were causing a crash on connection to game" />
+    <MESSAGE value="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running." />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running." />
   </component>
 </project>
