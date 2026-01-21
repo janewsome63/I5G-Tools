@@ -12,6 +12,8 @@ xcopy ".\LICENSE" ".\dist"
 
 xcopy ".\README.md" ".\dist"
 
+xcopy ".\icon.ico" ".\dist"
+
 rename ".\dist\I5G-Tools*.exe" I5G-Tools.exe
 
 mkdir .\dist\installer

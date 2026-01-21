@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running.">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.9b - Added support for binding keyboard keys to controls.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controls.py" beforeDir="false" afterPath="$PROJECT_DIR$/controls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Install.iit" beforeDir="false" afterPath="$PROJECT_DIR$/Install.iit" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,7 +80,7 @@
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
-  <component name="RunManager" selected="Python.Run">
+  <component name="RunManager" selected="Shell Script.Compile">
     <configuration name="Run" type="PythonConfigurationType" factoryName="Python">
       <module name="I5G-Tools" />
       <option name="ENV_FILES" value="" />
@@ -430,7 +428,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768804783809</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="v0.4.9b - Added support for binding keyboard keys to controls.">
+      <option name="closed" value="true" />
+      <created>1768972006241</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1768972006241</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -445,7 +451,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="vJoy functions" />
     <MESSAGE value="Starting control binding work" />
     <MESSAGE value="Work on binding and control detection" />
     <MESSAGE value="Rework controller polling system, weight jacker tool section functional" />
@@ -470,6 +475,7 @@
     <MESSAGE value="v0.4.5b - Begin reorganization work and bugfixing. Heavily refactored interface.py, renamed 'bite_point' to 'clutch' and 'engine_warming' to 'throttle'." />
     <MESSAGE value="v0.4.6b - Fixed missed variable renames which were causing a crash on connection to game" />
     <MESSAGE value="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running." />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running." />
+    <MESSAGE value="v0.4.9b - Added support for binding keyboard keys to controls." />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.4.9b - Added support for binding keyboard keys to controls." />
   </component>
 </project>
