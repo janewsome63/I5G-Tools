@@ -14,6 +14,8 @@ xcopy ".\README.md" ".\dist"
 
 xcopy ".\icon.ico" ".\dist"
 
+xcopy ".\Settings.lnk" ".\dist"
+
 rename ".\dist\I5G-Tools*.exe" I5G-Tools.exe
 
 mkdir .\dist\installer

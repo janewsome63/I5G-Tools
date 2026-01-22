@@ -4,11 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.4.9b - Added support for binding keyboard keys to controls.">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="Update compiler, installer and license.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Install.iit" beforeDir="false" afterPath="$PROJECT_DIR$/Install.iit" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/compile.bat" beforeDir="false" afterPath="$PROJECT_DIR$/compile.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sound_fx.py" beforeDir="false" afterPath="$PROJECT_DIR$/sound_fx.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +65,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Python.Run.executor": "Run",
+    "Python.Run.executor": "Debug",
     "Python.devices.executor": "Run",
     "Python.functions.executor": "Run",
     "Python.interface.executor": "Run",
@@ -436,7 +438,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768972006241</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Update compiler, installer and license.">
+      <option name="closed" value="true" />
+      <created>1768974355208</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1768974355208</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -451,7 +461,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Starting control binding work" />
     <MESSAGE value="Work on binding and control detection" />
     <MESSAGE value="Rework controller polling system, weight jacker tool section functional" />
     <MESSAGE value="Implement options on WJ tab, add axis threshold setting" />
@@ -476,6 +485,7 @@
     <MESSAGE value="v0.4.6b - Fixed missed variable renames which were causing a crash on connection to game" />
     <MESSAGE value="v0.4.8b - Remove disconnected device warning, replace with devices being marked in red when disconnected. Change old settings file selection in profiles that can be created or deleted in-app. Refactored files, reorganization. Fixed bug that caused a crash if the game opened or closed while program was running." />
     <MESSAGE value="v0.4.9b - Added support for binding keyboard keys to controls." />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.4.9b - Added support for binding keyboard keys to controls." />
+    <MESSAGE value="Update compiler, installer and license." />
+    <option name="LAST_COMMIT_MESSAGE" value="Update compiler, installer and license." />
   </component>
 </project>

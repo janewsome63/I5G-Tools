@@ -3,7 +3,7 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.9b",
+    "version": "v0.4.10b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
