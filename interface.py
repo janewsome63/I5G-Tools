@@ -85,6 +85,16 @@ class MainWindow(QMainWindow):
         self.store['timer'].timeout.connect(self.updater)
         self.store['timer'].start(int((var.settings['frequency'] * 1000) / 10))
 
+        for function in var.bindings:
+            if function != "status":
+                for control in var.bindings[function]:
+                    if var.bindings[function][control]['label'] == "Unknown device" and var.bindings[function][control]['guid'] in dev.device_info:
+                        var.status['rewrite']['profile'] = True
+                        self.store['index'][function][control]['device'].setText(dev.format_device(function, control))
+        if var.status['rewrite']['profile']:
+            fn.write_profile()
+            var.status['rewrite']['profile'] = False
+
     def tool_tabs(self, type, function):
         local_store = {
             "binds": ["up", "down", "switch"],
@@ -352,13 +362,13 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
             self.store['content'][function]['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
 
-            self.store['content'][function]['axis_samples_label'] = QLabel()
-            self.store['content'][function]['axis_samples_label'].setText(var.lang['axis_samples'])
+            # self.store['content'][function]['axis_samples_label'] = QLabel()
+            # self.store['content'][function]['axis_samples_label'].setText(var.lang['axis_samples'])
 
-            self.store['content'][function]['axis_samples'] = QSpinBox()
-            self.store['content'][function]['axis_samples'].setFixedSize(60, 20)
-            self.store['content'][function]['axis_samples'].setRange(2, 10)
-            self.store['content'][function]['axis_samples'].valueChanged.connect(lambda: self.settings_set('axis_samples'))
+            # self.store['content'][function]['axis_samples'] = QSpinBox()
+            # self.store['content'][function]['axis_samples'].setFixedSize(60, 20)
+            # self.store['content'][function]['axis_samples'].setRange(2, 10)
+            # self.store['content'][function]['axis_samples'].valueChanged.connect(lambda: self.settings_set('axis_samples'))
 
             self.store['content'][function]['scale_label'] = QLabel()
             self.store['content'][function]['scale_label'].setText(var.lang['scale'])
@@ -713,6 +723,7 @@ class MainWindow(QMainWindow):
                 if var.event['type'] == "button":
                     if var.event['value'] and not var.bindings['status']['input']:
                         var.bindings[function][control] = {
+                            "label": "Unknown device",
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
@@ -720,6 +731,7 @@ class MainWindow(QMainWindow):
                 elif var.event['type'] == "axis":
                     if var.bindings['status']['input']:
                         var.bindings[function][control] = {
+                            "label": "Unknown device",
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
@@ -728,6 +740,7 @@ class MainWindow(QMainWindow):
                     else:
                         if var.event['value'] >= var.settings['local']['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
                             var.bindings[function][control] = {
+                            "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
                                 "num": var.event['num'],
@@ -735,6 +748,7 @@ class MainWindow(QMainWindow):
                             }
                         if var.event['value'] <= var.settings['local']['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
                             var.bindings[function][control] = {
+                            "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
                                 "num": var.event['num'],
@@ -743,6 +757,7 @@ class MainWindow(QMainWindow):
                 elif var.event['type'] == "hat":
                     if var.event['value'] != "none" and not var.bindings['status']['input']:
                         var.bindings[function][control] = {
+                            "label": "Unknown device",
                             "guid": var.event['guid'],
                             "type": var.event['type'],
                             "num": var.event['num'],
@@ -752,6 +767,7 @@ class MainWindow(QMainWindow):
                     if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
                         if var.event['value'] and not var.bindings['status']['input']:
                             var.bindings[function][control] = {
+                                "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
                                 "num": var.event['num'],
@@ -873,7 +889,7 @@ class MainWindow(QMainWindow):
                 if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
                     self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
                 else:
-                    self.store['content'][function][control + '_device'].setStyleSheet("color: black;")
+                    self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
         except KeyError as error:
             print(error)
@@ -904,7 +920,7 @@ class MainWindow(QMainWindow):
         self.store['content']['settings']['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
         self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
         self.store['content']['settings']['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
-        self.store['content']['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
+        # self.store['content']['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
         self.store['content']['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
         self.store['content']['settings']['timer_first'].setValue(int(var.settings['timer_first']))
         self.store['content']['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))

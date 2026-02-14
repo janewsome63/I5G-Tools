@@ -3,7 +3,7 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.4.10b",
+    "version": "v0.5.0b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -22,7 +22,7 @@ lang = {
     "calibrating": "<-Calibrating->",
     "high_threshold": "High Axis Threshold:",
     "low_threshold": "Low Axis Threshold:",
-    "axis_samples": "Number of Axis Samples:",
+    # "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor:",
     "timer_loop": "Continuous Mode Loop Timer (in ms):",
     "timer_first": "Continuous Mode Initial Loop Timer (in ms)",
@@ -48,12 +48,38 @@ lang = {
     "sound_label": "Sound:",
     "volume_label": "Volume:",
     "section_errors": {
-        "title": "I5G Tools  -  Unknown sections in settings file!",
-        "intro": "There are sections in the settings file that are not recognized by this version of the program. The unknown sections have the following names:\n\n",
-        "outro": "\nIf this settings file is used, any settings related to the unrecognized sections listed above will be deleted.\n\n"
-                 "Pressing OK will open the app and delete all settings related to the unrecognized sections.\n"
-                 "Pressing Cancel will close the app now if you want to manually backup the settings file before opening this app again.\nProceed?",
-    }
+        "config": {
+            "title": "I5G Tools  -  Unknown sections in global config file!",
+            "intro": "There are sections in the global config file that are not recognized by this version of the program. The unknown sections have the following names:\n\n",
+            "outro": "\nIf this settings file is used, any settings related to the unrecognized sections listed above will be deleted.\n\n"
+                    "Pressing OK will open the app and delete all settings related to the unrecognized sections.\n"
+                    "Pressing Cancel will close the app now if you want to manually backup the global config file before opening this app again.\nProceed?",
+        },
+        "profile": {
+            "title": "I5G Tools  -  Unknown sections in profile config file!",
+            "intro": "There are sections in the profile config file that are not recognized by this version of the program. The unknown sections have the following names:\n\n",
+            "outro": "\nIf this settings file is used, any settings related to the unrecognized sections listed above will be deleted.\n\n"
+                    "Pressing OK will open the app and delete all settings related to the unrecognized sections.\n"
+                    "Pressing Cancel will close the app now if you want to manually backup the profile config file before opening this app again.\nProceed?",
+        },
+    },
+    "not_found":{
+        "config": {
+            "title": "I5G Tools  -  Global settings file not found!",
+            "body": "The global settings file does not exist.\n"
+                    "Pressing OK will create a default global settings file if you are okay with loading in with a default global settings file.\n"
+                    "Pressing Cancel will close the app now if you want to add the global settings file back into the I5G Tools folder before opening this app again.\n"
+                    "Proceed?",
+        },
+        "profile": {
+            "title": "I5G Tools  -  Config file listed in global settings file not found!",
+            "intro": "The config file that was last open does not exist anymore. The config file that was last open was named:\n\n",
+            "outro": "\n\n"
+                    "Pressing OK will open the app and switch back to the Default config file (or create a new blank Default config file if Default.ini doesn't exist).\n"
+                    "Pressing Cancel will close the app now if you want to add this config file back into the profiles folder before opening this app again.\n"
+                    "Proceed?",
+        },
+    },
 }
 
 step = {
@@ -212,7 +238,7 @@ bindings_cache = copy.deepcopy(bindings)
 settings = {
     "frequency": 0.1,
     "scale": 1.25,
-    "axis_samples": 2,
+    "axis_samples": 2, # constant, not really a setting anymore
     "timer_loop": 150,
     "timer_first": 300,
     "config": "global.ini",
@@ -281,6 +307,11 @@ status = {
     "key_prev": None,
     "profile_prev": "None",
     "profile_list": [],
+    "first": False,
+    "rewrite":{
+        "config": False,
+        "profile": False,
+    },
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,

@@ -1,3 +1,6 @@
+import check_dir
+check_dir.run() # checks to make sure all the folders are already set up and creates them if they don't exist before doing anything else
+
 import devices as dev
 import functions as fn
 import interface as ui
