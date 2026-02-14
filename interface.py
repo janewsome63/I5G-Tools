@@ -85,15 +85,15 @@ class MainWindow(QMainWindow):
         self.store['timer'].timeout.connect(self.updater)
         self.store['timer'].start(int((var.settings['frequency'] * 1000) / 10))
 
-        for function in var.bindings:
-            if function != "status":
-                for control in var.bindings[function]:
-                    if var.bindings[function][control]['label'] == "Unknown device" and var.bindings[function][control]['guid'] in dev.device_info:
-                        var.status['rewrite']['profile'] = True
-                        self.store['index'][function][control]['device'].setText(dev.format_device(function, control))
-        if var.status['rewrite']['profile']:
-            fn.write_profile()
-            var.status['rewrite']['profile'] = False
+        # for function in var.bindings:
+        #     if function != "status":
+        #         for control in var.bindings[function]:
+        #             if var.bindings[function][control]['label'] == "Unknown device" and var.bindings[function][control]['guid'] in dev.device_info:
+        #                 var.status['rewrite']['profile'] = True
+        #                 self.store['index'][function][control]['device'].setText(dev.format_device(function, control))
+        # if var.status['rewrite']['profile']:
+        #     fn.write_profile()
+        #     var.status['rewrite']['profile'] = False
 
     def tool_tabs(self, type, function):
         local_store = {
@@ -820,8 +820,14 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def delete_profile(self, name):
         fn.delete_profile(name)
+        if len(fn.get_profiles()) == 0:
+            var.settings['profile']['current'] = 'Default'
+            fn.write_profile()
+            fn.write_config()
         self.refresh_profile_list()
         self.store['content']['settings']['profile_select'].setCurrentIndex(0)
+        var.settings['profile']['current'] = self.store['content']['settings']['profile_select'].currentText()
+        fn.read_profile()
 
     @pyqtSlot()
     def update_limits(self):
@@ -890,6 +896,12 @@ class MainWindow(QMainWindow):
                     self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
                 else:
                     self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
+                    var.status['rewrite']['profile'] = True
+                    self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
+                    if var.status['rewrite']['profile']:
+                        fn.write_profile()
+                        var.status['rewrite']['profile'] = False
                 self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
         except KeyError as error:
             print(error)

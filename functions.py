@@ -92,7 +92,7 @@ def read_profile(profile=None):
                     var.status['rewrite']['config'] = True
                 elif "GENERAL" in config: # assume 0.4.4b
                     ver = "v0.4.4b"
-                    response = ctypes.windll.user32.MessageBoxW(0, "The profile " + profile + ".ini being loaded does not have a self-identifying version. Click OK if you upgrading from 0.4.4b and only want to use 0.4.10b (or newer) going forward.\n\nNote: If you are not upgrading from 0.4.4b, this will also edit your current global config file.", "I5G Tools  -  Profile Translation Needed!", 1)
+                    response = ctypes.windll.user32.MessageBoxW(0, "The profile " + profile + ".ini being loaded does not have a self-identifying version. Click OK if you are upgrading from 0.4.4b and only want to use " + var.lang['version'] + " (or newer) going forward.\n\nNote: If you are not upgrading from 0.4.4b, this will also edit your current global config file.", "I5G Tools  -  Profile Translation Needed!", 1)
                     if response == 1:
                         pass
                     elif response == 2:
@@ -164,7 +164,11 @@ def read_profile(profile=None):
             text = var.lang['not_found']['profile']['intro'] + profile + var.lang['not_found']['profile']['outro']
             response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['not_found']['profile']['title'], 1)
             if response == 1:
-                pass
+                var.settings['profile']['current'] = 'Default'
+                var.status['first'] = True
+                read_profile()
+                var.status['first'] = False
+                return
             elif response == 2:
                 sys.exit(0)
         var.settings['profile']['current'] = 'Default'
@@ -227,12 +231,9 @@ def write_profile(profile=None):
 
 def delete_profile(profile):
     path = var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + profile + ".ini"
-    if profile in get_profiles() and len(get_profiles()) > 1:
+    if profile in get_profiles():
         if os.path.exists(path):
             os.remove(path)
-        if profile == var.settings['profile']['current']:
-            var.settings['profile']['current'] = 'Default'
-            write_config()
 
 def get_profiles():
     directory = var.settings['path'] + "\\" + var.settings['profile']['path']
@@ -337,12 +338,29 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
             with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + now + ".bak", 'w') as newfile:
                 file.write(newfile)
 
+            # check for any errors before starting the translation:
+            errors = []
+            for section in file.sections():
+                if not section.lower() in var.bindings and section.lower() != "general" and section.lower() != "bite_point" and section.lower() != "engine_warming":
+                    if not section in errors:
+                        errors.append(section)
+
+            if errors:
+                text = var.lang['section_errors']['profile']['intro']
+                for error in errors:
+                    text += error + "\n"
+                text += var.lang['section_errors']['profile']['outro']
+                response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['section_errors']['profile']['title'], 1)
+                if response == 1:
+                    pass
+                elif response == 2:
+                    sys.exit(0)
+
             var.settings['timer_loop'] = file['GENERAL']['timer_loop']
             var.settings['timer_first'] = file['GENERAL']['timer_first']
             # scale and axis samples could go here, but neither actually do anything
             var.status['rewrite']['config'] = True
 
-            # add label: "Unknown" to all binds, or "None" if guid == 0
             for section in file:
                 if section == "GENERAL":
                     var.settings['local']['version'] = var.lang['version']
@@ -356,24 +374,27 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
                         section_name = "throttle"
                     else:
                         section_name = section.lower()
-                    for item in file[section]:
-                        if item == "up" or item == "down" or item == "switch" or item == "pedal":
-                            bind = eval(file[section][item])
-                            guid = bind['guid']
-                            if guid == 0:
-                                var.bindings[section_name][item] = {"label": 'None', "guid": 0, "type": 'none', "num": 'none'}
-                            else:
-                                label = 'Unknown device'
-                                type = bind['type']
-                                num = bind['num']
-                                if item != "pedal" and type == 'axis':
-                                    var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "value": float(bind['value'])}
-                                elif type == 'hat':
-                                    var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "dir": bind['dir']}
+                    if not section in errors: # Skip all identified section errors that were OK'd
+                        for item in file[section]:
+                            if item == "up" or item == "down" or item == "switch" or item == "pedal":
+                                bind = eval(file[section][item])
+                                guid = bind['guid']
+                                if guid == 0:
+                                    var.bindings[section_name][item] = {"label": 'None', "guid": 0, "type": 'none', "num": 'none'}
                                 else:
-                                    var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num}
-                        else:
-                            var.settings[section_name][item] = file[section][item]
+                                    label = 'Unknown device'
+                                    type = bind['type']
+                                    num = bind['num']
+                                    if item != "pedal" and type == 'axis':
+                                        var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "value": float(bind['value'])}
+                                    elif item == "pedal":
+                                        var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "input": True}
+                                    elif type == 'hat':
+                                        var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "dir": bind['dir']}
+                                    else:
+                                        var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num}
+                            else:
+                                var.settings[section_name][item] = file[section][item]
                             
             var.status['rewrite']['profile'] = True
         else:
