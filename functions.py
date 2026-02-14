@@ -88,7 +88,8 @@ def read_profile(profile=None):
         if ver != var.lang['version']:
             if ver == "v0.4.Xb": # either 0.4.4b or 0.4.10b
                 if "LOCAL" in config: # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
-                    var.settings["LOCAL"][var.lang['version']]
+                    var.settings['version'] = var.lang['version']
+                    var.status['rewrite']['config'] = True
                 elif "GENERAL" in config: # assume 0.4.4b
                     ver = "v0.4.4b"
                     response = ctypes.windll.user32.MessageBoxW(0, "The profile " + profile + ".ini being loaded does not have a self-identifying version. Click OK if you upgrading from 0.4.4b and only want to use 0.4.10b (or newer) going forward.\n\nNote: If you are not upgrading from 0.4.4b, this will also edit your current global config file.", "I5G Tools  -  Profile Translation Needed!", 1)
