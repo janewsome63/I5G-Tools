@@ -3,7 +3,7 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.5.0b",
+    "version": "v0.5.1b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -80,6 +80,7 @@ lang = {
                     "Proceed?",
         },
     },
+    "settings_version": "v0.5.0b" # the version written down in the settings/global file, not necessarily equal to the program current version (to avoid breaking profile/global backwards compatibility unnecessarily)
 }
 
 step = {

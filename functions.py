@@ -17,12 +17,12 @@ def read_config():
         config.read(var.settings['path'] + "\\" + var.settings['config'])
 
         ver = check_ver(config, 'config')
-        if ver != var.lang['version']:
+        if ver != var.lang['settings_version']:
             if ver == "v0.4.Xb": # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
-                var.settings['version'] = var.lang['version']
+                var.settings['version'] = var.lang['settings_version']
                 var.status['rewrite']['config'] = True
-            # elif ver in var.lang['valid_versions']: # for the future, if/when the config file has changed between versions
-                # var.status['rewrite']['config'] = True
+            # elif ver in var.lang['compatible_versions']: # for the future, if/when the config file has changed between versions
+            #     var.status['rewrite']['config'] = True
             else: # if the version isn't valid, then something
                 #TODO
                 response = ctypes.windll.user32.MessageBoxW(0, "The config file " + var.settings['config'] + " has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -85,20 +85,21 @@ def read_profile(profile=None):
         config.read(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + profile + ".ini")
 
         ver = check_ver(config, 'profile')
-        if ver != var.lang['version']:
+        if ver != var.lang['settings_version']:
             if ver == "v0.4.Xb": # either 0.4.4b or 0.4.10b
                 if "LOCAL" in config: # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
-                    var.settings['version'] = var.lang['version']
+                    var.settings['version'] = var.lang['settings_version']
                     var.status['rewrite']['config'] = True
                 elif "GENERAL" in config: # assume 0.4.4b
                     ver = "v0.4.4b"
-                    response = ctypes.windll.user32.MessageBoxW(0, "The profile " + profile + ".ini being loaded does not have a self-identifying version. Click OK if you are upgrading from 0.4.4b and only want to use " + var.lang['version'] + " (or newer) going forward.\n\nNote: If you are not upgrading from 0.4.4b, this will also edit your current global config file.", "I5G Tools  -  Profile Translation Needed!", 1)
+                    response = ctypes.windll.user32.MessageBoxW(0, "The profile " + profile + ".ini being loaded does not have a self-identifying version. Click OK if you are upgrading from 0.4.4b and only want to use " + var.lang['settings_version'] + " (or newer) going forward.\n\nNote: If you are not upgrading from 0.4.4b, this will also edit your current global config file.", "I5G Tools  -  Profile Translation Needed!", 1)
                     if response == 1:
                         pass
                     elif response == 2:
                         sys.exit(0)
                     var.status['rewrite']['profile'] = True
-            # elif ver in var.lang['valid_versions']: # for the future, if/when the config file has changed between versions
+            # elif ver in var.lang['compatible_versions']: # for the future, if/when the config file has changed between versions
+            #     var.status['rewrite']['profile'] = True
             else: # if the version isn't valid, then something
                 #TODO
                 response = ctypes.windll.user32.MessageBoxW(0, "The profile file " + profile + ".ini has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -178,7 +179,7 @@ def write_config():
     config = parse.ConfigParser()
 
     config['GLOBAL'] = {}
-    config['GLOBAL']['version'] = var.lang['version']
+    config['GLOBAL']['version'] = var.lang['settings_version']
     for setting in var.settings:
         if not isinstance(var.settings[setting], dict):
             config['GLOBAL'][setting] = str(var.settings[setting])
@@ -206,7 +207,8 @@ def write_profile(profile=None):
     config = parse.ConfigParser()
 
     config['LOCAL'] = {}
-    config['LOCAL']['version'] = var.lang['version']
+    #config['LOCAL']['version'] = var.lang['version']
+    config['LOCAL']['version'] = var.lang['settings_version']
     for setting in var.settings['local']:
         config['LOCAL'][setting] = str(var.settings['local'][setting])
 
@@ -363,7 +365,7 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
 
             for section in file:
                 if section == "GENERAL":
-                    var.settings['local']['version'] = var.lang['version']
+                    var.settings['local']['version'] = var.lang['settings_version']
                     var.settings['local']['high_threshold'] = float(file[section]['high_threshold'])
                     var.settings['local']['low_threshold'] = float(file[section]['low_threshold'])
                     var.status['rewrite']['config'] = True
@@ -397,11 +399,20 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
                                 var.settings[section_name][item] = file[section][item]
                             
             var.status['rewrite']['profile'] = True
+        # elif ver in var.lang['compatible_versions']:
+        #     var.settings['local']['version'] = var.lang['settings_version']
+        #     var.status['rewrite']['config'] = True
         else:
+            response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong. Program closing", "I5G Tools  -  Translate Error 1!", 0)
+            if response == 1:
+                sys.exit(0)
             sys.exit(0)
 
         # else: # for when future versions change things
     else:
+        response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong. Program closing", "I5G Tools  -  Translate Error 2!", 0)
+        if response == 1:
+            sys.exit(0)
         sys.exit(0)
 
     if var.status['rewrite']['config']:
