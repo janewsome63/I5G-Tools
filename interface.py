@@ -9,9 +9,9 @@ import variables as var
 import vjoy
 from car_settings_list import car_settings
 from PyQt6.QtCore import (pyqtSlot, QSize, Qt, QThreadPool, QTimer)
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import (QIcon, QColor)
 from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayout, QLabel, QLCDNumber, QLineEdit,
-    QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget)
+    QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget, QScrollArea)
 from time import sleep
 
 # noinspection PyUnresolvedReferences,PyProtectedMember
@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
             applicationPath = "C:\\"
 
         self.store = {
-            "width": 626,
+            "width": 640,
             "height": 250,
             "running": False,
             "profile_busy": False,
@@ -56,12 +56,20 @@ class MainWindow(QMainWindow):
         for type in self.tabs['types']:
             for function in self.tabs['types'][type]:
                 self.tabs[function] = QWidget()
-                self.tabs['obj'].addTab(self.tabs[function], var.lang[function])
+                if function == "settings":
+                    self.settings_scroll = QScrollArea()
+                    self.settings_scroll.setWidgetResizable(True)
+                    self.settings_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+                    self.settings_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+                    self.settings_scroll.setWidget(self.tabs[function])
+                    self.tabs['obj'].addTab(self.settings_scroll, var.lang[function])
+                else:
+                    self.tabs['obj'].addTab(self.tabs[function], var.lang[function])
                 self.store['content'][function] = {}
                 if type == "adjustment" or type == "input":
                     self.tool_tabs(type, function)
                 elif type == "other":
-                    self.other_tabs(function)
+                    self.other_tabs(function)        
 
         self.layout.addWidget(self.tabs['obj'])
         self.setCentralWidget(self.tabs['obj'])
@@ -80,10 +88,24 @@ class MainWindow(QMainWindow):
         self.lastval = {
             'soc': 999.0,
             'deploy_lim': 999.0,
+            'IsOnTrack': False,
         }
 
         self.store['timer'].timeout.connect(self.updater)
         self.store['timer'].start(int((var.settings['frequency'] * 1000) / 10))
+
+        self.flashtimer = {}
+        self.default_tab_color = {}
+
+        for type in self.tabs['types']:
+            for function in self.tabs['types'][type]:
+                if type == "adjustment" or type == "input":
+                    if type == "input":
+                        controls = ("pedal", "up", "down", "switch")
+                    else:
+                        controls = ("up", "down", "switch")
+                    for control in controls:
+                        self.update_label(function, control)
 
         # for function in var.bindings:
         #     if function != "status":
@@ -375,11 +397,11 @@ class MainWindow(QMainWindow):
 
             self.store['content'][function]['scale'] = QComboBox()
             self.store['content'][function]['scale'].setFixedSize(70, 22)
-            self.store['content'][function]['scale'].addItem("0.50" + "x")
+            self.store['content'][function]['scale'].addItem("0.5" + "x")
             self.store['content'][function]['scale'].addItem("0.75" + "x")
-            self.store['content'][function]['scale'].addItem("1.00" + "x")
+            self.store['content'][function]['scale'].addItem("1.0" + "x")
             self.store['content'][function]['scale'].addItem("1.25" + "x")
-            self.store['content'][function]['scale'].addItem("1.50" + "x")
+            self.store['content'][function]['scale'].addItem("1.5" + "x")
             self.store['content'][function]['scale'].currentTextChanged.connect(self.scale)
 
             self.store['content'][function]['timer_first_label'] = QLabel()
@@ -443,6 +465,33 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['volume'].setRange(0, 100)
             self.store['content'][function]['volume'].valueChanged.connect(lambda: self.settings_set('volume'))
 
+            self.store['content'][function]['hybrid_low_label'] = QLabel()
+            self.store['content'][function]['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
+
+            self.store['content'][function]['hybrid_low_val'] = QSpinBox()
+            self.store['content'][function]['hybrid_low_val'].setFixedSize(70, 20)
+            self.store['content'][function]['hybrid_low_val'].setRange(0, 99)
+            self.store['content'][function]['hybrid_low_val'].setValue(int(var.settings['local']['hybrid_low_val']))
+            self.store['content'][function]['hybrid_low_val'].valueChanged.connect(lambda: self.settings_set('hybrid_low_val'))
+
+            self.store['content'][function]['hybrid_high_label'] = QLabel()
+            self.store['content'][function]['hybrid_high_label'].setText(var.lang['hybrid_high_label'])
+
+            self.store['content'][function]['hybrid_high_val'] = QSpinBox()
+            self.store['content'][function]['hybrid_high_val'].setFixedSize(70, 20)
+            self.store['content'][function]['hybrid_high_val'].setRange(1, 99)
+            self.store['content'][function]['hybrid_high_val'].setValue(int(var.settings['local']['hybrid_high_val']))
+            self.store['content'][function]['hybrid_high_val'].valueChanged.connect(lambda: self.settings_set('hybrid_high_val'))
+
+            self.store['content'][function]['hybrid_limit_label'] = QLabel()
+            self.store['content'][function]['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'])
+
+            self.store['content'][function]['hybrid_limit_val'] = QSpinBox()
+            self.store['content'][function]['hybrid_limit_val'].setFixedSize(70, 20)
+            self.store['content'][function]['hybrid_limit_val'].setRange(1, 100)
+            self.store['content'][function]['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
+            self.store['content'][function]['hybrid_limit_val'].valueChanged.connect(lambda: self.settings_set('hybrid_limit_val'))
+
         row, column = 0, 0
         for element in self.store['content'][function]:
             if element == "profile_create" or element == "profile_delete":
@@ -499,6 +548,14 @@ class MainWindow(QMainWindow):
             if self.store['content']['axes_display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
                 self.store['content']['axes_display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                 self.update_limits()
+            if self.ir['IsOnTrack'] != self.lastval['IsOnTrack'] and not self.lastval['IsOnTrack']:
+                self.store['running'] = False
+                var.status['calibration'] = "None"
+                var.bindings['status']['active'] = False
+                self.stop_flash_tab_all()
+                var.status['flash_tab'] = []
+            self.lastval['IsOnTrack'] = self.ir['IsOnTrack']
+            # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
         elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
             self.ir.shutdown()
             self.store['content']['axes_display']['car_id'] = "None"
@@ -513,16 +570,6 @@ class MainWindow(QMainWindow):
             self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
             self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
             self.update_limits()
-
-        for type in self.tabs['types']:
-            for function in self.tabs['types'][type]:
-                if type == "adjustment" or type == "input":
-                    if type == "input":
-                        controls = ("pedal", "up", "down", "switch")
-                    else:
-                        controls = ("up", "down", "switch")
-                    for control in controls:
-                        self.update_label(function, control)
 
     def display(self):
         for func in vjoy.axis_values:
@@ -584,14 +631,14 @@ class MainWindow(QMainWindow):
                 self.lastval['deploy_lim'] = 999.0
             if self.store['content']['settings']['sound'].currentText() == "Yes":
                 if self.lastval['soc'] != 999.0:
-                    if self.store['content']['hybrid']['soc_axis'].value() <= 0.10*100 < self.lastval['soc']: # make this adjustable later
+                    if self.store['content']['hybrid']['soc_axis'].value() <= var.settings['local']['hybrid_low_val'] < self.lastval['soc']:
                         print("call play low")
                         fn.start_thread(sfx.play('low'))
-                    if self.store['content']['hybrid']['soc_axis'].value() >= 0.90*100 > self.lastval['soc']: # make this adjustable later
+                    if self.store['content']['hybrid']['soc_axis'].value() >= var.settings['local']['hybrid_high_val'] > self.lastval['soc']:
                         print("call play high")
                         fn.start_thread(sfx.play('high'))
                 if self.lastval['deploy_lim'] != 999.0:
-                    if self.store['content']['hybrid']['deploy_lim_axis'].value() >= 1.0*100 > self.lastval['deploy_lim']: # make this adjustable later maybe?
+                    if self.store['content']['hybrid']['deploy_lim_axis'].value() >= var.settings['local']['hybrid_limit_val'] > self.lastval['deploy_lim']:
                         print("call play deploy limit")
                         fn.start_thread(sfx.play('limit'))
                 self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
@@ -605,26 +652,36 @@ class MainWindow(QMainWindow):
             print("Warning: calibrate()")
 
         vjoy.calibrate(self.store['axis'])
+        var.status['calibration'] += "Done"
         while self.store['running']:
             sleep(0.1)
         self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
         vjoy.set(self.store['axis'], self.store['pct'])
-        var.status['calibration'] = False
 
     @pyqtSlot()
     def calibrate_start(self, func):
-        self.store['axis'] = func
-        if not self.store['running']:
+        if not self.store['running'] and var.status['calibration'] == "None":
+            self.store['axis'] = func
             self.store['running'] = True
-            var.status['calibration'] = True
+            var.status['calibration'] = func
             sleep(0.1) #wait for loops to stop
             if not var.status[func]['switched']:
                 self.store['pct'] = var.status[func]['primary']
             elif var.status[func]['switched']:
                 self.store['pct'] = var.status[func]['secondary']
             self.store['thread_pool'].start(self.calibrate)
-        else:
+        elif func + "Done" == var.status['calibration']:
+            var.status['calibration'] = "None"
             self.store['running'] = False
+            if func in var.status['flash_tab']:
+                var.status['flash_tab'].remove(func)
+                self.stop_flash_tab(func)
+        elif var.status['calibration'] != "None":
+            func_pass = var.status['calibration']
+            for function in var.bindings:
+                if function + "Done" == func_pass:
+                    func_pass = function
+            self.start_flash_tab(func_pass)
 
     @pyqtSlot()
     def increment(self, func):
@@ -687,6 +744,9 @@ class MainWindow(QMainWindow):
         elif func == 'volume':
             var.settings['local']['volume'] = value/100
             fn.write_profile()
+        elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val":
+            var.settings['local'][func] = value
+            fn.write_config()
         else:
             var.settings[func] = value
             fn.write_config()
@@ -700,8 +760,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def bind(self):
-        self.store['running'] = True
-        var.bindings['status']['active'] = True
+        # self.store['running'] = True
         function = var.bindings['status']['function']
         control = var.bindings['status']['control']
         history.clear()
@@ -714,15 +773,16 @@ class MainWindow(QMainWindow):
             "num": 0,
             "value": None,
         }
-        var.bindings[function][control] = {}
-        while not var.bindings[function][control]:
-            if not self.store['running']:
-                var.bindings[function][control] = {"label": "None", "guid": 0, "type": "none", "num": 0}
+        var.potential_bind = {}
+        # var.bindings[function][control] = {}
+        while not var.potential_bind and var.bindings['status']['active']:
+            # if not self.store['running']:
+            #     var.potential_bind = {"label": "None", "guid": 0, "type": "none", "num": 0}
 
             if var.event['guid'] != 0:
                 if var.event['type'] == "button":
                     if var.event['value'] and not var.bindings['status']['input']:
-                        var.bindings[function][control] = {
+                        var.potential_bind = {
                             "label": "Unknown device",
                             "guid": var.event['guid'],
                             "type": var.event['type'],
@@ -730,7 +790,7 @@ class MainWindow(QMainWindow):
                         }
                 elif var.event['type'] == "axis":
                     if var.bindings['status']['input']:
-                        var.bindings[function][control] = {
+                        var.potential_bind = {
                             "label": "Unknown device",
                             "guid": var.event['guid'],
                             "type": var.event['type'],
@@ -739,7 +799,7 @@ class MainWindow(QMainWindow):
                         }
                     else:
                         if var.event['value'] >= var.settings['local']['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
-                            var.bindings[function][control] = {
+                            var.potential_bind = {
                             "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
@@ -747,7 +807,7 @@ class MainWindow(QMainWindow):
                                 "value": var.settings['local']['high_threshold']
                             }
                         if var.event['value'] <= var.settings['local']['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
-                            var.bindings[function][control] = {
+                            var.potential_bind = {
                             "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
@@ -756,7 +816,7 @@ class MainWindow(QMainWindow):
                             }
                 elif var.event['type'] == "hat":
                     if var.event['value'] != "none" and not var.bindings['status']['input']:
-                        var.bindings[function][control] = {
+                        var.potential_bind = {
                             "label": "Unknown device",
                             "guid": var.event['guid'],
                             "type": var.event['type'],
@@ -766,7 +826,7 @@ class MainWindow(QMainWindow):
                 elif var.event['type'] == "key" and var.event['value']:
                     if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
                         if var.event['value'] and not var.bindings['status']['input']:
-                            var.bindings[function][control] = {
+                            var.potential_bind = {
                                 "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
@@ -774,6 +834,9 @@ class MainWindow(QMainWindow):
                                 "value": var.event['value'],
                             }
             sleep(0.001)
+
+        if var.bindings['status']['active']: # for if binding is suddenly deactiviated due to driver getting in car, keep the last bind
+            var.bindings[function][control] = var.potential_bind
 
         self.store['index'][function][control]['bind'].setText(var.lang['bind'])
 
@@ -785,20 +848,33 @@ class MainWindow(QMainWindow):
             "control": None,
             "input": None,
         }
+        var.potential_bind = {}
         fn.write_profile()
-        self.store['running'] = False
+        # self.store['running'] = False
 
     @pyqtSlot()
     def bind_start(self, func, ctrl, input=False):
-        var.bindings['status'] = {
-            "function": func,
-            "control": ctrl,
-            "input": input,
-        }
-        if not self.store['running']:
+        if not var.bindings['status']['active']:
+            var.bindings['status'] = {
+                "active": True,
+                "function": func,
+                "control": ctrl,
+                "input": input,
+            }
             self.store['thread_pool'].start(self.bind)
+        elif func == var.bindings['status']['function'] and ctrl == var.bindings['status']['control'] and input == var.bindings['status']['input']:
+            var.potential_bind = {"label": "None", "guid": 0, "type": "none", "num": 0}
         else:
-            self.store['running'] = False
+            var.bindings['status']['active'] = False
+            # self.store['running'] = False
+            sleep(0.01) # race condition, potentially
+            var.bindings['status'] = {
+                "active": True,
+                "function": func,
+                "control": ctrl,
+                "input": input,
+            }
+            self.store['thread_pool'].start(self.bind)
 
     @pyqtSlot()
     def refresh_profile_list(self):
@@ -942,6 +1018,37 @@ class MainWindow(QMainWindow):
         else:
             self.store['content']['settings']['sound'].setCurrentText('No')
         self.store['content']['settings']['volume'].setValue(int(var.settings['local']['volume']*100))
+
+    @pyqtSlot()
+    def start_flash_tab(self, func):
+        if not func in var.status['flash_tab']:
+            var.status['flash_tab'].append(func)
+            index = self.tabs['obj'].indexOf(self.tabs[func])
+            self.default_tab_color = self.tabs['obj'].tabBar().tabTextColor(index)
+            self.tabs['obj'].tabBar().setTabTextColor(index, QColor("red"))
+            self.flashtimer[func] = QTimer()
+            self.flashtimer[func].timeout.connect(lambda: self.alt_flash(index))
+            self.flashtimer[func].start(250)
+
+    @pyqtSlot()
+    def stop_flash_tab(self, func):
+        self.flashtimer[func].stop()
+        index = self.tabs['obj'].indexOf(self.tabs[func])
+        self.default_tab_color = self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+
+    @pyqtSlot()
+    def stop_flash_tab_all(self):
+        for func in var.status['flash_tab']:
+            self.flashtimer[func].stop()
+            index = self.tabs['obj'].indexOf(self.tabs[func])
+            self.default_tab_color = self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+
+    @pyqtSlot()
+    def alt_flash(self, index):
+        if self.tabs['obj'].tabBar().tabTextColor(index) == self.default_tab_color:
+                self.tabs['obj'].tabBar().setTabTextColor(index, QColor("red"))
+        else:
+            self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])

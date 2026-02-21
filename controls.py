@@ -16,7 +16,7 @@ def controls():
             else:
                 value = None
 
-            if not var.status['calibration'] and not var.bindings['status']['active']:
+            if var.status['calibration'] == "None" and not var.bindings['status']['active']:
                 bind = var.bindings[function][control]
                 if control == "pedal":
                     pedal(function, value)
@@ -91,7 +91,7 @@ def increment(bind, function, control):
             count = 1
             #print("count check1: ", count)
             timer = var.settings['timer_first']/1000
-            while check_pressed(bind) and not var.status['calibration'] and not var.bindings['status']['active']:
+            while check_pressed(bind) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
                 if count % interval == 0:
                     #print("count check2: ", count, var.status[function]['switched'])
                     #print("continuous loop")
@@ -107,7 +107,7 @@ def increment(bind, function, control):
                 sleep(timer/interval)
                 count += 1
         else:
-            while check_pressed(bind) and not var.status['calibration'] and not var.bindings['status']['active']:
+            while check_pressed(bind) and var.status['calibration']== "None" and not var.bindings['status']['active']:
                 sleep(var.settings['timer_first']/(1000*interval))
     #else:
         #print("bind check_pressed failed: ", bind)
@@ -123,7 +123,7 @@ def switch(bind, function):
             var.status[function]['switched'] = True
             vjoy.set(function, var.status[function]['secondary'])
 
-        while check_pressed(bind) and not var.bindings['status']['active'] and not var.status['calibration']:
+        while check_pressed(bind) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
             sleep(0.05)
 
         if not var.settings[function]['toggle']:

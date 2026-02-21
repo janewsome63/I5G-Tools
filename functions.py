@@ -12,6 +12,7 @@ from time import sleep
 import datetime
 
 def read_config():
+    print("read_config() start")
     if os.path.exists(var.settings['path'] + "\\" + var.settings['config']):
         config = parse.ConfigParser()
         config.read(var.settings['path'] + "\\" + var.settings['config'])
@@ -23,6 +24,9 @@ def read_config():
                 var.status['rewrite']['config'] = True
             # elif ver in var.lang['compatible_versions']: # for the future, if/when the config file has changed between versions
             #     var.status['rewrite']['config'] = True
+            elif ver == "v0.5.0b":
+                var.settings['version'] = var.lang['settings_version']
+                var.status['rewrite']['config'] = True
             else: # if the version isn't valid, then something
                 #TODO
                 response = ctypes.windll.user32.MessageBoxW(0, "The config file " + var.settings['config'] + " has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -71,6 +75,7 @@ def read_config():
     read_profile()
 
 def read_profile(profile=None):
+    print("read_profile() start")
     if not get_profiles():
         var.settings['profile']['current'] = "Default"
 
@@ -100,6 +105,9 @@ def read_profile(profile=None):
                     var.status['rewrite']['profile'] = True
             # elif ver in var.lang['compatible_versions']: # for the future, if/when the config file has changed between versions
             #     var.status['rewrite']['profile'] = True
+            elif ver == "v0.5.0b":
+                var.settings['version'] = var.lang['settings_version']
+                # var.status['rewrite']['profile'] = True
             else: # if the version isn't valid, then something
                 #TODO
                 response = ctypes.windll.user32.MessageBoxW(0, "The profile file " + profile + ".ini has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -116,7 +124,8 @@ def read_profile(profile=None):
         for section in config.sections():
             for item in config[section]:
                 if item == 'version':
-                    setting = config[section][item]
+                    # setting = config[section][item]
+                    setting = var.lang['settings_version']
                 else:
                     setting = eval(config[section][item])
                 if section == "LOCAL":
@@ -174,7 +183,7 @@ def read_profile(profile=None):
                 sys.exit(0)
         var.settings['profile']['current'] = 'Default'
         write_profile()
-
+    print("read_profile() end")
 def write_config():
     config = parse.ConfigParser()
 
@@ -201,6 +210,7 @@ def write_config():
         config.write(file)
         
 def write_profile(profile=None):
+    print("write_profile() start")
     if not profile:
         profile = var.settings['profile']['current']
 
@@ -230,7 +240,7 @@ def write_profile(profile=None):
     with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + profile + ".ini", 'w') as file:
         # noinspection PyTypeChecker
         config.write(file)
-
+    print("write_profile() end")
 def delete_profile(profile):
     path = var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + profile + ".ini"
     if profile in get_profiles():
@@ -403,14 +413,14 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
         #     var.settings['local']['version'] = var.lang['settings_version']
         #     var.status['rewrite']['config'] = True
         else:
-            response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong. Program closing", "I5G Tools  -  Translate Error 1!", 0)
+            response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong in fn.translate(). Error Code 1. Program closing", "I5G Tools  -  Translate Error 1!", 0)
             if response == 1:
                 sys.exit(0)
             sys.exit(0)
 
         # else: # for when future versions change things
     else:
-        response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong. Program closing", "I5G Tools  -  Translate Error 2!", 0)
+        response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong in fn.translate(). Error Code 2. Program closing", "I5G Tools  -  Translate Error 2!", 0)
         if response == 1:
             sys.exit(0)
         sys.exit(0)

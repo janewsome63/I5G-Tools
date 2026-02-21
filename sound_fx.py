@@ -17,7 +17,7 @@ if not os.path.exists(var.settings['path'] + "\\" + var.settings['sound']['path'
     os.mkdir(var.settings['path'] + "\\" + var.settings['sound']['path'])
 
 for sound in var.settings['sound']:
-    if sound != "path":
+    if sound != "path" and "val" not in sound:
         source = resources + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound'][sound]
         sounds[sound] = var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound'][sound]
         if not os.path.exists(sounds[sound]):

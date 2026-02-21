@@ -3,7 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.5.1b",
+    "version": "v0.5.2b",
+    "settings_version": "v0.5.2b", # the version written down in the settings/global file, not necessarily equal to the program current version (to avoid breaking profile/global backwards compatibility unnecessarily)
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -47,6 +48,9 @@ lang = {
     "hybrid": "Hybrid",
     "sound_label": "Sound:",
     "volume_label": "Volume:",
+    "hybrid_low_label": "SoC Low Trigger:",
+    "hybrid_high_label": "SoC High Trigger:",
+    "hybrid_limit_label": "Deploy Limit Trigger:",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",
@@ -80,7 +84,6 @@ lang = {
                     "Proceed?",
         },
     },
-    "settings_version": "v0.5.0b" # the version written down in the settings/global file, not necessarily equal to the program current version (to avoid breaking profile/global backwards compatibility unnecessarily)
 }
 
 step = {
@@ -262,6 +265,9 @@ settings = {
         "low_threshold": 0.10,
         "audio": False,
         "volume": 0.5,
+        "hybrid_low_val": 10,
+        "hybrid_high_val": 90,
+        "hybrid_limit_val": 100,
     },
 
     "weight_jacker": {
@@ -303,7 +309,7 @@ settings = {
 }
 
 status = {
-    "calibration": False,
+    "calibration": "None",
     "devices_loaded": False,
     "key_prev": None,
     "profile_prev": "None",
@@ -313,6 +319,7 @@ status = {
         "config": False,
         "profile": False,
     },
+    "flash_tab": [],
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,
@@ -419,3 +426,5 @@ backend = {
 }
 
 profile_list = []
+
+potential_bind = {}
