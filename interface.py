@@ -9,7 +9,7 @@ import variables as var
 import vjoy
 from car_settings_list import car_settings
 from PyQt6.QtCore import (pyqtSlot, QSize, Qt, QThreadPool, QTimer)
-from PyQt6.QtGui import (QIcon, QColor)
+from PyQt6.QtGui import (QIcon, QColor, QWheelEvent)
 from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayout, QLabel, QLCDNumber, QLineEdit,
     QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget, QScrollArea)
 from time import sleep
@@ -158,14 +158,14 @@ class MainWindow(QMainWindow):
         self.store['content'][function]['switch_value_label'].setText(var.lang['switch_value'])
         self.store['content'][function]['switch_value_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        self.store['content'][function]['increment'] = QDoubleSpinBox()
+        self.store['content'][function]['increment'] = CustomDoubleSpinBox()
         self.store['content'][function]['increment'].setFixedSize(70, 25)
         self.store['content'][function]['increment'].setRange(local_store['range']['increment'][0], local_store['range']['increment'][1])
         self.store['content'][function]['increment'].setDecimals(local_store['decimals'])
         self.store['content'][function]['increment'].setSingleStep(local_store['step'])
         self.store['content'][function]['increment'].valueChanged.connect(lambda: self.increment(function))
 
-        self.store['content'][function]['switch'] = QDoubleSpinBox()
+        self.store['content'][function]['switch'] = CustomDoubleSpinBox()
         self.store['content'][function]['switch'].setFixedSize(70, 25)
         self.store['content'][function]['switch'].setRange(local_store['range']['switch'][0], local_store['range']['switch'][1])
         self.store['content'][function]['switch'].setDecimals(local_store['decimals'])
@@ -179,12 +179,12 @@ class MainWindow(QMainWindow):
         self.store['content'][function]['switch_mode_label'].setText(var.lang['switch_mode'])
         self.store['content'][function]['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
-        self.store['content'][function]['increment_mode'] = QComboBox()
+        self.store['content'][function]['increment_mode'] = CustomComboBox()
         self.store['content'][function]['increment_mode'].setFixedSize(100, 25)
         self.store['content'][function]['increment_mode'].addItems((var.lang['continuous'], var.lang['single']))
         self.store['content'][function]['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode(function))
 
-        self.store['content'][function]['switch_mode'] = QComboBox()
+        self.store['content'][function]['switch_mode'] = CustomComboBox()
         self.store['content'][function]['switch_mode'].setFixedSize(70, 25)
         self.store['content'][function]['switch_mode'].addItems((var.lang['hold'], var.lang['toggle']))
         self.store['content'][function]['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode(function))
@@ -369,7 +369,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['high_threshold_label'] = QLabel()
             self.store['content'][function]['high_threshold_label'].setText(var.lang['high_threshold'])
 
-            self.store['content'][function]['high_threshold'] = QSpinBox()
+            self.store['content'][function]['high_threshold'] = CustomSpinBox()
             self.store['content'][function]['high_threshold'].setFixedSize(60, 20)
             self.store['content'][function]['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
             self.store['content'][function]['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
@@ -378,7 +378,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['low_threshold_label'] = QLabel()
             self.store['content'][function]['low_threshold_label'].setText(var.lang['low_threshold'])
 
-            self.store['content'][function]['low_threshold'] = QSpinBox()
+            self.store['content'][function]['low_threshold'] = CustomSpinBox()
             self.store['content'][function]['low_threshold'].setFixedSize(60, 20)
             self.store['content'][function]['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
             self.store['content'][function]['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
@@ -395,7 +395,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['scale_label'] = QLabel()
             self.store['content'][function]['scale_label'].setText(var.lang['scale'])
 
-            self.store['content'][function]['scale'] = QComboBox()
+            self.store['content'][function]['scale'] = CustomComboBox()
             self.store['content'][function]['scale'].setFixedSize(70, 22)
             self.store['content'][function]['scale'].addItem("0.5" + "x")
             self.store['content'][function]['scale'].addItem("0.75" + "x")
@@ -407,7 +407,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['timer_first_label'] = QLabel()
             self.store['content'][function]['timer_first_label'].setText(var.lang['timer_first'])
 
-            self.store['content'][function]['timer_first'] = QSpinBox()
+            self.store['content'][function]['timer_first'] = CustomSpinBox()
             self.store['content'][function]['timer_first'].setFixedSize(70, 20)
             self.store['content'][function]['timer_first'].setRange(1, 1000)
             self.store['content'][function]['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
@@ -415,7 +415,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['timer_loop_label'] = QLabel()
             self.store['content'][function]['timer_loop_label'].setText(var.lang['timer_loop'])
 
-            self.store['content'][function]['timer_loop'] = QSpinBox()
+            self.store['content'][function]['timer_loop'] = CustomSpinBox()
             self.store['content'][function]['timer_loop'].setFixedSize(70, 20)
             self.store['content'][function]['timer_loop'].setRange(1, 1000)
             self.store['content'][function]['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
@@ -435,7 +435,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['profile_select_label'] = QLabel()
             self.store['content'][function]['profile_select_label'].setText(var.lang['profile_select'])
 
-            self.store['content'][function]['profile_select'] = QComboBox()
+            self.store['content'][function]['profile_select'] = CustomComboBox()
             self.store['content'][function]['profile_select'].setFixedSize(100, 25)
             self.store['content'][function]['profile_select'].addItem(var.settings['profile']['current'])
             self.store['content'][function]['profile_select'].setCurrentText(var.settings['profile']['current'])
@@ -450,7 +450,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['sound_label'] = QLabel()
             self.store['content'][function]['sound_label'].setText(var.lang['sound_label'])
 
-            self.store['content'][function]['sound'] = QComboBox()
+            self.store['content'][function]['sound'] = CustomComboBox()
             self.store['content'][function]['sound'].setFixedSize(200, 25)
             self.store['content'][function]['sound'].addItem("Yes")
             self.store['content'][function]['sound'].addItem("No")
@@ -460,7 +460,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['volume_label'] = QLabel()
             self.store['content'][function]['volume_label'].setText(var.lang['volume_label'])
 
-            self.store['content'][function]['volume'] = QSpinBox()
+            self.store['content'][function]['volume'] = CustomSpinBox()
             self.store['content'][function]['volume'].setFixedSize(70, 25)
             self.store['content'][function]['volume'].setRange(0, 100)
             self.store['content'][function]['volume'].valueChanged.connect(lambda: self.settings_set('volume'))
@@ -468,7 +468,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['hybrid_low_label'] = QLabel()
             self.store['content'][function]['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
 
-            self.store['content'][function]['hybrid_low_val'] = QSpinBox()
+            self.store['content'][function]['hybrid_low_val'] = CustomSpinBox()
             self.store['content'][function]['hybrid_low_val'].setFixedSize(70, 20)
             self.store['content'][function]['hybrid_low_val'].setRange(0, 99)
             self.store['content'][function]['hybrid_low_val'].setValue(int(var.settings['local']['hybrid_low_val']))
@@ -477,7 +477,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['hybrid_high_label'] = QLabel()
             self.store['content'][function]['hybrid_high_label'].setText(var.lang['hybrid_high_label'])
 
-            self.store['content'][function]['hybrid_high_val'] = QSpinBox()
+            self.store['content'][function]['hybrid_high_val'] = CustomSpinBox()
             self.store['content'][function]['hybrid_high_val'].setFixedSize(70, 20)
             self.store['content'][function]['hybrid_high_val'].setRange(1, 99)
             self.store['content'][function]['hybrid_high_val'].setValue(int(var.settings['local']['hybrid_high_val']))
@@ -486,7 +486,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['hybrid_limit_label'] = QLabel()
             self.store['content'][function]['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'])
 
-            self.store['content'][function]['hybrid_limit_val'] = QSpinBox()
+            self.store['content'][function]['hybrid_limit_val'] = CustomSpinBox()
             self.store['content'][function]['hybrid_limit_val'].setFixedSize(70, 20)
             self.store['content'][function]['hybrid_limit_val'].setRange(1, 100)
             self.store['content'][function]['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
@@ -746,7 +746,7 @@ class MainWindow(QMainWindow):
             fn.write_profile()
         elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val":
             var.settings['local'][func] = value
-            fn.write_config()
+            fn.write_profile()
         else:
             var.settings[func] = value
             fn.write_config()
@@ -1049,6 +1049,18 @@ class MainWindow(QMainWindow):
                 self.tabs['obj'].tabBar().setTabTextColor(index, QColor("red"))
         else:
             self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+
+class CustomComboBox(QComboBox):
+    def wheelEvent(self ,event: QWheelEvent):
+        event.ignore()
+
+class CustomSpinBox(QSpinBox):
+    def wheelEvent(self, event: QWheelEvent):
+        event.ignore()
+
+class CustomDoubleSpinBox(QDoubleSpinBox):
+    def wheelEvent(self, event: QWheelEvent):
+        event.ignore()
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])
