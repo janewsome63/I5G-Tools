@@ -121,8 +121,8 @@ def device_detection():
 
     for i in range(p.joystick.get_count()):
         add_device(i, True)
-
     var.status['devices_loaded'] = True
+    var.status['refresh_labels'] = True
     running = True
     p.event.wait(1000)
     p.event.clear()
@@ -132,9 +132,10 @@ def device_detection():
                 running = False
             if e.type == p.JOYDEVICEADDED:
                 add_device(e.device_index, False)
+                var.status['refresh_labels'] = True
             elif e.type == p.JOYDEVICEREMOVED:
                 remove_device(e.instance_id)
-
+                var.status['refresh_labels'] = True
             if e.type == p.JOYBUTTONDOWN:
                 log_event(e.joy, "button", e.button, True)
                 fn.start_thread(con.controls)

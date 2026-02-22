@@ -3,7 +3,7 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.5.3b",
+    "version": "v0.5.4b",
     "settings_version": "v0.5.2b", # the version written down in the settings/global file, not necessarily equal to the program current version (to avoid breaking profile/global backwards compatibility unnecessarily)
     "pedal": "Pedal Axis:",
     "up": "Increase:",
@@ -24,7 +24,7 @@ lang = {
     "high_threshold": "High Axis Threshold:",
     "low_threshold": "Low Axis Threshold:",
     # "axis_samples": "Number of Axis Samples:",
-    "scale": "Scale Factor:",
+    "scale": "Scale Factor (Requires Restart):",
     "timer_loop": "Continuous Mode Loop Timer (in ms):",
     "timer_first": "Continuous Mode Initial Loop Timer (in ms)",
     "none": "None",
@@ -315,11 +315,13 @@ status = {
     "profile_prev": "None",
     "profile_list": [],
     "first": False,
+    "refresh_labels": False,
     "rewrite":{
         "config": False,
         "profile": False,
     },
     "flash_tab": [],
+    "set_list_count": 1,
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,

@@ -441,6 +441,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['profile_select'].setCurrentText(var.settings['profile']['current'])
             self.store['content'][function]['profile_select'].activated.connect(lambda: self.refresh_profile_list())
             self.store['content'][function]['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content'][function]['profile_select'].currentText()))
+            # self.store['content'][function]['profile_select'].highlighted.connect(lambda: self.refresh_profile_list()) # This causes a recusion error in v0.5.4b?? Is this an Apollo Error 62 situation?
 
             self.store['content'][function]['profile_delete'] = QPushButton()
             self.store['content'][function]['profile_delete'].setFixedSize(100, 25)
@@ -570,6 +571,9 @@ class MainWindow(QMainWindow):
             self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
             self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
             self.update_limits()
+        if var.status['refresh_labels']:
+            self.update_label_all()
+            var.status['refresh_labels'] = False
 
     def display(self):
         for func in vjoy.axis_values:
@@ -643,6 +647,12 @@ class MainWindow(QMainWindow):
                         fn.start_thread(sfx.play('limit'))
                 self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
                 self.lastval['deploy_lim'] = self.store['content']['hybrid']['deploy_lim_axis'].value()
+        if var.status['set_list_count'] % 50 == 0:
+            self.refresh_profile_list()
+            var.status['set_list_count'] = 1
+        else:
+            var.status['set_list_count'] += 1
+        
 
     @pyqtSlot()
     def calibrate(self):
@@ -980,7 +990,16 @@ class MainWindow(QMainWindow):
                         var.status['rewrite']['profile'] = False
                 self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
         except KeyError as error:
-            print(error)
+            print("in update_label(func,ctrl): ", error)
+    
+    def update_label_all(self):
+        try:
+            for function in var.bindings:
+                if function != "status":
+                    for control in var.bindings[function]:
+                        self.update_label(function, control)
+        except KeyError as error:
+            print("in update_label_all(): ", error)
 
     @pyqtSlot()
     def apply_settings(self, file):
