@@ -13,6 +13,7 @@ from PyQt6.QtGui import (QIcon, QColor, QWheelEvent)
 from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayout, QLabel, QLCDNumber, QLineEdit,
     QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget, QScrollArea)
 from time import sleep
+import math
 
 # noinspection PyUnresolvedReferences,PyProtectedMember
 class MainWindow(QMainWindow):
@@ -89,6 +90,16 @@ class MainWindow(QMainWindow):
             'soc': 999.0,
             'deploy_lim': 999.0,
             'IsOnTrack': False,
+            'OnPitLane': False,
+            'CarIdx': -1,
+            'SessionTick': -1,
+            'Throttle': -1,
+            'Gear': -1,
+            'Brake': -1,
+            'Clutch': -1,
+            'RPM': -1,
+            'Speed': 0,
+            'IsOnTrack_beep': False,
         }
 
         self.store['timer'].timeout.connect(self.updater)
@@ -493,6 +504,67 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
             self.store['content'][function]['hybrid_limit_val'].valueChanged.connect(lambda: self.settings_set('hybrid_limit_val'))
 
+            self.store['content'][function]['upshift_beep_label'] = QLabel()
+            self.store['content'][function]['upshift_beep_label'].setText(var.lang['upshift_beep'])
+
+            self.store['content'][function]['upshift_beep'] = CustomComboBox()
+            self.store['content'][function]['upshift_beep'].setFixedSize(200, 25)
+            self.store['content'][function]['upshift_beep'].addItem("Yes")
+            self.store['content'][function]['upshift_beep'].addItem("No")
+            self.store['content'][function]['upshift_beep'].setCurrentText(str(var.settings['local']['upshift_beep']))
+            self.store['content'][function]['upshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('upshift_beep'))
+
+            self.store['content'][function]['downshift_beep_label'] = QLabel()
+            self.store['content'][function]['downshift_beep_label'].setText(var.lang['downshift_beep'])
+
+            self.store['content'][function]['downshift_beep'] = CustomComboBox()
+            self.store['content'][function]['downshift_beep'].setFixedSize(200, 25)
+            self.store['content'][function]['downshift_beep'].addItem("Yes")
+            self.store['content'][function]['downshift_beep'].addItem("No")
+            self.store['content'][function]['downshift_beep'].setCurrentText(str(var.settings['local']['downshift_beep']))
+            self.store['content'][function]['downshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('downshift_beep'))
+
+            self.store['content'][function]['beep_mode_label'] = QLabel()
+            self.store['content'][function]['beep_mode_label'].setText(var.lang['beep_mode'])
+
+            self.store['content'][function]['beep_mode'] = CustomComboBox()
+            self.store['content'][function]['beep_mode'].setFixedSize(200, 25)
+            self.store['content'][function]['beep_mode'].addItem("Fixed")
+            # self.store['content'][function]['beep_mode'].addItem("Dynamic")
+            self.store['content'][function]['beep_mode'].setCurrentText(str(var.settings['local']['beep_mode']))
+            self.store['content'][function]['beep_mode'].currentIndexChanged.connect(lambda: self.settings_set('beep_mode'))
+
+            #dynamic mode offset
+            self.store['content'][function]['dynamic_mode_offset_label'] = QLabel()
+            self.store['content'][function]['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset'])
+
+            self.store['content'][function]['dynamic_mode_offset'] = CustomSpinBox()
+            self.store['content'][function]['dynamic_mode_offset'].setFixedSize(70, 20)
+            self.store['content'][function]['dynamic_mode_offset'].setRange(-10000, 10000)
+            self.store['content'][function]['dynamic_mode_offset'].setValue(int(var.settings['local']['dynamic_mode_offset']))
+            self.store['content'][function]['dynamic_mode_offset'].valueChanged.connect(lambda: self.settings_set('dynamic_mode_offset'))
+
+            #upshift offset
+            self.store['content'][function]['upshift_offset_label'] = QLabel()
+            self.store['content'][function]['upshift_offset_label'].setText(var.lang['upshift_offset'])
+
+            self.store['content'][function]['upshift_offset'] = CustomSpinBox()
+            self.store['content'][function]['upshift_offset'].setFixedSize(70, 20)
+            self.store['content'][function]['upshift_offset'].setRange(-10000, 10000)
+            self.store['content'][function]['upshift_offset'].setValue(int(var.settings['local']['upshift_offset']))
+            self.store['content'][function]['upshift_offset'].valueChanged.connect(lambda: self.settings_set('upshift_offset'))
+
+            #downshift offset
+            self.store['content'][function]['downshift_offset_label'] = QLabel()
+            self.store['content'][function]['downshift_offset_label'].setText(var.lang['downshift_offset'])
+
+            self.store['content'][function]['downshift_offset'] = CustomSpinBox()
+            self.store['content'][function]['downshift_offset'].setFixedSize(70, 20)
+            self.store['content'][function]['downshift_offset'].setRange(-10000, 10000)
+            self.store['content'][function]['downshift_offset'].setValue(int(var.settings['local']['downshift_offset']))
+            self.store['content'][function]['downshift_offset'].valueChanged.connect(lambda: self.settings_set('downshift_offset'))
+
+
         row, column = 0, 0
         for element in self.store['content'][function]:
             if element == "profile_create" or element == "profile_delete":
@@ -501,7 +573,7 @@ class MainWindow(QMainWindow):
                 self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
             if element != "profile_create_name" and element != "profile_select":
                 column += 1
-                if function == "settings":
+                if function == "settings" or function == "rpm":
                     if column > 1:
                         column = 0
                         row += 1
@@ -541,6 +613,8 @@ class MainWindow(QMainWindow):
             length = len(self.ir['DriverInfo']['Drivers'])
             index = length-1
             check = True
+            if self.lastval['CarIdx'] in self.ir['DriverInfo']['Drivers'] and self.lastval['CarIdx'] == self.ir['DriverInfo']['Drivers']:
+                check = False
             while index >= 0 and check:
                 if self.ir['DriverInfo']['Drivers'][index]['CarIdx'] == self.ir['PlayerCarIdx']:
                     check = False
@@ -549,6 +623,8 @@ class MainWindow(QMainWindow):
             if self.store['content']['axes_display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
                 self.store['content']['axes_display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                 self.update_limits()
+            if self.lastval['CarIdx'] != index:
+                self.lastval['CarIdx'] = index
             if self.ir['IsOnTrack'] != self.lastval['IsOnTrack'] and not self.lastval['IsOnTrack']:
                 self.store['running'] = False
                 var.status['calibration'] = "None"
@@ -556,6 +632,17 @@ class MainWindow(QMainWindow):
                 self.stop_flash_tab_all()
                 var.status['flash_tab'] = []
             self.lastval['IsOnTrack'] = self.ir['IsOnTrack']
+            if self.lastval['CarIdx'] in car_settings and 'limiter' in car_settings[self.lastval['CarIdx']]: # if limiter in car_settings, save limiter minus settings offset for up and down
+                var.status['upshift_val'] = car_settings[self.lastval['CarIdx']]['limiter'] - var.settings['local']['upshift_offset']
+                var.status['downshift_val'] = car_settings[self.lastval['CarIdx']]['limiter'] - var.settings['local']['downshift_offset']
+            else:
+                try:
+                    var.status['upshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['upshift_offset']
+                    var.status['downshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['downshift_offset']
+                except:
+                    print("upshift and downshift values failed in updater()")
+            if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'])):
+                self.shift_beep()
             # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
         elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
             self.ir.shutdown()
@@ -571,6 +658,7 @@ class MainWindow(QMainWindow):
             self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
             self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
             self.update_limits()
+            var.gearing = []
         if var.status['refresh_labels']:
             self.update_label_all()
             var.status['refresh_labels'] = False
@@ -732,7 +820,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def settings_set(self, func):
-        if func == 'sound':
+        if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode':
             value = self.store['content']['settings'][func].currentText()
         else:
             value = self.store['content']['settings'][func].value()
@@ -748,13 +836,19 @@ class MainWindow(QMainWindow):
                 fn.reset_bind_thresh(func, value/100)
                 var.settings['local'][func] = value/100
                 fn.write_profile()
-        elif func == 'sound':
+        if func == 'sound':
             var.settings['local']['audio'] = (value == "Yes")
+            fn.write_profile()
+        elif func == 'upshift_beep' or func == 'downshift_beep':
+            var.settings['local'][func] = (value == "Yes")
+            fn.write_profile()
+        elif func == 'beep_mode':
+            var.settings['local']['beep_mode'] = (value == "Fixed")
             fn.write_profile()
         elif func == 'volume':
             var.settings['local']['volume'] = value/100
             fn.write_profile()
-        elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val":
+        elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val" or func == "dynamic_mode_offset" or func == "upshift_offset" or func == "downshift_offset":
             var.settings['local'][func] = value
             fn.write_profile()
         else:
@@ -1068,6 +1162,74 @@ class MainWindow(QMainWindow):
                 self.tabs['obj'].tabBar().setTabTextColor(index, QColor("red"))
         else:
             self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+
+    @pyqtSlot()
+    def shift_beep(self):
+        # print("shift_beep() start")
+        if self.lastval['SessionTick'] != self.ir['SessionTick']: # if the information is not new, do nothing because there is no new information
+            # ideally would copy a snapshot of self.ir at this moment to make sure all the information is from the same set, but this is probably close enough
+            self.lastval['IsOnTrack_beep'] = self.ir['IsOnTrack']
+            self.lastval['OnPitRoad'] = self.ir['OnPitRoad']
+            self.lastval['Throttle'] = self.ir['Throttle']
+            self.lastval['Brake'] = self.ir['Brake']
+            self.lastval['Clutch'] = self.ir['Clutch']
+            self.lastval['Gear'] = self.ir['Gear']
+            self.lastval['RPM'] = self.ir['RPM']
+            self.lastval['Speed'] = self.ir['Speed']
+            if self.lastval['Speed'] == 0:
+                self.lastval['RPM/Speed'] = 0
+            else:
+                self.lastval['RPM/Speed'] = self.lastval['RPM']/self.lastval['Speed']
+            if self.lastval['IsOnTrack_beep'] and not self.lastval['OnPitRoad'] and self.lastval['Throttle'] == 1.0 and self.lastval['Brake'] == 0.0 and self.lastval['Clutch'] == 1.0 and self.lastval['Gear'] > 0: # update RPM to gear guesses
+                if len(var.gearing) < self.lastval['Gear']:
+                    ind = 0
+                    while ind <= self.lastval['Gear']:
+                        if len(var.gearing) < ind:
+                            var.gearing.append([])
+                        ind += 1
+                # print(self.lastval['Gear'], len(var.gearing))
+                if var.gearing[self.lastval['Gear']-1] == [] or var.gearing[self.lastval['Gear']-1][0] == 0:
+                    var.gearing[self.lastval['Gear']-1] = [1, self.lastval['RPM/Speed'], 0.0]
+                else:
+                    if var.gearing[self.lastval['Gear']-1][0] < 1:
+                        print("WARNING: something with sample count in shift_beep() has gone wrong, number of samples is below 1")
+                    std_dev = math.sqrt(var.gearing[self.lastval['Gear']-1][2])
+                    old_avg = var.gearing[self.lastval['Gear']-1][1]
+                    # print(self.lastval['RPM/Speed'])
+                    if var.gearing[self.lastval['Gear']-1][0] < 10 or abs(self.lastval['RPM/Speed'] - old_avg) < std_dev*3:
+                        var.gearing[self.lastval['Gear']-1][0] += 1 # update number of samples
+                        var.gearing[self.lastval['Gear']-1][1] += (self.lastval['RPM/Speed']-var.gearing[self.lastval['Gear']-1][1])/(var.gearing[self.lastval['Gear']-1][0]) # update average
+                        var.gearing[self.lastval['Gear']-1][2] *= var.gearing[self.lastval['Gear']-1][0]-2 # update std dev, in 3 parts
+                        var.gearing[self.lastval['Gear']-1][2] += (self.lastval['RPM/Speed']-var.gearing[self.lastval['Gear']-1][1])*(self.lastval['RPM/Speed']-old_avg)
+                        var.gearing[self.lastval['Gear']-1][2] /= var.gearing[self.lastval['Gear']-1][0]-1
+                # print(var.gearing)
+            elif not self.lastval['IsOnTrack_beep']:
+                i = 0
+                while i < len(var.gearing):
+                    var.gearing[i] = [0, 0, 0]
+                    i += 1
+            
+            if self.lastval['IsOnTrack_beep'] and self.lastval['Gear'] > 0: # determine if a beep is required now
+                if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
+                    if var.settings['local']['beep_mode'] == True: # True -> fixed beep setting
+                        if var.settings['local']['upshift_beep'] and len(var.gearing) >= self.lastval['Gear'] and var.gearing[self.lastval['Gear']-1] != [] and var.gearing[self.lastval['Gear']-1][1] != 0 and var.status['upshift_val'] > 0:
+                            if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val']:
+                                # print("call play upshift_beep ", var.status['upshift_val'], self.lastval['Speed'], self.lastval['Gear'], var.gearing)
+                                fn.start_thread(sfx.play('upshift_beep'))
+                            else:
+                                sfx.status['upshift_beep'] = False
+                        if var.settings['local']['downshift_beep'] and self.lastval['Gear'] > 1 and var.gearing[self.lastval['Gear']-2] != [] and var.gearing[self.lastval['Gear']-2][1] != 0 and var.status['downshift_val'] > 0:
+                            if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-2][1] < var.status['downshift_val']:
+                                # print("call play downshift_beep ", var.status['downshift_val'])
+                                fn.start_thread(sfx.play('downshift_beep'))
+                            else:
+                                sfx.status['downshift_beep'] = False
+                    # elif var.settings['local']['beep_mode'] == "Dynamic":
+                    #     return
+            elif self.lastval['Gear'] == 0:
+                sfx.status['upshift_beep'] = False # maybe only do this after upshifting?
+                sfx.status['downshift_beep'] = False # maybe only reset this when an upshift happens?
+        # print("shift_beep() end")
 
 class CustomComboBox(QComboBox):
     def wheelEvent(self ,event: QWheelEvent):

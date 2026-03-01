@@ -27,6 +27,9 @@ def read_config():
             elif ver == "v0.5.0b":
                 var.settings['version'] = var.lang['settings_version']
                 var.status['rewrite']['config'] = True
+            elif ver == "v0.5.2b":
+                var.settings['version'] = var.lang['settings_version']
+                var.status['rewrite']['config'] = True
             else: # if the version isn't valid, then something
                 #TODO
                 response = ctypes.windll.user32.MessageBoxW(0, "The config file " + var.settings['config'] + " has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -108,6 +111,8 @@ def read_profile(profile=None):
             elif ver == "v0.5.0b":
                 var.settings['version'] = var.lang['settings_version']
                 # var.status['rewrite']['profile'] = True
+            elif ver == "v0.5.2b":
+                var.settings['version'] = var.lang['settings_version']
             else: # if the version isn't valid, then something
                 #TODO
                 response = ctypes.windll.user32.MessageBoxW(0, "The profile file " + profile + ".ini has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -337,6 +342,8 @@ def check_ver(file, type):
     elif type == 'profile':
         if 'LOCAL' not in file or 'version' not in file['LOCAL']:
             return "v0.4.Xb"
+        if file['LOCAL']['version'] in var.compatible_settings:
+            return var.lang['version']
         return file['LOCAL']['version']
     # else:
     #     sys.exit(0)
@@ -347,7 +354,7 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
         if ver == "v0.4.4b":
             # backup the current profile file if something goes wrong
             now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-            with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + now + ".bak", 'w') as newfile:
+            with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + ver + now + ".bak", 'w') as newfile:
                 file.write(newfile)
 
             # check for any errors before starting the translation:

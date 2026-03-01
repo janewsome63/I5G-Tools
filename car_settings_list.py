@@ -146,6 +146,7 @@ car_settings = {
         "rear_roll_bar": [1, 6],
         "fuel_map": [1, 8],
         "hybrid": True,
+        # "limiter": 11950,
         # "regen": [0.5, 1.0],
         # "deploy": [0.1, 1.0],
         # "brake_bias": "?"

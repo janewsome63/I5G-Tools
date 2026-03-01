@@ -110,7 +110,7 @@ def log_event(index, type, num, value):
             "num": num,
             "value": value,
         }
-        print(var.event)
+        # print(var.event)
 
 
 def device_detection():

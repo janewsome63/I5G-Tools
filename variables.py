@@ -3,8 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.5.4b",
-    "settings_version": "v0.5.2b", # the version written down in the settings/global file, not necessarily equal to the program current version (to avoid breaking profile/global backwards compatibility unnecessarily)
+    "version": "v0.6.0b",
+    "settings_version": "v0.6.0b", # identical to version now, compatibility list stored elsewhere
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -51,6 +51,12 @@ lang = {
     "hybrid_low_label": "SoC Low Trigger:",
     "hybrid_high_label": "SoC High Trigger:",
     "hybrid_limit_label": "Deploy Limit Trigger:",
+    "upshift_beep": "Upshift Beep (if Sound is Yes):",
+    "downshift_beep": "Downshift Beep (if Sound is Yes):",
+    "beep_mode": "Beep Trigger Mode (Dynamic is experimental):",
+    "dynamic_mode_offset": "Dynamic Mode Offset (in ms):",
+    "upshift_offset": "Upshift Trigger Offset from redline (in RPM):",
+    "downshift_offset": "Downshift Trigger Offset from redline (in RPM):",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",
@@ -253,6 +259,8 @@ settings = {
         "hybrid_high": "high.mp3",
         "hybrid_low": "low.mp3",
         "hybrid_limit": "limit.mp3",
+        "upshift_beep": "upshift_beep.mp3",
+        "downshift_beep": "downshift_beep.mp3",
     },
 
     "profile": {
@@ -268,6 +276,12 @@ settings = {
         "hybrid_low_val": 10,
         "hybrid_high_val": 90,
         "hybrid_limit_val": 100,
+        "upshift_beep": False,
+        "downshift_beep": False,
+        "beep_mode": "Fixed",
+        "dynamic_mode_offset": 500,
+        "upshift_offset": 300,
+        "downshift_offset": 450,
     },
 
     "weight_jacker": {
@@ -322,6 +336,8 @@ status = {
     },
     "flash_tab": [],
     "set_list_count": 1,
+    "upshift_val": -1,
+    "downshift_val": -1,
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,
@@ -427,6 +443,11 @@ backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505),
 }
 
+compatible_settings = ['v0.6.0b']
+
+
 profile_list = []
 
 potential_bind = {}
+
+gearing = [[]] # the first index is the gear-1 and the second index gives the number of sample points, the current average, and the current variance (std dev squared)
