@@ -18,7 +18,7 @@ def read_config():
         config.read(var.settings['path'] + "\\" + var.settings['config'])
 
         ver = check_ver(config, 'config')
-        if ver != var.lang['settings_version']:
+        if not ver in var.compatible_settings:
             if ver == "v0.4.Xb": # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
                 var.settings['version'] = var.lang['settings_version']
                 var.status['rewrite']['config'] = True
@@ -93,7 +93,7 @@ def read_profile(profile=None):
         config.read(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + profile + ".ini")
 
         ver = check_ver(config, 'profile')
-        if ver != var.lang['settings_version']:
+        if not ver in var.compatible_settings:
             if ver == "v0.4.Xb": # either 0.4.4b or 0.4.10b
                 if "LOCAL" in config: # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
                     var.settings['version'] = var.lang['settings_version']

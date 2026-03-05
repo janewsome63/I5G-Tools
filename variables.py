@@ -3,8 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.6.0b",
-    "settings_version": "v0.6.0b", # identical to version now, compatibility list stored elsewhere
+    "version": "v0.6.1b",
+    "settings_version": "v0.6.1b", # identical to version now, compatibility list stored elsewhere
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -278,7 +278,7 @@ settings = {
         "hybrid_limit_val": 100,
         "upshift_beep": False,
         "downshift_beep": False,
-        "beep_mode": "Fixed",
+        "beep_mode": True,
         "dynamic_mode_offset": 500,
         "upshift_offset": 300,
         "downshift_offset": 450,
@@ -443,7 +443,7 @@ backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505),
 }
 
-compatible_settings = ['v0.6.0b']
+compatible_settings = ['v0.6.0b', 'v0.6.1b']
 
 
 profile_list = []
