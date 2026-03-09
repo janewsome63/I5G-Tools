@@ -3,8 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.6.1.1b",
-    "settings_version": "v0.6.1.1b", # identical to version now, compatibility list stored elsewhere
+    "version": "v0.6.1.2b",
+    "settings_version": "v0.6.1.2b", # identical to version now, compatibility list stored elsewhere
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -440,10 +440,10 @@ event = {
 }
 
 backend = {
-    "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 821985),
+    "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985),
 }
 
-compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b']
+compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b']
 
 
 profile_list = []
