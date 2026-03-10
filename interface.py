@@ -609,6 +609,7 @@ class MainWindow(QMainWindow):
         if not self.ir.is_initialized:
             self.ir.startup()
             fn.check_uid(self.ir)
+            
         if self.ir.is_initialized and self.ir.is_connected:
             length = len(self.ir['DriverInfo']['Drivers'])
             index = length-1
@@ -631,6 +632,11 @@ class MainWindow(QMainWindow):
                 var.bindings['status']['active'] = False
                 self.stop_flash_tab_all()
                 var.status['flash_tab'] = []
+                sleep(0.01)
+                var.bindings['status']['active'] = True
+                sleep(0.01)
+                vjoy.set('weight_jacker', vjoy.axis_values['weight_jacker']) # bad hack to make sure vjoy is actually 'active'
+                var.bindings['status']['active'] = False
             self.lastval['IsOnTrack'] = self.ir['IsOnTrack']
             if self.lastval['CarIdx'] in car_settings and 'limiter' in car_settings[self.lastval['CarIdx']]: # if limiter in car_settings, save limiter minus settings offset for up and down
                 var.status['upshift_val'] = car_settings[self.lastval['CarIdx']]['limiter'] - var.settings['local']['upshift_offset']

@@ -51,7 +51,7 @@ number = 0
 
 def set(axis, pct):
     global number
-    #print("vjoy set check1")
+    print("vjoy set check1")
     if axis_busy[axis]:
         local_number = number
         queue.append(local_number)
@@ -71,15 +71,15 @@ def set(axis, pct):
     elif raw > 32768:
         raw = 32768
         pct = 1.0
-    # print("try set using: ", axis, pct)
+    print("try set using: ", axis, pct)
     j.set_axis(axis_ref[axis], raw)
     axis_values[axis] = pct
     if switched:
         var.status[axis]['secondary'] = axis_values[axis]
-        #print("new secondary: ", var.status[axis]['secondary'])
+        print("new secondary: ", var.status[axis]['secondary'])
     else:
         var.status[axis]['primary'] = axis_values[axis]
-        #print("new primary: ", var.status[axis]['primary'])
+        print("new primary: ", var.status[axis]['primary'])
     axis_busy[axis] = False
 
 def calibrate(axis):
