@@ -1209,11 +1209,19 @@ class MainWindow(QMainWindow):
                         var.gearing[self.lastval['Gear']-1][2] += (self.lastval['RPM/Speed']-var.gearing[self.lastval['Gear']-1][1])*(self.lastval['RPM/Speed']-old_avg)
                         var.gearing[self.lastval['Gear']-1][2] /= var.gearing[self.lastval['Gear']-1][0]-1
                 # print(var.gearing)
-            elif not self.lastval['IsOnTrack_beep']:
+            elif not self.lastval['IsOnTrack_beep']: # if the car physics are reset, wipe gearing data as don't know if setup changed or not
                 i = 0
                 while i < len(var.gearing):
                     var.gearing[i] = [0, 0, 0]
                     i += 1
+            else: # if on track but not in a state to update gearing data, still update the length of the gearing list if needed
+                if len(var.gearing) < self.lastval['Gear']:
+                    ind = 0
+                    while ind <= self.lastval['Gear']:
+                        if len(var.gearing) < ind:
+                            var.gearing.append([])
+                        ind += 1
+
             
             if self.lastval['IsOnTrack_beep'] and self.lastval['Gear'] > 0: # determine if a beep is required now
                 if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
