@@ -3,8 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.6.3b",
-    "settings_version": "v0.6.3b", # identical to version now, compatibility list stored elsewhere
+    "version": "v0.6.4b",
+    "settings_version": "v0.6.4b", # identical to version now, compatibility list stored elsewhere
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -48,6 +48,9 @@ lang = {
     "hybrid": "Hybrid",
     "sound_label": "Sound:",
     "volume_label": "Volume:",
+    "hybrid_low_audio_label": "Hybrid Low Audio (if Sound is Yes):",
+    "hybrid_high_audio_label": "Hybrid High Audio (if Sound is Yes):",
+    "hybrid_limit_audio_label": "Hybrid Limit Audio (if Sound is Yes):",
     "hybrid_low_label": "SoC Low Trigger:",
     "hybrid_high_label": "SoC High Trigger:",
     "hybrid_limit_label": "Deploy Limit Trigger:",
@@ -273,6 +276,9 @@ settings = {
         "low_threshold": 0.10,
         "audio": False,
         "volume": 0.5,
+        "hybrid_low_audio": True,
+        "hybrid_high_audio": True,
+        "hybrid_limit_audio": True,
         "hybrid_low_val": 10,
         "hybrid_high_val": 90,
         "hybrid_limit_val": 100,
@@ -443,7 +449,7 @@ backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985),
 }
 
-compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b']
+compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b']
 
 
 profile_list = []

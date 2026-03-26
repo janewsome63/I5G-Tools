@@ -71,7 +71,7 @@ def set(axis, pct):
     elif raw > 32768:
         raw = 32768
         pct = 1.0
-    print("try set using: ", axis, pct)
+    print("try set using: ", axis, raw, pct)
     j.set_axis(axis_ref[axis], raw)
     axis_values[axis] = pct
     if switched:
@@ -92,6 +92,10 @@ def calibrate(axis):
         set(axis, pct)
         pct = pct + step
         sleep(0.005)
+    set(axis,pct)
+    sleep(0.05) # make sure iRacing reads the max value
+    set(axis,pct)
+    sleep(0.125)
     while pct > 0:
         set(axis, pct)
         pct = pct - step

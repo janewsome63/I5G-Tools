@@ -477,6 +477,36 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['volume'].setRange(0, 100)
             self.store['content'][function]['volume'].valueChanged.connect(lambda: self.settings_set('volume'))
 
+            self.store['content'][function]['hybrid_low_audio_label'] = QLabel()
+            self.store['content'][function]['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'])
+
+            self.store['content'][function]['hybrid_low_audio'] = CustomComboBox()
+            self.store['content'][function]['hybrid_low_audio'].setFixedSize(200, 25)
+            self.store['content'][function]['hybrid_low_audio'].addItem("Yes")
+            self.store['content'][function]['hybrid_low_audio'].addItem("No")
+            self.store['content'][function]['hybrid_low_audio'].setCurrentText(str(var.settings['local']['hybrid_low_audio']))
+            self.store['content'][function]['hybrid_low_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_low_audio'))
+
+            self.store['content'][function]['hybrid_high_audio_label'] = QLabel()
+            self.store['content'][function]['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'])
+
+            self.store['content'][function]['hybrid_high_audio'] = CustomComboBox()
+            self.store['content'][function]['hybrid_high_audio'].setFixedSize(200, 25)
+            self.store['content'][function]['hybrid_high_audio'].addItem("Yes")
+            self.store['content'][function]['hybrid_high_audio'].addItem("No")
+            self.store['content'][function]['hybrid_high_audio'].setCurrentText(str(var.settings['local']['hybrid_high_audio']))
+            self.store['content'][function]['hybrid_high_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_high_audio'))
+
+            self.store['content'][function]['hybrid_limit_audio_label'] = QLabel()
+            self.store['content'][function]['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'])
+
+            self.store['content'][function]['hybrid_limit_audio'] = CustomComboBox()
+            self.store['content'][function]['hybrid_limit_audio'].setFixedSize(200, 25)
+            self.store['content'][function]['hybrid_limit_audio'].addItem("Yes")
+            self.store['content'][function]['hybrid_limit_audio'].addItem("No")
+            self.store['content'][function]['hybrid_limit_audio'].setCurrentText(str(var.settings['local']['hybrid_limit_audio']))
+            self.store['content'][function]['hybrid_limit_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_limit_audio'))
+
             self.store['content'][function]['hybrid_low_label'] = QLabel()
             self.store['content'][function]['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
 
@@ -647,7 +677,7 @@ class MainWindow(QMainWindow):
                     var.status['downshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['downshift_offset']
                 except:
                     print("upshift and downshift values failed in updater()")
-            if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'])):
+            if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'])):
                 self.shift_beep()
             # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
         elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
@@ -729,14 +759,14 @@ class MainWindow(QMainWindow):
                 self.lastval['deploy_lim'] = 999.0
             if self.store['content']['settings']['sound'].currentText() == "Yes":
                 if self.lastval['soc'] != 999.0:
-                    if self.store['content']['hybrid']['soc_axis'].value() <= var.settings['local']['hybrid_low_val'] < self.lastval['soc']:
+                    if self.store['content']['hybrid']['soc_axis'].value() <= var.settings['local']['hybrid_low_val'] < self.lastval['soc'] and var.settings['local']['hybrid_low_audio']:
                         print("call play low")
                         fn.start_thread(sfx.play('low'))
-                    if self.store['content']['hybrid']['soc_axis'].value() >= var.settings['local']['hybrid_high_val'] > self.lastval['soc']:
+                    if self.store['content']['hybrid']['soc_axis'].value() >= var.settings['local']['hybrid_high_val'] > self.lastval['soc'] and var.settings['local']['hybrid_high_audio']:
                         print("call play high")
                         fn.start_thread(sfx.play('high'))
                 if self.lastval['deploy_lim'] != 999.0:
-                    if self.store['content']['hybrid']['deploy_lim_axis'].value() >= var.settings['local']['hybrid_limit_val'] > self.lastval['deploy_lim']:
+                    if self.store['content']['hybrid']['deploy_lim_axis'].value() >= var.settings['local']['hybrid_limit_val'] > self.lastval['deploy_lim'] and var.settings['local']['hybrid_limit_audio']:
                         print("call play deploy limit")
                         fn.start_thread(sfx.play('limit'))
                 self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
@@ -826,7 +856,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def settings_set(self, func):
-        if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode':
+        if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio":
             value = self.store['content']['settings'][func].currentText()
         else:
             value = self.store['content']['settings'][func].value()
@@ -845,7 +875,7 @@ class MainWindow(QMainWindow):
         if func == 'sound':
             var.settings['local']['audio'] = (value == "Yes")
             fn.write_profile()
-        elif func == 'upshift_beep' or func == 'downshift_beep':
+        elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio":
             var.settings['local'][func] = (value == "Yes")
             fn.write_profile()
         elif func == 'beep_mode':
@@ -960,6 +990,7 @@ class MainWindow(QMainWindow):
         }
         var.potential_bind = {}
         fn.write_profile()
+        var.status['refresh_labels'] = True
         # self.store['running'] = False
 
     @pyqtSlot()
@@ -1182,6 +1213,7 @@ class MainWindow(QMainWindow):
             self.lastval['Gear'] = self.ir['Gear']
             self.lastval['RPM'] = self.ir['RPM']
             self.lastval['Speed'] = self.ir['Speed']
+            self.lastval['P2P'] = self.ir['P2P_Status']
             if self.lastval['Speed'] == 0:
                 self.lastval['RPM/Speed'] = 0
             else:
@@ -1227,7 +1259,7 @@ class MainWindow(QMainWindow):
                 if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
                     if var.settings['local']['beep_mode'] == True: # True -> fixed beep setting
                         if var.settings['local']['upshift_beep'] and len(var.gearing) >= self.lastval['Gear'] and var.gearing[self.lastval['Gear']-1] != [] and var.gearing[self.lastval['Gear']-1][1] != 0 and var.status['upshift_val'] > 0:
-                            if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val']:
+                            if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val'] + (self.lastval['P2P'] == True)*300: # P2P pushes upshift beep up by 300RPM
                                 # print("call play upshift_beep ", var.status['upshift_val'], self.lastval['Speed'], self.lastval['Gear'], var.gearing)
                                 fn.start_thread(sfx.play('upshift_beep'))
                             else:
