@@ -295,12 +295,12 @@ settings = {
         "dynamic_mode_offset": 500,
         "upshift_offset": 300,
         "downshift_offset": 450,
-        "p2p_behind_audio": True,
-        "p2p_behind_audio_cont": True,
+        "p2p_behind_audio": False,
+        "p2p_behind_audio_cont": False,
         "p2p_behind_nobrake": True,
-        "p2p_behind_thresh": int(2000),
+        "p2p_behind_thresh": int(3000),
         "p2p_behind_thresh_cont": int(1000),
-        "p2p_behind_closest_car": False,
+        "p2p_behind_closest_car": True,
     },
 
     "weight_jacker": {
