@@ -1321,13 +1321,13 @@ class MainWindow(QMainWindow):
                     if not var.settings['local']['p2p_behind_closest_car']:
                         self.lastval['CarIdx_Within_p2p_Range'].append(index)
                     else:
-                        if (self.lastval['CarIdx_Within_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] < self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_p2p_Range'][0]]) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                        if (self.lastval['CarIdx_Within_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] > self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_p2p_Range'][0]]) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                             self.lastval['CarIdx_Within_p2p_Range'] = [index]
-                if (var.settings['local']['p2p_behind_thresh_cont'] == -1 (self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] > 0 and self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh_cont']/1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                if (var.settings['local']['p2p_behind_thresh_cont'] == -1 or (self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] > 0 and self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh_cont']/1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                     if not var.settings['local']['p2p_behind_closest_car']:
                         self.lastval['CarIdx_Within_Cont_p2p_Range'].append(index)
                     else:
-                        if (self.lastval['CarIdx_Within_Cont_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] < self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_Cont_p2p_Range'][0]]) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                        if (self.lastval['CarIdx_Within_Cont_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] > self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_Cont_p2p_Range'][0]]) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                             self.lastval['CarIdx_Within_Cont_p2p_Range'] = [index]
                 index -= 1
             # print(self.lastval['CarIdx_Within_p2p_Range'], self.lastval['CarIdx_Within_Cont_p2p_Range'])
