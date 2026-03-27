@@ -3,6 +3,7 @@ import variables as var
 import pygame as p
 import sys
 import shutil
+from time import sleep
 
 p.mixer.init()
 
@@ -14,6 +15,7 @@ status = {
     "limit": False,
     "upshift_beep": False,
     "downshift_beep": False,
+    "p2p_active": False,
 }
 
 try:
@@ -36,6 +38,7 @@ hybrid_high = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound'][
 hybrid_limit = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_limit'])
 upshift_beep = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['upshift_beep'])
 downshift_beep = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['downshift_beep'])
+p2p_active = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['p2p_active'])
 
 def play(notif):
     if status[notif] == False:
@@ -63,3 +66,20 @@ def play(notif):
             status[notif] = True
             downshift_beep.set_volume(var.settings['local']['volume'])
             downshift_beep.play()
+        elif notif == "p2p_active":
+            status[notif] = True
+            p2p_active.set_volume(var.settings['local']['volume'])
+            p2p_active.play()
+            status[notif] = False
+
+def play_loop(notif):
+    if status[notif] == False:
+        print("playing notif on loop: ", notif)
+        if notif == "p2p_active":
+            status[notif] = True
+            p2p_active.set_volume(var.settings['local']['volume'])
+            p2p_active.play(loops=-1)
+            while var.status['p2p_sound_active'] == True and var.settings['local']['p2p_behind_cont']:
+                sleep(0.02)
+            p2p_active.stop()
+            status[notif] = False

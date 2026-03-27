@@ -3,8 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.6.4b",
-    "settings_version": "v0.6.4b", # identical to version now, compatibility list stored elsewhere
+    "version": "v0.7.0b",
+    "settings_version": "v0.7.0b", # identical to version now, compatibility list stored elsewhere
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -54,12 +54,18 @@ lang = {
     "hybrid_low_label": "SoC Low Trigger:",
     "hybrid_high_label": "SoC High Trigger:",
     "hybrid_limit_label": "Deploy Limit Trigger:",
-    "upshift_beep": "Upshift Beep (if Sound is Yes):",
-    "downshift_beep": "Downshift Beep (if Sound is Yes):",
-    "beep_mode": "Beep Trigger Mode (Dynamic is experimental):",
-    "dynamic_mode_offset": "Dynamic Mode Offset (in ms):",
-    "upshift_offset": "Upshift Trigger Offset from redline (in RPM):",
-    "downshift_offset": "Downshift Trigger Offset from redline (in RPM):",
+    "upshift_beep_label": "Upshift Beep (if Sound is Yes):",
+    "downshift_beep_label": "Downshift Beep (if Sound is Yes):",
+    "beep_mode_label": "Beep Trigger Mode (Dynamic is experimental):",
+    "dynamic_mode_offset_label": "Dynamic Mode Offset (in ms):",
+    "upshift_offset_label": "Upshift Trigger Offset from redline (in RPM):",
+    "downshift_offset_label": "Downshift Trigger Offset from redline (in RPM):",
+    "p2p_behind_audio_label": "Car Behind p2p Single Warning (if Sound is Yes):",
+    "p2p_behind_audio_cont_label": "Car Behind p2p Continuous Warning (if Sound is Yes):",
+    "p2p_behind_nobrake_label": "Stop p2p Warning Under Braking:",
+    "p2p_behind_thresh_label": "p2p Single Warning Threshold (in ms, -1 is all cars):",
+    "p2p_behind_thresh_cont_label": "p2p Continuous Warning Threshold (in ms, -1 is all cars):",
+    "p2p_behind_closest_car_label": "p2p Warning For Closest Car Behind Only:",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",
@@ -264,6 +270,7 @@ settings = {
         "hybrid_limit": "limit.mp3",
         "upshift_beep": "upshift_beep.mp3",
         "downshift_beep": "downshift_beep.mp3",
+        "p2p_active": "p2p_behind.mp3",
     },
 
     "profile": {
@@ -288,6 +295,12 @@ settings = {
         "dynamic_mode_offset": 500,
         "upshift_offset": 300,
         "downshift_offset": 450,
+        "p2p_behind_audio": True,
+        "p2p_behind_audio_cont": True,
+        "p2p_behind_nobrake": True,
+        "p2p_behind_thresh": int(2000),
+        "p2p_behind_thresh_cont": int(1000),
+        "p2p_behind_closest_car": False,
     },
 
     "weight_jacker": {
@@ -344,6 +357,7 @@ status = {
     "set_list_count": 1,
     "upshift_val": -1,
     "downshift_val": -1,
+    "p2p_sound_active": False,
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,
@@ -449,7 +463,7 @@ backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985),
 }
 
-compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b']
+compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b']
 
 
 profile_list = []

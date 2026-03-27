@@ -535,7 +535,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['hybrid_limit_val'].valueChanged.connect(lambda: self.settings_set('hybrid_limit_val'))
 
             self.store['content'][function]['upshift_beep_label'] = QLabel()
-            self.store['content'][function]['upshift_beep_label'].setText(var.lang['upshift_beep'])
+            self.store['content'][function]['upshift_beep_label'].setText(var.lang['upshift_beep_label'])
 
             self.store['content'][function]['upshift_beep'] = CustomComboBox()
             self.store['content'][function]['upshift_beep'].setFixedSize(200, 25)
@@ -545,7 +545,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['upshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('upshift_beep'))
 
             self.store['content'][function]['downshift_beep_label'] = QLabel()
-            self.store['content'][function]['downshift_beep_label'].setText(var.lang['downshift_beep'])
+            self.store['content'][function]['downshift_beep_label'].setText(var.lang['downshift_beep_label'])
 
             self.store['content'][function]['downshift_beep'] = CustomComboBox()
             self.store['content'][function]['downshift_beep'].setFixedSize(200, 25)
@@ -555,7 +555,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['downshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('downshift_beep'))
 
             self.store['content'][function]['beep_mode_label'] = QLabel()
-            self.store['content'][function]['beep_mode_label'].setText(var.lang['beep_mode'])
+            self.store['content'][function]['beep_mode_label'].setText(var.lang['beep_mode_label'])
 
             self.store['content'][function]['beep_mode'] = CustomComboBox()
             self.store['content'][function]['beep_mode'].setFixedSize(200, 25)
@@ -566,7 +566,7 @@ class MainWindow(QMainWindow):
 
             #dynamic mode offset
             self.store['content'][function]['dynamic_mode_offset_label'] = QLabel()
-            self.store['content'][function]['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset'])
+            self.store['content'][function]['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'])
 
             self.store['content'][function]['dynamic_mode_offset'] = CustomSpinBox()
             self.store['content'][function]['dynamic_mode_offset'].setFixedSize(70, 20)
@@ -576,7 +576,7 @@ class MainWindow(QMainWindow):
 
             #upshift offset
             self.store['content'][function]['upshift_offset_label'] = QLabel()
-            self.store['content'][function]['upshift_offset_label'].setText(var.lang['upshift_offset'])
+            self.store['content'][function]['upshift_offset_label'].setText(var.lang['upshift_offset_label'])
 
             self.store['content'][function]['upshift_offset'] = CustomSpinBox()
             self.store['content'][function]['upshift_offset'].setFixedSize(70, 20)
@@ -586,13 +586,78 @@ class MainWindow(QMainWindow):
 
             #downshift offset
             self.store['content'][function]['downshift_offset_label'] = QLabel()
-            self.store['content'][function]['downshift_offset_label'].setText(var.lang['downshift_offset'])
+            self.store['content'][function]['downshift_offset_label'].setText(var.lang['downshift_offset_label'])
 
             self.store['content'][function]['downshift_offset'] = CustomSpinBox()
             self.store['content'][function]['downshift_offset'].setFixedSize(70, 20)
             self.store['content'][function]['downshift_offset'].setRange(-10000, 10000)
             self.store['content'][function]['downshift_offset'].setValue(int(var.settings['local']['downshift_offset']))
             self.store['content'][function]['downshift_offset'].valueChanged.connect(lambda: self.settings_set('downshift_offset'))
+
+            # p2p behind audio enabled
+            self.store['content'][function]['p2p_behind_audio_label'] = QLabel()
+            self.store['content'][function]['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'])
+
+            self.store['content'][function]['p2p_behind_audio'] = CustomComboBox()
+            self.store['content'][function]['p2p_behind_audio'].setFixedSize(200, 25)
+            self.store['content'][function]['p2p_behind_audio'].addItem("Yes")
+            self.store['content'][function]['p2p_behind_audio'].addItem("No")
+            self.store['content'][function]['p2p_behind_audio'].setCurrentText(str(var.settings['local']['p2p_behind_audio']))
+            self.store['content'][function]['p2p_behind_audio'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_audio'))
+
+            # p2p behind audio continuous enabled
+            self.store['content'][function]['p2p_behind_audio_cont_label'] = QLabel()
+            self.store['content'][function]['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'])
+
+            self.store['content'][function]['p2p_behind_audio_cont'] = CustomComboBox()
+            self.store['content'][function]['p2p_behind_audio_cont'].setFixedSize(200, 25)
+            self.store['content'][function]['p2p_behind_audio_cont'].addItem("Yes")
+            self.store['content'][function]['p2p_behind_audio_cont'].addItem("No")
+            self.store['content'][function]['p2p_behind_audio_cont'].setCurrentText(str(var.settings['local']['p2p_behind_audio_cont']))
+            self.store['content'][function]['p2p_behind_audio_cont'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_audio_cont'))
+
+            # p2p behind stop audio under braking
+            self.store['content'][function]['p2p_behind_nobrake_label'] = QLabel()
+            self.store['content'][function]['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'])
+
+            self.store['content'][function]['p2p_behind_nobrake'] = CustomComboBox()
+            self.store['content'][function]['p2p_behind_nobrake'].setFixedSize(200, 25)
+            self.store['content'][function]['p2p_behind_nobrake'].addItem("Yes")
+            self.store['content'][function]['p2p_behind_nobrake'].addItem("No")
+            self.store['content'][function]['p2p_behind_nobrake'].setCurrentText(str(var.settings['local']['p2p_behind_nobrake']))
+            self.store['content'][function]['p2p_behind_nobrake'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_nobrake'))
+
+            # p2p behind single warning threshold
+            self.store['content'][function]['p2p_behind_thresh_label'] = QLabel()
+            self.store['content'][function]['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'])
+
+            self.store['content'][function]['p2p_behind_thresh'] = CustomSpinBox()
+            self.store['content'][function]['p2p_behind_thresh'].setFixedSize(70, 20)
+            self.store['content'][function]['p2p_behind_thresh'].setRange(-1, 1000000)
+            self.store['content'][function]['p2p_behind_thresh'].setValue(int(var.settings['local']['p2p_behind_thresh']))
+            self.store['content'][function]['p2p_behind_thresh'].valueChanged.connect(lambda: self.settings_set('p2p_behind_thresh'))
+
+            # p2p behind continuous warning threshold
+            self.store['content'][function]['p2p_behind_thresh_cont_label'] = QLabel()
+            self.store['content'][function]['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'])
+
+            self.store['content'][function]['p2p_behind_thresh_cont'] = CustomSpinBox()
+            self.store['content'][function]['p2p_behind_thresh_cont'].setFixedSize(70, 20)
+            self.store['content'][function]['p2p_behind_thresh_cont'].setRange(-1, 1000000)
+            self.store['content'][function]['p2p_behind_thresh_cont'].setValue(int(var.settings['local']['p2p_behind_thresh_cont']))
+            self.store['content'][function]['p2p_behind_thresh_cont'].valueChanged.connect(lambda: self.settings_set('p2p_behind_thresh_cont'))
+
+            # p2p behind audio for any car within range vs closest car only
+            self.store['content'][function]['p2p_behind_closest_car_label'] = QLabel()
+            self.store['content'][function]['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'])
+
+            self.store['content'][function]['p2p_behind_closest_car'] = CustomComboBox()
+            self.store['content'][function]['p2p_behind_closest_car'].setFixedSize(200, 25)
+            self.store['content'][function]['p2p_behind_closest_car'].addItem("Yes")
+            self.store['content'][function]['p2p_behind_closest_car'].addItem("No")
+            self.store['content'][function]['p2p_behind_closest_car'].setCurrentText(str(var.settings['local']['p2p_behind_closest_car']))
+            self.store['content'][function]['p2p_behind_closest_car'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_closest_car'))
+            
 
 
         row, column = 0, 0
@@ -677,8 +742,8 @@ class MainWindow(QMainWindow):
                     var.status['downshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['downshift_offset']
                 except:
                     print("upshift and downshift values failed in updater()")
-            if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'])):
-                self.shift_beep()
+            if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['ybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont'])):
+                self.irsdk_audio()
             # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
         elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
             self.ir.shutdown()
@@ -856,7 +921,7 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def settings_set(self, func):
-        if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio":
+        if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
             value = self.store['content']['settings'][func].currentText()
         else:
             value = self.store['content']['settings'][func].value()
@@ -875,7 +940,7 @@ class MainWindow(QMainWindow):
         if func == 'sound':
             var.settings['local']['audio'] = (value == "Yes")
             fn.write_profile()
-        elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio":
+        elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
             var.settings['local'][func] = (value == "Yes")
             fn.write_profile()
         elif func == 'beep_mode':
@@ -884,7 +949,7 @@ class MainWindow(QMainWindow):
         elif func == 'volume':
             var.settings['local']['volume'] = value/100
             fn.write_profile()
-        elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val" or func == "dynamic_mode_offset" or func == "upshift_offset" or func == "downshift_offset":
+        elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val" or func == "dynamic_mode_offset" or func == "upshift_offset" or func == "downshift_offset" or func == "p2p_behind_thresh" or func == "p2p_behind_thresh_cont":
             var.settings['local'][func] = value
             fn.write_profile()
         else:
@@ -1168,6 +1233,23 @@ class MainWindow(QMainWindow):
         else:
             self.store['content']['settings']['sound'].setCurrentText('No')
         self.store['content']['settings']['volume'].setValue(int(var.settings['local']['volume']*100))
+        self.store['content']['settings']['hybrid_low_audio'].setCurrentText(str(var.settings['local']['hybrid_low_audio']))
+        self.store['content']['settings']['hybrid_high_audio'].setCurrentText(str(var.settings['local']['hybrid_high_audio']))
+        self.store['content']['settings']['hybrid_limit_audio'].setCurrentText(str(var.settings['local']['hybrid_limit_audio']))
+        self.store['content']['settings']['hybrid_low_val'].setValue(int(var.settings['local']['hybrid_low_val']))
+        self.store['content']['settings']['hybrid_high_val'].setValue(int(var.settings['local']['hybrid_high_val']))
+        self.store['content']['settings']['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
+        self.store['content']['settings']['upshift_beep'].setCurrentText(str(var.settings['local']['upshift_beep']))
+        self.store['content']['settings']['downshift_beep'].setCurrentText(str(var.settings['local']['downshift_beep']))
+        self.store['content']['settings']['beep_mode'].setCurrentText(str(var.settings['local']['beep_mode']))
+        self.store['content']['settings']['dynamic_mode_offset'].setValue(int(var.settings['local']['dynamic_mode_offset']))
+        self.store['content']['settings']['downshift_offset'].setValue(int(var.settings['local']['downshift_offset']))
+        self.store['content']['settings']['p2p_behind_audio'].setCurrentText(str(var.settings['local']['p2p_behind_audio']))
+        self.store['content']['settings']['p2p_behind_audio_cont'].setCurrentText(str(var.settings['local']['p2p_behind_audio_cont']))
+        self.store['content']['settings']['p2p_behind_nobrake'].setCurrentText(str(var.settings['local']['p2p_behind_nobrake']))
+        self.store['content']['settings']['p2p_behind_thresh'].setValue(int(var.settings['local']['p2p_behind_thresh']))
+        self.store['content']['settings']['p2p_behind_thresh_cont'].setValue(int(var.settings['local']['p2p_behind_thresh_cont']))
+        self.store['content']['settings']['p2p_behind_closest_car'].setCurrentText(str(var.settings['local']['p2p_behind_closest_car']))
 
     @pyqtSlot()
     def start_flash_tab(self, func):
@@ -1201,7 +1283,7 @@ class MainWindow(QMainWindow):
             self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
 
     @pyqtSlot()
-    def shift_beep(self):
+    def irsdk_audio(self):
         # print("shift_beep() start")
         if self.lastval['SessionTick'] != self.ir['SessionTick']: # if the information is not new, do nothing because there is no new information
             # ideally would copy a snapshot of self.ir at this moment to make sure all the information is from the same set, but this is probably close enough
@@ -1213,7 +1295,54 @@ class MainWindow(QMainWindow):
             self.lastval['Gear'] = self.ir['Gear']
             self.lastval['RPM'] = self.ir['RPM']
             self.lastval['Speed'] = self.ir['Speed']
-            self.lastval['P2P'] = self.ir['P2P_Status']
+            self.lastval['p2p'] = self.ir['p2p_Status']
+            self.lastval['CarIdxp2p'] = self.ir['CarIdxp2p_Status']
+            self.lastval['CarIdxEstTime'] = self.ir['CarIdxEstTime']
+            self.lastval['CarIdx_Within_p2p_Range'] = []
+            self.lastval['CarIdx_Within_Cont_p2p_Range'] = []
+            length = len(self.ir['DriverInfo']['Drivers'])
+            index = length-1
+            self.lastval['CarIdxList'] = list(0*range(index)-1)
+            while index >= 0:
+                self.lastval['CarIdxList'][index] = self.ir['DriverInfo']['Drivers'][index]['CarIdx']
+                if var.settings['local']['p2p_behind_thresh'] == -1 or self.lastval['CarIdxEstTime'][index] < var.settings['local']['p2p_behind_thresh']/1000:
+                    if not var.settings['local']['p2p_behind_closest_car']:
+                        self.lastval['CarIdx_Within_p2p_Range'].append(index)
+                    else:
+                        if self.lastval['CarIdx_Within_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] < self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_p2p_Range'][0]]:
+                            self.lastval['CarIdx_Within_p2p_Range'] = [self.lastval['CarIdxEstTime'][index]]
+                if var.settings['local']['p2p_behind_thresh_cont'] == -1 or self.lastval['CarIdxEstTime'][index] < var.settings['local']['p2p_behind_thresh_cont']/1000:
+                    if not var.settings['local']['p2p_behind_closest_car']:
+                        self.lastval['CarIdx_Within_Cont_p2p_Range'].append(index)
+                    else:
+                        if self.lastval['CarIdx_Within_Cont_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] < self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_Cont_p2p_Range'][0]]:
+                            self.lastval['CarIdx_Within_Cont_p2p_Range'] = [self.lastval['CarIdxEstTime'][index]]
+                index -= 1
+            if var.settings['p2p_behind_audio']:
+                if var.settings['p2p_behind_nobrakes'] and self.lastval['Brake'] > 0.05:
+                    var.status['p2p_sound_active'] = False
+                else:
+                    if var.settings['local']['p2p_behind_audio_cont']:
+                        if self.lastval['CarIdx_Within_Cont_p2p_Range'] == []:
+                            var.status['p2p_sound_active'] = False
+                        elif var.status['p2p_sound_active'] == False:
+                            for CarIdx in self.lastval['CarIdx_Within_Cont_p2p_Range']:
+                                if self.lastval['CarIdxp2p'][CarIdx] == True:
+                                    var.status['p2p_sound_active'] = True
+                                    fn.start_thread(sfx.play_loop('p2p_active'))       
+                    elif var.settings['local']['p2p_behind_audio']:
+                        if self.lastval['CarIdx_Within_p2p_Range'] == []:
+                            var.status['p2p_sound_active'] = False
+                        elif var.status['p2p_sound_active'] == False:
+                            for CarIdx in self.lastval['CarIdx_Within_p2p_Range']:
+                                if self.lastval['CarIdxp2p'][CarIdx] == True:
+                                    fn.start_thread(sfx.play('p2p_active'))
+                    else:
+                        var.status['p2p_sound_active'] = False
+            else:
+                var.status['p2p_sound_active'] = False
+
+
             if self.lastval['Speed'] == 0:
                 self.lastval['RPM/Speed'] = 0
             else:
@@ -1259,7 +1388,7 @@ class MainWindow(QMainWindow):
                 if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
                     if var.settings['local']['beep_mode'] == True: # True -> fixed beep setting
                         if var.settings['local']['upshift_beep'] and len(var.gearing) >= self.lastval['Gear'] and var.gearing[self.lastval['Gear']-1] != [] and var.gearing[self.lastval['Gear']-1][1] != 0 and var.status['upshift_val'] > 0:
-                            if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val'] + (self.lastval['P2P'] == True)*300: # P2P pushes upshift beep up by 300RPM
+                            if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val'] + (self.lastval['p2p'] == True)*300: # p2p pushes upshift beep up by 300RPM
                                 # print("call play upshift_beep ", var.status['upshift_val'], self.lastval['Speed'], self.lastval['Gear'], var.gearing)
                                 fn.start_thread(sfx.play('upshift_beep'))
                             else:
