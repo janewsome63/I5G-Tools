@@ -16,6 +16,8 @@ status = {
     "upshift_beep": False,
     "downshift_beep": False,
     "p2p_active": False,
+    "p2p_active_single": False,
+    "p2p_active_loop": False,
 }
 
 try:
@@ -42,7 +44,8 @@ p2p_active = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['
 
 def play(notif):
     if status[notif] == False:
-        print("playing notif: ", notif)
+        if not notif == "p2p_active":
+            print("playing notif: ", notif)
         if notif == "low":
             status[notif] = True
             hybrid_low.set_volume(var.settings['local']['volume'])
@@ -66,20 +69,33 @@ def play(notif):
             status[notif] = True
             downshift_beep.set_volume(var.settings['local']['volume'])
             downshift_beep.play()
-        elif notif == "p2p_active":
-            status[notif] = True
-            p2p_active.set_volume(var.settings['local']['volume'])
-            p2p_active.play()
-            status[notif] = False
+        elif notif == "p2p_active" and status["p2p_active_single"] == False and status['p2p_active_loop'] == False:
+            if p2p_active.get_num_channels() == 0: # not currently playing at all
+                print("playing notif: ", notif)
+                status[notif] = True
+                status["p2p_active_single"] = True
+                p2p_active.set_volume(var.settings['local']['volume'])
+                p2p_active.play()
+                status[notif] = False
+                # status["p2p_active_single"] = False # latch this elsewhere, only release it to False once p2p single is eligible to be played again
+            else:
+                print ("p2p_active already playing ", p2p_active.get_num_channels(), " times")
 
 def play_loop(notif):
-    if status[notif] == False:
-        print("playing notif on loop: ", notif)
-        if notif == "p2p_active":
+    if notif == "p2p_active":
+        if status["p2p_active_loop"] == False:
+            print("playing notif on loop: ", notif)
+            p2p_active.stop() # if currently playing single
+            status['p2p_active_single'] = False
             status[notif] = True
+            status["p2p_active_loop"] = True
             p2p_active.set_volume(var.settings['local']['volume'])
             p2p_active.play(loops=-1)
-            while var.status['p2p_sound_active'] == True and var.settings['local']['p2p_behind_cont']:
-                sleep(0.02)
+
+def stop_loop(notif):
+    if status[notif] == True:
+        print("stopping notif on loop: ", notif)
+        if notif == "p2p_active":
             p2p_active.stop()
             status[notif] = False
+            status["p2p_active_loop"] = False

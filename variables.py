@@ -357,7 +357,10 @@ status = {
     "set_list_count": 1,
     "upshift_val": -1,
     "downshift_val": -1,
-    "p2p_sound_active": False,
+    "p2p_sound_active": {
+        "single": False,
+        "loop": False,
+    },
     "weight_jacker": {
         "primary": 0.5,
         "secondary": 0.0,

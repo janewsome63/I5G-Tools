@@ -45,7 +45,8 @@ def read_config():
                     setting = config[section][item]
 
                 if section == "GLOBAL":
-                    var.settings[item] = setting
+                    if not (item == "high_threshold" or item == "low_threshold"): # to make up for a mistake in all 0.6.Xb versions
+                        var.settings[item] = setting
                 elif section == "SOUND":
                     var.settings['sound'][item] = setting
                 elif section == "PROFILE":
