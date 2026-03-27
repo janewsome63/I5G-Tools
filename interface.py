@@ -1199,8 +1199,10 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def apply_settings(self, file):
+        print("try apply_settings")
         if self.store['profile_busy']: #if list is getting cleared or current text is being reset during list refresh, skip this function
             return
+        print("proceeding with apply_settings")
 
         fn.read_profile(file)
         fn.write_config()
@@ -1228,28 +1230,25 @@ class MainWindow(QMainWindow):
         self.store['content']['settings']['timer_first'].setValue(int(var.settings['timer_first']))
         self.store['content']['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
         self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
-        if var.settings['local']['audio']:
-            self.store['content']['settings']['sound'].setCurrentText('Yes')
-        else:
-            self.store['content']['settings']['sound'].setCurrentText('No')
-        self.store['content']['settings']['volume'].setValue(int(var.settings['local']['volume']*100))
-        self.store['content']['settings']['hybrid_low_audio'].setCurrentText(str(var.settings['local']['hybrid_low_audio']))
-        self.store['content']['settings']['hybrid_high_audio'].setCurrentText(str(var.settings['local']['hybrid_high_audio']))
-        self.store['content']['settings']['hybrid_limit_audio'].setCurrentText(str(var.settings['local']['hybrid_limit_audio']))
-        self.store['content']['settings']['hybrid_low_val'].setValue(int(var.settings['local']['hybrid_low_val']))
-        self.store['content']['settings']['hybrid_high_val'].setValue(int(var.settings['local']['hybrid_high_val']))
-        self.store['content']['settings']['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
-        self.store['content']['settings']['upshift_beep'].setCurrentText(str(var.settings['local']['upshift_beep']))
-        self.store['content']['settings']['downshift_beep'].setCurrentText(str(var.settings['local']['downshift_beep']))
-        self.store['content']['settings']['beep_mode'].setCurrentText(str(var.settings['local']['beep_mode']))
-        self.store['content']['settings']['dynamic_mode_offset'].setValue(int(var.settings['local']['dynamic_mode_offset']))
-        self.store['content']['settings']['downshift_offset'].setValue(int(var.settings['local']['downshift_offset']))
-        self.store['content']['settings']['p2p_behind_audio'].setCurrentText(str(var.settings['local']['p2p_behind_audio']))
-        self.store['content']['settings']['p2p_behind_audio_cont'].setCurrentText(str(var.settings['local']['p2p_behind_audio_cont']))
-        self.store['content']['settings']['p2p_behind_nobrake'].setCurrentText(str(var.settings['local']['p2p_behind_nobrake']))
-        self.store['content']['settings']['p2p_behind_thresh'].setValue(int(var.settings['local']['p2p_behind_thresh']))
-        self.store['content']['settings']['p2p_behind_thresh_cont'].setValue(int(var.settings['local']['p2p_behind_thresh_cont']))
-        self.store['content']['settings']['p2p_behind_closest_car'].setCurrentText(str(var.settings['local']['p2p_behind_closest_car']))
+        for setting in var.settings['local']:
+            if setting == "audio":
+                if var.settings['local']['audio']:
+                    self.store['content']['settings']['sound'].setCurrentText('Yes')
+                else:
+                    self.store['content']['settings']['sound'].setCurrentText('No')
+            elif isinstance(var.settings['local'][setting], bool):
+                if var.settings['local'][setting]:
+                    self.store['content']['settings'][setting].setCurrentText('Yes')
+                else:
+                    self.store['content']['settings'][setting].setCurrentText('No')
+            elif isinstance(var.settings['local'][setting], (float, int)):
+                if setting == 'volume':
+                    self.store['content']['settings']['volume'].setValue(int(var.settings['local']['volume']*100))
+                else:
+                    self.store['content']['settings'][setting].setValue(int(var.settings['local'][setting]))
+            else:
+                print("isinstance check failed")
+        print ("end apply_settings")
 
     @pyqtSlot()
     def start_flash_tab(self, func):

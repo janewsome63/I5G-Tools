@@ -60,12 +60,12 @@ lang = {
     "dynamic_mode_offset_label": "Dynamic Mode Offset (in ms):",
     "upshift_offset_label": "Upshift Trigger Offset from redline (in RPM):",
     "downshift_offset_label": "Downshift Trigger Offset from redline (in RPM):",
-    "p2p_behind_audio_label": "Car Behind p2p Single Warning (if Sound is Yes):",
-    "p2p_behind_audio_cont_label": "Car Behind p2p Continuous Warning (if Sound is Yes):",
-    "p2p_behind_nobrake_label": "Stop p2p Warning Under Braking:",
-    "p2p_behind_thresh_label": "p2p Single Warning Threshold (in ms, -1 is all cars):",
-    "p2p_behind_thresh_cont_label": "p2p Continuous Warning Threshold (in ms, -1 is all cars):",
-    "p2p_behind_closest_car_label": "p2p Warning For Closest Car Behind Only:",
+    "p2p_behind_audio_label": "Car Behind P2P Single Warning (if Sound is Yes):",
+    "p2p_behind_audio_cont_label": "Car Behind P2P Continuous Warning (if Sound is Yes):",
+    "p2p_behind_nobrake_label": "Stop P2P Warning Under Braking:",
+    "p2p_behind_thresh_label": "P2P Single Warning Threshold (in ms, -1 is any distance):",
+    "p2p_behind_thresh_cont_label": "P2P Continuous Warning Threshold (in ms, -1 is any distance):",
+    "p2p_behind_closest_car_label": "P2P Warning For Closest Car Behind Only:",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",

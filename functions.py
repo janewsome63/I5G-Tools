@@ -128,6 +128,11 @@ def read_profile(profile=None):
         errors = []
         for section in config.sections():
             for item in config[section]:
+                if section == 'LOCAL':
+                    if item == 'version':
+                        print (item, var.lang['settings_version'])
+                    else:
+                        print(item, eval(config[section][item]))
                 if item == 'version':
                     # setting = config[section][item]
                     setting = var.lang['settings_version']
@@ -189,6 +194,7 @@ def read_profile(profile=None):
         var.settings['profile']['current'] = 'Default'
         write_profile()
     var.status['refresh_labels'] = True
+    print(var.settings)
     print("read_profile() end")
 def write_config():
     config = parse.ConfigParser()
