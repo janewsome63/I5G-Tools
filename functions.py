@@ -195,7 +195,7 @@ def read_profile(profile=None):
         var.settings['profile']['current'] = 'Default'
         write_profile()
     var.status['refresh_labels'] = True
-    print(var.settings)
+    # print(var.settings)
     print("read_profile() end")
 def write_config():
     config = parse.ConfigParser()
