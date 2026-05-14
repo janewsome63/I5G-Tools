@@ -22,34 +22,44 @@ device_info = {
         },
     },
 }
+id_table = [[-1,-1]] # index is the instance id, first value is the joystick index, second value is the guid
 
-def add_device(index, startup):
-    device = p.joystick.Joystick(index)
-    if "vJoy" not in device.get_name():
-        guid = device.get_guid()
-        devices.append(device)
-        device_info[guid] = {
-            "guid": guid,
-            "name": device.get_name(),
-            "index": index,
-            "instance": device.get_instance_id(),
-            "initialized": device.get_init(),
-        }
-        if device.get_numbuttons():
-            device_info[guid]['buttons'] = {}
-            for b in range(device.get_numbuttons()):
-                device_info[guid]['buttons'][b] = device.get_button(b)
-        if device.get_numaxes():
-            device_info[guid]['axes'] = {}
-            for a in range(device.get_numaxes()):
-                device_info[guid]['axes'][a] = device.get_axis(a)
-        if device.get_numhats():
-            device_info[guid]['hats'] = {}
-            for h in range(device.get_numhats()):
-                device_info[guid]['hats'][h] = device.get_hat(h)
-        print(device_info[guid])
-        if not startup:
-            fn.read_profile(var.settings['profile']['current'])
+def add_device(startup):
+    # device = p.joystick.Joystick(index)
+    print("start add_device")
+    for i in range(p.joystick.get_count()):
+        print(i)
+        device = p.joystick.Joystick(i)
+        if "vJoy" not in device.get_name():
+            guid = device.get_guid()
+            index = i
+            devices.append(device)
+            device_info[guid] = {
+                "guid": guid,
+                "name": device.get_name(),
+                "index": index,
+                "instance": device.get_instance_id(),
+                "initialized": device.get_init(),
+            }
+            while len(id_table) <= device.get_instance_id():
+                id_table.append([-1,-1])
+            id_table[device.get_instance_id()] = [index, guid]
+            print("id_table is now ", id_table)
+            if device.get_numbuttons():
+                device_info[guid]['buttons'] = {}
+                for b in range(device.get_numbuttons()):
+                    device_info[guid]['buttons'][b] = device.get_button(b)
+            if device.get_numaxes():
+                device_info[guid]['axes'] = {}
+                for a in range(device.get_numaxes()):
+                    device_info[guid]['axes'][a] = device.get_axis(a)
+            if device.get_numhats():
+                device_info[guid]['hats'] = {}
+                for h in range(device.get_numhats()):
+                    device_info[guid]['hats'][h] = device.get_hat(h)
+            print(device_info[guid])
+    if not startup:
+        fn.read_profile(var.settings['profile']['current'])
 
 def remove_device(instance):
     for i, device in enumerate(devices):
@@ -63,11 +73,12 @@ def remove_device(instance):
     fn.read_profile(var.settings['profile']['current'])
 
 
-def log_event(index, type, num, value):
-    if index != -1:
-        guid = p.joystick.Joystick(index).get_guid()
-    else:
-        guid = "-1"
+def log_event(instance_id, type, num, value):
+    [index, guid] = id_table[instance_id]
+    # if index != -1:
+    #     guid = p.joystick.Joystick(index).get_guid()
+    # else:
+    #     guid = "-1"
     if guid in device_info:
         if type == "button":
             if "buttons" in device_info[guid] and num in device_info[guid]['buttons']:
@@ -110,7 +121,7 @@ def log_event(index, type, num, value):
             "num": num,
             "value": value,
         }
-        # print(var.event)
+        print(var.event)
 
 
 def device_detection():
@@ -118,9 +129,9 @@ def device_detection():
     p.init()
     p.joystick.init()
     p.display.set_mode((0, 0), flags=p.HIDDEN)
-
-    for i in range(p.joystick.get_count()):
-        add_device(i, True)
+    
+    add_device(True)
+    
     var.status['devices_loaded'] = True
     var.status['refresh_labels'] = True
     running = True
@@ -131,21 +142,21 @@ def device_detection():
             if e.type == p.QUIT:
                 running = False
             if e.type == p.JOYDEVICEADDED:
-                add_device(e.device_index, False)
+                add_device(False)
                 var.status['refresh_labels'] = True
             elif e.type == p.JOYDEVICEREMOVED:
                 remove_device(e.instance_id)
                 var.status['refresh_labels'] = True
             if e.type == p.JOYBUTTONDOWN:
-                log_event(e.joy, "button", e.button, True)
+                log_event(e.instance_id, "button", e.button, True)
                 fn.start_thread(con.controls)
             elif e.type == p.JOYBUTTONUP:
-                log_event(e.joy, "button", e.button, False)
+                log_event(e.instance_id, "button", e.button, False)
             elif e.type == p.JOYAXISMOTION:
-                log_event(e.joy, "axis", e.axis, e.value)
+                log_event(e.instance_id, "axis", e.axis, e.value)
                 fn.start_thread(con.controls)
             elif e.type == p.JOYHATMOTION:
-                log_event(e.joy, "hat", e.hat, e.value)
+                log_event(e.instance_id, "hat", e.hat, e.value)
                 fn.start_thread(con.controls)
 
         try:
