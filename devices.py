@@ -11,7 +11,7 @@ import keyboard
 
 devices = []
 device_info = {
-    "-1": {
+    "keyboard": {
         "guid": None,
         "name": "Keyboard",
         "index": -1,
@@ -22,7 +22,7 @@ device_info = {
         },
     },
 }
-id_table = [[-1,-1]] # index is the instance id, first value is the joystick index, second value is the guid
+id_table = [[-2,-2]] # index is the instance id, first value is the joystick index, second value is the guid; -1 is keyboard, so using -2 to avoid confusion
 
 def add_device(startup):
     # device = p.joystick.Joystick(index)
@@ -42,7 +42,7 @@ def add_device(startup):
                 "initialized": device.get_init(),
             }
             while len(id_table) <= device.get_instance_id():
-                id_table.append([-1,-1])
+                id_table.append([-2,-2])
             id_table[device.get_instance_id()] = [index, guid]
             print("id_table is now ", id_table)
             if device.get_numbuttons():
@@ -74,7 +74,14 @@ def remove_device(instance):
 
 
 def log_event(instance_id, type, num, value):
-    [index, guid] = id_table[instance_id]
+    # print(instance_id, type, num, value)
+    # print(id_table)
+    if instance_id != -1:
+        [index, guid] = id_table[instance_id]
+    else:
+        [index, guid] = [-1, "keyboard"]
+    # print(index, guid)
+    # print(device_info)
     # if index != -1:
     #     guid = p.joystick.Joystick(index).get_guid()
     # else:
@@ -114,6 +121,8 @@ def log_event(instance_id, type, num, value):
                     value = "none"
                 device_info[guid]['hats'][num] = value
         elif type == "key":
+            # print(guid)
+            # print(device_info)
             device_info[guid]['keys'][num] = value
         var.event = {
             "guid": guid,
@@ -122,6 +131,8 @@ def log_event(instance_id, type, num, value):
             "value": value,
         }
         print(var.event)
+    # else:
+        # print("guid in device_info failed: ", guid, device_info)
 
 
 def device_detection():
@@ -168,6 +179,7 @@ def device_detection():
             key = None
 
         if key != var.status['key_prev']:
+            # print("key!: ", key)
             log_event(-1, "key", 0, key)
             fn.start_thread(con.controls)
         var.status['key_prev'] = key
