@@ -662,8 +662,21 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['p2p_behind_closest_car'].addItem("No")
             self.store['content'][function]['p2p_behind_closest_car'].setCurrentText(str(var.settings['local']['p2p_behind_closest_car']))
             self.store['content'][function]['p2p_behind_closest_car'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_closest_car'))
-            
 
+            self.store['content'][function]['donate'] = QPushButton()
+            self.store['content'][function]['donate'].setFixedSize(200, 25)
+            self.store['content'][function]['donate'].setText(var.lang['donate'])
+            self.store['content'][function]['donate'].clicked.connect(lambda: fn.open_browser(var.lang['donate_link']))
+
+            self.store['content'][function]['I5GYT'] = QPushButton()
+            self.store['content'][function]['I5GYT'].setFixedSize(200, 25)
+            self.store['content'][function]['I5GYT'].setText(var.lang['I5GYT'])
+            self.store['content'][function]['I5GYT'].clicked.connect(lambda: fn.open_browser(var.lang['I5GYT_link']))
+
+            self.store['content'][function]['discord'] = QPushButton()
+            self.store['content'][function]['discord'].setFixedSize(200, 25)
+            self.store['content'][function]['discord'].setText(var.lang['discord'])
+            self.store['content'][function]['discord'].clicked.connect(lambda: fn.open_browser(var.lang['discord_link']))
 
         row, column = 0, 0
         for element in self.store['content'][function]:
@@ -673,8 +686,11 @@ class MainWindow(QMainWindow):
                 self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
             if element != "profile_create_name" and element != "profile_select":
                 column += 1
-                if function == "settings" or function == "rpm":
-                    if column > 1:
+                if (function == "settings" or function == "rpm"):
+                    if element == 'donate' or element == 'I5GYT':
+                        column = 0
+                        row += 1
+                    elif column > 1:
                         column = 0
                         row += 1
                 else:

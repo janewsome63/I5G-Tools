@@ -99,6 +99,12 @@ lang = {
                     "Proceed?",
         },
     },
+    "donate": "Donate to support this app!",
+    "donate_link": "https://ko-fi.com/cmdracer",
+    "I5GYT": "Team I5G YouTube",
+    "I5GYT_link": "https://www.youtube.com/@TeamI5G",
+    "discord": "App Discord (TODO)",
+    "discord_link": "https://www.discord.com",
 }
 
 step = {

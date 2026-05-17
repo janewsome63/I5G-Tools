@@ -10,6 +10,7 @@ import devices as dev
 import variables as var
 from time import sleep
 import datetime
+import webbrowser
 
 def read_config():
     print("read_config() start")
@@ -447,3 +448,6 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
     if var.status['rewrite']['profile']:
         write_profile()
         var.status['rewrite']['profile'] = False
+
+def open_browser(link):
+    webbrowser.open(link)
