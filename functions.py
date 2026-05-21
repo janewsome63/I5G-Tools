@@ -451,3 +451,9 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
 
 def open_browser(link):
     webbrowser.open(link)
+
+def error_handling(e):
+    now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+    with open("I5G_Tools_err_" + now + ".log", "w") as f:
+        f.write(now + "\n") 
+        f.write(f"Error occurred: {str(e)}\n")

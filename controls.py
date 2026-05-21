@@ -6,28 +6,31 @@ import vjoy
 from time import sleep
 
 def controls():
-    check = fn.is_bind()
-    if check:
-        for entry in check:
-            function = entry['function']
-            control = entry['control']
-            if 'value' in entry:
-                value = entry['value']
-            else:
-                value = None
+    try:
+        check = fn.is_bind()
+        if check:
+            for entry in check:
+                function = entry['function']
+                control = entry['control']
+                if 'value' in entry:
+                    value = entry['value']
+                else:
+                    value = None
 
-            if var.status['calibration'] == "None" and not var.bindings['status']['active']:
-                bind = var.bindings[function][control]
-                if control == "pedal":
-                    pedal(function, value)
-                elif control == "up" or control == "down":
-                    if not var.status[function]['thread']['running'][control]:
-                        var.status[function]['thread']['running'][control] = True
-                        fn.start_thread(lambda: increment(bind, function, control))
-                elif control == "switch":
-                    if not var.status[function]['thread']['waiting']:
-                        var.status[function]['thread']['waiting'] = True
-                        fn.start_thread(lambda: switch(bind, function))
+                if var.status['calibration'] == "None" and not var.bindings['status']['active']:
+                    bind = var.bindings[function][control]
+                    if control == "pedal":
+                        pedal(function, value)
+                    elif control == "up" or control == "down":
+                        if not var.status[function]['thread']['running'][control]:
+                            var.status[function]['thread']['running'][control] = True
+                            fn.start_thread(lambda: increment(bind, function, control))
+                    elif control == "switch":
+                        if not var.status[function]['thread']['waiting']:
+                            var.status[function]['thread']['waiting'] = True
+                            fn.start_thread(lambda: switch(bind, function))
+    except Exception as e:
+        fn.error_handling(e)
 
 def check_pressed(bind):
     if bind['type'] == "button":
@@ -58,82 +61,88 @@ def check_pressed(bind):
     return pressed
 
 def increment(bind, function, control):
-    #print("increment function print1: ", bind, function, control)
-    if function == 'clutch' or function == 'throttle':
-        if control == "up":
-            offset = var.settings[function]['increment']/100
-        elif control == "down":
-            offset = -var.settings[function]['increment']/100
-        else:
-            offset = 0.0
-    else:
-        if control == "up":
-            offset = var.step[function] * var.settings[function]['increment']
-        elif control == "down":
-            offset = var.step[function] * var.settings[function]['increment'] * -1
-        else:
-            offset = 0.0
-    # print("offset: ", offset)
-    if check_pressed(bind):
-
-        if var.status[function]['switched']:
-            vjoy.set(function, var.status[function]['secondary'] + offset)
-            #print("secondary")
-        else:
-            if function == 'clutch' or function == 'throttle':
-                var.status[function]['secondary'] = var.status[function]['secondary'] + offset
+    try:
+        #print("increment function print1: ", bind, function, control)
+        if function == 'clutch' or function == 'throttle':
+            if control == "up":
+                offset = var.settings[function]['increment']/100
+            elif control == "down":
+                offset = -var.settings[function]['increment']/100
             else:
-                vjoy.set(function, var.status[function]['primary'] + offset)
-            #print("primary")
-
-        interval = int(10)
-        if var.settings[function]['continuous']:
-            count = 1
-            #print("count check1: ", count)
-            timer = var.settings['timer_first']/1000
-            while check_pressed(bind) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
-                if count % interval == 0:
-                    #print("count check2: ", count, var.status[function]['switched'])
-                    #print("continuous loop")
-                    if var.status[function]['switched']:
-                        vjoy.set(function, var.status[function]['secondary'] + offset)
-                    else:
-                        if function == 'clutch' or function == 'throttle':
-                            var.status[function]['secondary'] = var.status[function]['secondary'] + offset
-                        else:
-                            vjoy.set(function, var.status[function]['primary'] + offset)
-                    if count == 10:
-                        timer = var.settings['timer_loop']/1000
-                sleep(timer/interval)
-                count += 1
+                offset = 0.0
         else:
-            while check_pressed(bind) and var.status['calibration']== "None" and not var.bindings['status']['active']:
-                sleep(var.settings['timer_first']/(1000*interval))
-    #else:
-        #print("bind check_pressed failed: ", bind)
-    var.status[function]['thread']['running'][control] = False
+            if control == "up":
+                offset = var.step[function] * var.settings[function]['increment']
+            elif control == "down":
+                offset = var.step[function] * var.settings[function]['increment'] * -1
+            else:
+                offset = 0.0
+        # print("offset: ", offset)
+        if check_pressed(bind):
+
+            if var.status[function]['switched']:
+                vjoy.set(function, var.status[function]['secondary'] + offset)
+                #print("secondary")
+            else:
+                if function == 'clutch' or function == 'throttle':
+                    var.status[function]['secondary'] = var.status[function]['secondary'] + offset
+                else:
+                    vjoy.set(function, var.status[function]['primary'] + offset)
+                #print("primary")
+
+            interval = int(10)
+            if var.settings[function]['continuous']:
+                count = 1
+                #print("count check1: ", count)
+                timer = var.settings['timer_first']/1000
+                while check_pressed(bind) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
+                    if count % interval == 0:
+                        #print("count check2: ", count, var.status[function]['switched'])
+                        #print("continuous loop")
+                        if var.status[function]['switched']:
+                            vjoy.set(function, var.status[function]['secondary'] + offset)
+                        else:
+                            if function == 'clutch' or function == 'throttle':
+                                var.status[function]['secondary'] = var.status[function]['secondary'] + offset
+                            else:
+                                vjoy.set(function, var.status[function]['primary'] + offset)
+                        if count == 10:
+                            timer = var.settings['timer_loop']/1000
+                    sleep(timer/interval)
+                    count += 1
+            else:
+                while check_pressed(bind) and var.status['calibration']== "None" and not var.bindings['status']['active']:
+                    sleep(var.settings['timer_first']/(1000*interval))
+        #else:
+            #print("bind check_pressed failed: ", bind)
+        var.status[function]['thread']['running'][control] = False
+    except Exception as e:
+        fn.error_handling(e)
 
 
 def switch(bind, function):
-    if check_pressed(bind):
-        if var.status[function]['switched']:
-            var.status[function]['switched'] = False
-            vjoy.set(function, var.status[function]['primary'])
-        elif not var.status[function]['switched']:
-            var.status[function]['switched'] = True
-            vjoy.set(function, var.status[function]['secondary'])
-
-        while check_pressed(bind) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
-            sleep(0.05)
-
-        if not var.settings[function]['toggle']:
+    try:
+        if check_pressed(bind):
             if var.status[function]['switched']:
                 var.status[function]['switched'] = False
                 vjoy.set(function, var.status[function]['primary'])
             elif not var.status[function]['switched']:
                 var.status[function]['switched'] = True
                 vjoy.set(function, var.status[function]['secondary'])
-    var.status[function]['thread']['waiting'] = False
+
+            while check_pressed(bind) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
+                sleep(0.05)
+
+            if not var.settings[function]['toggle']:
+                if var.status[function]['switched']:
+                    var.status[function]['switched'] = False
+                    vjoy.set(function, var.status[function]['primary'])
+                elif not var.status[function]['switched']:
+                    var.status[function]['switched'] = True
+                    vjoy.set(function, var.status[function]['secondary'])
+        var.status[function]['thread']['waiting'] = False
+    except Exception as e:
+        fn.error_handling(e)
 
 def pedal(function, value):
     if value is not None:
