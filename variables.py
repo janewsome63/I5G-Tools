@@ -3,8 +3,8 @@ import os
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.0b",
-    "settings_version": "v0.7.0b", # identical to version now, compatibility list stored elsewhere
+    "version": "v0.7.1b",
+    "settings_version": "v0.7.1b", # identical to version now, compatibility list stored elsewhere
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -23,6 +23,7 @@ lang = {
     "calibrating": "<-Calibrating->",
     "high_threshold": "High Axis Threshold:",
     "low_threshold": "Low Axis Threshold:",
+    "axis_rollover": "Axis Rollover:",
     # "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor (Requires Restart):",
     "timer_loop": "Continuous Mode Loop Timer (in ms):",
@@ -114,6 +115,7 @@ step = {
     "fuel_map": 1 / (8 - 1),
     "clutch": 1 / (201 - 1),
     "throttle": 1 / (201 - 1),
+    "brake": 1 / (201 - 1),
     "regen": 1 / (1.0 - 0.5),
     "deploy": 1 / (1.0 - 0.1),
 }
@@ -287,6 +289,7 @@ settings = {
     "local": {
         "high_threshold": 0.90,
         "low_threshold": 0.10,
+        "axis_rollover": False,
         "audio": False,
         "volume": 0.5,
         "hybrid_low_audio": True,

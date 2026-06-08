@@ -401,6 +401,16 @@ class MainWindow(QMainWindow):
                 self.store['content'][function]['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
                 self.store['content'][function]['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
 
+                self.store['content'][function]['axis_rollover_label'] = QLabel()
+                self.store['content'][function]['axis_rollover_label'].setText(var.lang['axis_rollover'])
+
+                self.store['content'][function]['axis_rollover'] = CustomComboBox()
+                self.store['content'][function]['axis_rollover'].setFixedSize(200, 25)
+                self.store['content'][function]['axis_rollover'].addItem("Yes")
+                self.store['content'][function]['axis_rollover'].addItem("No")
+                self.store['content'][function]['axis_rollover'].setCurrentText("No")
+                self.store['content'][function]['axis_rollover'].currentIndexChanged.connect(lambda: self.settings_set('axis_rollover'))
+
                 # self.store['content'][function]['axis_samples_label'] = QLabel()
                 # self.store['content'][function]['axis_samples_label'].setText(var.lang['axis_samples'])
 
@@ -943,7 +953,7 @@ class MainWindow(QMainWindow):
 
         @pyqtSlot()
         def settings_set(self, func):
-            if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
+            if func == 'axis_rollover' or func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['settings'][func].currentText()
             else:
                 value = self.store['content']['settings'][func].value()
@@ -963,6 +973,9 @@ class MainWindow(QMainWindow):
                     fn.reset_bind_thresh(func, value/100)
                     var.settings['local'][func] = value/100
                     fn.write_profile()
+            elif func == 'axis_rollover':
+                var.settings['local']['axis_rollover'] = (value == "Yes")
+                fn.write_profile()
             elif func == 'sound':
                 var.settings['local']['audio'] = (value == "Yes")
                 fn.write_profile()

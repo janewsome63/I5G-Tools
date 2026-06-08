@@ -64,6 +64,11 @@ def set(axis, pct):
             print("queue order error in vjoy.py!!!")
     axis_busy[axis] = True
     switched = var.status[axis]['switched']
+    if var.settings['local']['axis_rollover']:
+        if pct < 0.0:
+            pct = 1.0
+        elif pct > 1.0:
+            pct = 0.0
     raw = round(pct * 32768)
     if raw <= 0:
         raw = 1
