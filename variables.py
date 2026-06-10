@@ -1,10 +1,13 @@
 import copy
 import os
 
+compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
+                       'v0.7.1b', '0.7.1.1b']
+
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.1b",
-    "settings_version": "v0.7.1b", # identical to version now, compatibility list stored elsewhere
+    "version": "v0.7.1.1b",
+    "settings_version": "v0.7.1.1b", # identical to version now, compatibility list stored above
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -473,11 +476,8 @@ event = {
 
 backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985,
-                  693475, 778565, 292374, 909283),
+                  693475, 778565, 292374, 909283, 1177562),
 }
-
-compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b']
 
 
 profile_list = []
