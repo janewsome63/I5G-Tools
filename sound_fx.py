@@ -82,6 +82,12 @@ def play(notif):
                     # status["p2p_active_single"] = False # latch this elsewhere, only release it to False once p2p single is eligible to be played again
                 else:
                     print ("p2p_active already playing ", p2p_active.get_num_channels(), " times")
+            elif notif == "p2p_active":
+                print ("in sfx.play for p2p_active, statuses are: ", status["p2p_active_single"], status['p2p_active_loop'])
+            else:
+                print(notif, " is not valid in sfx.play")
+        else:
+            print(notif, " sound status is already True in sfx.play")
     except Exception as e:
         fn.error_handling(e)
 
@@ -96,6 +102,30 @@ def play_loop(notif):
                 status["p2p_active_loop"] = True
                 p2p_active.set_volume(var.settings['local']['volume'])
                 p2p_active.play(loops=-1)
+            else:
+                print(notif, " sound status is already True in sfx.play_loop")
+        else:
+            print(notif, " is not valid in sfx.play_loop")
+    except Exception as e:
+        fn.error_handling(e)
+
+def play_num_loop(notif, num):
+    try:
+        if notif == "p2p_active":
+            if status["p2p_active_loop"] == False and p2p_active.get_num_channels() == 0:
+                print("playing notif on finite loop: ", notif, num)
+                p2p_active.stop() # if currently playing single
+                status['p2p_active_single'] = False
+                status[notif] = True
+                status["p2p_active_loop"] = True
+                p2p_active.set_volume(var.settings['local']['volume'])
+                p2p_active.play(loops=num-1)
+                status[notif] = False
+                status["p2p_active_loop"] = False
+            else:
+                print(notif, " sound status is already True in sfx.play_num_loop", p2p_active.get_num_channels(),"times")
+        else:
+            print(notif, " is not valid in sfx.play_num_loop")
     except Exception as e:
         fn.error_handling(e)
 
@@ -107,5 +137,7 @@ def stop_loop(notif):
                 p2p_active.stop()
                 status[notif] = False
                 status["p2p_active_loop"] = False
+        else:
+            print(notif, " sound status is already True in sfx.stop_loop")
     except Exception as e:
         fn.error_handling(e)

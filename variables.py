@@ -2,12 +2,12 @@ import copy
 import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b', '0.7.1.1b']
+                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.1.1b",
-    "settings_version": "v0.7.1.1b", # identical to version now, compatibility list stored above
+    "version": "v0.7.2b",
+    "settings_version": "v0.7.2b", # identical to version now, compatibility list stored above
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -30,7 +30,7 @@ lang = {
     # "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor (Requires Restart):",
     "timer_loop": "Continuous Mode Loop Timer (in ms):",
-    "timer_first": "Continuous Mode Initial Loop Timer (in ms)",
+    "timer_first": "Continuous Mode Initial Loop Timer (in ms):",
     "none": "None",
     "weight_jacker": "Weight Jacker",
     "front_roll_bar": "Front Bar",
@@ -41,6 +41,7 @@ lang = {
     "regen": "Regen",
     "deploy": "Deploy",
     "deploy_lim": "Deploy Limit:",
+    "sounds": "Sounds",
     "settings": "Settings",
     "create": "Create",
     "delete": "Delete",
@@ -50,6 +51,8 @@ lang = {
     "car_id": "Car ID:",
     "soc": "SoC",
     "hybrid": "Hybrid",
+    "play_sound": "Play Sound",
+    "playing_sound": "Playing",
     "sound_label": "Sound:",
     "volume_label": "Volume:",
     "hybrid_low_audio_label": "Hybrid Low Audio (if Sound is Yes):",
@@ -109,6 +112,8 @@ lang = {
     "I5GYT_link": "https://www.youtube.com/@TeamI5G",
     "discord": "App Discord (TODO)",
     "discord_link": "https://www.discord.com",
+    "github": "Github Repo (TODO)",
+    "github_link": "https://www.github.com",
 }
 
 step = {
