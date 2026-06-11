@@ -1000,7 +1000,7 @@ class MainWindow(QMainWindow):
         def settings_set(self, func):
             if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['sounds'][func].currentText()
-            elif func == 'volume':
+            elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
             elif func == 'axis_rollover':
                 value = self.store['content']['settings'][func].currentText()
