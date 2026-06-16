@@ -40,21 +40,21 @@ def read_config():
         errors = []
         for section in config.sections():
             for item in config[section]:
-                try:
-                    setting = eval(config[section][item])
-                except (SyntaxError, ValueError):
-                    setting = config[section][item]
+                if item not in var.obsolete:  # Check that variable isn't obsolete
+                    try:
+                        setting = eval(config[section][item])
+                    except (SyntaxError, ValueError):
+                        setting = config[section][item]
 
-                if section == "GLOBAL":
-                    if not (item == "high_threshold" or item == "low_threshold"): # to make up for a mistake in all 0.6.Xb versions
+                    if section == "GLOBAL":
                         var.settings[item] = setting
-                elif section == "SOUND":
-                    var.settings['sound'][item] = setting
-                elif section == "PROFILE":
-                    var.settings['profile'][item] = setting
-                else:
-                    if not section in errors:
-                        errors.append(section)
+                    elif section == "SOUND":
+                        var.settings['sound'][item] = setting
+                    elif section == "PROFILE":
+                        var.settings['profile'][item] = setting
+                    else:
+                        if not section in errors:
+                            errors.append(section)
 
         if errors: # and not var.status['rewrite']['config']:
             text = var.lang['section_errors']['config']['intro']
@@ -130,26 +130,27 @@ def read_profile(profile=None):
         errors = []
         for section in config.sections():
             for item in config[section]:
-                if section == 'LOCAL':
+                if item not in var.obsolete:  # Check that variable isn't obsolete
+                    if section == 'LOCAL':
+                        if item == 'version':
+                            print (item, var.lang['settings_version'])
+                        else:
+                            print(item, eval(config[section][item]))
                     if item == 'version':
-                        print (item, var.lang['settings_version'])
+                        # setting = config[section][item]
+                        setting = var.lang['settings_version']
                     else:
-                        print(item, eval(config[section][item]))
-                if item == 'version':
-                    # setting = config[section][item]
-                    setting = var.lang['settings_version']
-                else:
-                    setting = eval(config[section][item])
-                if section == "LOCAL":
-                    var.settings['local'][item] = setting
-                elif section.lower() in var.bindings:
-                    if item == "up" or item == "down" or item == "switch" or item == "pedal" or item == "label":
-                        var.bindings[section.lower()][item] = setting
+                        setting = eval(config[section][item])
+                    if section == "LOCAL":
+                            var.settings['local'][item] = setting
+                    elif section.lower() in var.bindings:
+                        if item == "up" or item == "down" or item == "switch" or item == "pedal" or item == "label":
+                            var.bindings[section.lower()][item] = setting
+                        else:
+                            var.settings[section.lower()][item] = setting
                     else:
-                        var.settings[section.lower()][item] = setting
-                else:
-                    if not section in errors:
-                        errors.append(section)
+                        if not section in errors:
+                            errors.append(section)
 
         if errors:
             text = var.lang['section_errors']['profile']['intro']
@@ -204,16 +205,18 @@ def write_config():
     config['GLOBAL'] = {}
     config['GLOBAL']['version'] = var.lang['settings_version']
     for setting in var.settings:
-        if not isinstance(var.settings[setting], dict):
-            config['GLOBAL'][setting] = str(var.settings[setting])
+        if setting not in var.obsolete:  # Check that variable isn't obsolete
+            if not isinstance(var.settings[setting], dict):
+                config['GLOBAL'][setting] = str(var.settings[setting])
 
     config['SOUND'] = {}
     for setting in var.settings['sound']:
-        config['SOUND'][setting] = str(var.settings['sound'][setting])
+        if setting not in var.obsolete:  # Check that variable isn't obsolete
+            config['SOUND'][setting] = str(var.settings['sound'][setting])
 
     config['PROFILE'] = {}
     for setting in var.settings['profile']:
-        if setting != "previous":
+        if setting not in var.obsolete:  # Check that variable isn't obsolete
             config['PROFILE'][setting] = str(var.settings['profile'][setting])
 
     if not os.path.exists(var.settings['path']):
@@ -234,7 +237,8 @@ def write_profile(profile=None):
     #config['LOCAL']['version'] = var.lang['version']
     config['LOCAL']['version'] = var.lang['settings_version']
     for setting in var.settings['local']:
-        config['LOCAL'][setting] = str(var.settings['local'][setting])
+        if setting not in var.obsolete:  # Check that variable isn't obsolete
+            config['LOCAL'][setting] = str(var.settings['local'][setting])
 
     for bind in var.bindings:
         if bind != "status":
@@ -277,10 +281,25 @@ def is_bind():
             "num": var.event['num'],
             "value": var.event['value']
         }
-        if event['value'] > var.settings['local']['high_threshold']:
-            event['value'] = var.settings['local']['high_threshold']
-        elif event['value'] < var.settings['local']['low_threshold']:
-            event['value'] = var.settings['local']['low_threshold']
+
+        # Find a less janky way to do this other than repeating the loop from the end
+        found = False
+        for function in var.bindings:
+            if function != "status":
+                for control in var.bindings[function]:
+                    bind = copy.deepcopy(var.bindings[function][control])
+                    if event['guid'] == bind['guid'] and event['num'] == bind['num']:
+                        found = True
+                        if event['value'] > var.settings[function]['axis_threshold']:
+                            event['value'] = var.settings[function]['axis_threshold']
+                        elif event['value'] < round(1 - var.settings[function]['axis_threshold'], 2):
+                            event['value'] = round(1 - var.settings[function]['axis_threshold'], 2)
+
+        if not found:
+            if event['value'] > var.settings['global_threshold']:
+                event['value'] = var.settings['global_threshold']
+            elif event['value'] < 1 - var.settings['global_threshold']:
+                event['value'] = round(1 - var.settings['global_threshold'], 2)
     elif var.event['type'] == "hat":
         event = {
             "guid": var.event['guid'],
@@ -309,6 +328,7 @@ def is_bind():
                 bind = copy.deepcopy(var.bindings[function][control])
                 try:
                     bind.pop("label")
+                    bind.pop("inverted")
                 except KeyError:
                     pass
                 if "input" in bind:
@@ -328,16 +348,13 @@ def check_uid(irsdk):
             if response == 1:
                 sys.exit(0)
 
-def reset_bind_thresh(thresh, value):
-    if not (thresh == 'low_threshold' or thresh == 'high_threshold'):
-        print("Warning: reset_bind_thresh with arguments: ", thresh, value)
-        return
-    for function in var.bindings:
-        if function != 'status':
-            for control in var.bindings[function]:
-                if var.bindings[function][control] is not None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
-                    if (var.bindings[function][control]['value'] == var.settings['local']['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['local']['low_threshold'] and thresh == 'low_threshold'):
-                        var.bindings[function][control]['value'] = value
+def reset_bind_thresh(function, value):
+    for control in var.bindings[function]:
+        if var.bindings[function][control] is not None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
+            if not var.bindings[function][control]['inverted']:
+                var.bindings[function][control]['value'] = value
+            else:
+                var.bindings[function][control]['value'] = round(1 - value, 2)
 
 def start_thread(target):
     thread = threading.Thread(target=target, daemon=True)
@@ -392,8 +409,9 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
             for section in file:
                 if section == "GENERAL":
                     var.settings['local']['version'] = var.lang['settings_version']
-                    var.settings['local']['high_threshold'] = float(file[section]['high_threshold'])
-                    var.settings['local']['low_threshold'] = float(file[section]['low_threshold'])
+                    # Not sure how this should be handled since the removal of these variables
+                    # var.settings['local']['high_threshold'] = float(file[section]['high_threshold'])
+                    # var.settings['local']['low_threshold'] = float(file[section]['low_threshold'])
                     var.status['rewrite']['config'] = True
                 else:
                     if section == "BITE_POINT":

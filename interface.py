@@ -11,7 +11,8 @@ from car_settings_list import car_settings
 from PyQt6.QtCore import (pyqtSlot, QSize, Qt, QThreadPool, QTimer)
 from PyQt6.QtGui import (QIcon, QColor, QWheelEvent)
 from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayout, QLabel, QLCDNumber, QLineEdit,
-    QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget, QScrollArea)
+                             QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget,
+                             QScrollArea)
 from time import sleep
 import math
 
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
                 applicationPath = "C:\\"
 
             self.store = {
-                "width": 700,
+                "width": 675,
                 "height": 250,
                 "running": False,
                 "profile_busy": False,
@@ -52,9 +53,10 @@ class MainWindow(QMainWindow):
                 "types": {
                     "adjustment": ("weight_jacker", "front_roll_bar", "rear_roll_bar", "fuel_map"),
                     "input": ("throttle", "clutch"),
-                    "other": ("axes_display", "hybrid", "sounds", "settings")
+                    "other": ("hybrid", "fuel", "display", "sounds", "settings", "about")
                 }
             }
+
             for type in self.tabs['types']:
                 for function in self.tabs['types'][type]:
                     self.tabs[function] = QWidget()
@@ -70,8 +72,13 @@ class MainWindow(QMainWindow):
                     self.store['content'][function] = {}
                     if type == "adjustment" or type == "input":
                         self.tool_tabs(type, function)
-                    elif type == "other":
-                        self.other_tabs(function)
+
+            self.hybrid_tab()
+            self.fuel_tab()
+            self.display_tab()
+            self.sounds_tab()
+            self.settings_tab()
+            self.about_tab()
 
             self.layout.addWidget(self.tabs['obj'])
             self.setCentralWidget(self.tabs['obj'])
@@ -79,12 +86,12 @@ class MainWindow(QMainWindow):
             self.apply_settings(var.settings['profile']['current'])
             self.refresh_profile_list()
 
-            self.store['index']['car_id'] = self.store['content']['axes_display']['car_id']
+            self.store['index']['car_id'] = self.store['content']['display']['car_id']
 
             self.ir = irsdk.IRSDK()
             self.ir.startup()
             fn.check_uid(self.ir)
-            self.store['content']['axes_display']['car_id'] = "None"
+            self.store['content']['display']['car_id'] = "None"
             self.update_limits()
 
             self.lastval = {
@@ -164,7 +171,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['axis'].setTextVisible(False)
 
             self.store['content'][function]['calibrate'] = QPushButton()
-            self.store['content'][function]['calibrate'].setFixedSize(100, 25)
+            self.store['content'][function]['calibrate'].setFixedSize(95, 25)
             self.store['content'][function]['calibrate'].setText(var.lang['calibrate'])
             self.store['content'][function]['calibrate'].clicked.connect(lambda: self.calibrate_start(function))
 
@@ -176,14 +183,14 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch_value_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['increment'] = CustomDoubleSpinBox()
-            self.store['content'][function]['increment'].setFixedSize(70, 25)
+            self.store['content'][function]['increment'].setFixedSize(95, 25)
             self.store['content'][function]['increment'].setRange(local_store['range']['increment'][0], local_store['range']['increment'][1])
             self.store['content'][function]['increment'].setDecimals(local_store['decimals'])
             self.store['content'][function]['increment'].setSingleStep(local_store['step'])
             self.store['content'][function]['increment'].valueChanged.connect(lambda: self.increment(function))
 
             self.store['content'][function]['switch'] = CustomDoubleSpinBox()
-            self.store['content'][function]['switch'].setFixedSize(70, 25)
+            self.store['content'][function]['switch'].setFixedSize(95, 25)
             self.store['content'][function]['switch'].setRange(local_store['range']['switch'][0], local_store['range']['switch'][1])
             self.store['content'][function]['switch'].setDecimals(local_store['decimals'])
             self.store['content'][function]['switch'].setSingleStep(local_store['step'])
@@ -197,14 +204,32 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['increment_mode'] = CustomComboBox()
-            self.store['content'][function]['increment_mode'].setFixedSize(100, 25)
+            self.store['content'][function]['increment_mode'].setFixedSize(95, 25)
             self.store['content'][function]['increment_mode'].addItems((var.lang['continuous'], var.lang['single']))
             self.store['content'][function]['increment_mode'].currentIndexChanged.connect(lambda: self.increment_mode(function))
 
             self.store['content'][function]['switch_mode'] = CustomComboBox()
-            self.store['content'][function]['switch_mode'].setFixedSize(70, 25)
+            self.store['content'][function]['switch_mode'].setFixedSize(95, 25)
             self.store['content'][function]['switch_mode'].addItems((var.lang['hold'], var.lang['toggle']))
             self.store['content'][function]['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode(function))
+
+            self.store['content'][function]['axis_threshold_label'] = QLabel()
+            self.store['content'][function]['axis_threshold_label'].setText(var.lang['axis_threshold'])
+
+            self.store['content'][function]['rollover_mode_label'] = QLabel()
+            self.store['content'][function]['rollover_mode_label'].setText(var.lang['rollover_mode'])
+            self.store['content'][function]['rollover_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+            self.store['content'][function]['axis_threshold'] = CustomSpinBox()
+            self.store['content'][function]['axis_threshold'].setFixedSize(95, 25)
+            self.store['content'][function]['axis_threshold'].setRange(1, 99)
+            self.store['content'][function]['axis_threshold'].setValue(int(var.settings[function]['axis_threshold'] * 100))
+            self.store['content'][function]['axis_threshold'].valueChanged.connect(lambda: self.axis_threshold(function))
+
+            self.store['content'][function]['rollover_mode'] = CustomComboBox()
+            self.store['content'][function]['rollover_mode'].setFixedSize(95, 25)
+            self.store['content'][function]['rollover_mode'].addItems((var.lang['locked'], var.lang['unlocked']))
+            self.store['content'][function]['rollover_mode'].currentIndexChanged.connect(lambda: self.rollover_mode(function))
             
             if type == "input":
                 self.store['content'][function]['pedal_label'] = QLabel()
@@ -216,7 +241,7 @@ class MainWindow(QMainWindow):
                 self.store['content'][function]['pedal_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
 
                 self.store['content'][function]['pedal_bind'] = QPushButton()
-                self.store['content'][function]['pedal_bind'].setFixedSize(100, 25)
+                self.store['content'][function]['pedal_bind'].setFixedSize(95, 25)
                 self.store['content'][function]['pedal_bind'].setText(var.lang['bind'])
                 self.store['content'][function]['pedal_bind'].clicked.connect(lambda: self.bind_start(function, "pedal", True))
 
@@ -229,7 +254,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['up_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
 
             self.store['content'][function]['up_bind'] = QPushButton()
-            self.store['content'][function]['up_bind'].setFixedSize(100, 25)
+            self.store['content'][function]['up_bind'].setFixedSize(95, 25)
             self.store['content'][function]['up_bind'].setText(var.lang['bind'])
             self.store['content'][function]['up_bind'].clicked.connect(lambda: self.bind_start(function, "up"))
 
@@ -242,7 +267,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['down_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
 
             self.store['content'][function]['down_bind'] = QPushButton()
-            self.store['content'][function]['down_bind'].setFixedSize(100, 25)
+            self.store['content'][function]['down_bind'].setFixedSize(95, 25)
             self.store['content'][function]['down_bind'].setText(var.lang['bind'])
             self.store['content'][function]['down_bind'].clicked.connect(lambda: self.bind_start(function, "down"))
 
@@ -255,14 +280,14 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
 
             self.store['content'][function]['switch_bind'] = QPushButton()
-            self.store['content'][function]['switch_bind'].setFixedSize(100, 25)
+            self.store['content'][function]['switch_bind'].setFixedSize(95, 25)
             self.store['content'][function]['switch_bind'].setText(var.lang['bind'])
             self.store['content'][function]['switch_bind'].clicked.connect(lambda: self.bind_start(function, "switch"))
 
             row, column = 0, 0
             for element in self.store['content'][function]:
                 self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
-                if element != "switch_value_label" and element != "switch_mode_label":
+                if element != "switch_value_label" and element != "switch_mode_label" and element != "rollover_mode_label":
                     column += 1
                     if column > 2:
                         column = 0
@@ -278,483 +303,542 @@ class MainWindow(QMainWindow):
                     "label": self.store['content'][function][control + '_label'],
                 }
 
-        def other_tabs(self, function):
-            self.tabs[function].layout = QGridLayout()
-
-            if function == "axes_display":
-                self.store['content'][function]['car_id_label'] = QLabel()
-                self.store['content'][function]['car_id_label'].setText(var.lang['car_id'])
-
-                self.store['content'][function]['car_id'] = QLabel()
-                self.store['content'][function]['car_id'].setText("None")
-
-                self.store['content'][function]['car_id_limits'] = QLabel()
-                self.store['content'][function]['car_id_limits'].setText("Placeholder")
-                self.store['content'][function]['car_id_limits'].setWordWrap(True)
-
-                self.store['content'][function]['weight_jacker_label'] = QLabel()
-                self.store['content'][function]['weight_jacker_label'].setText(var.lang['weight_jacker'])
-
-                self.store['content'][function]['weight_jacker_lcd'] = QLCDNumber()
-                self.store['content'][function]['weight_jacker_lcd'].display(0)
-                self.store['content'][function]['weight_jacker_lcd'].setSegmentStyle(self.store['content']['weight_jacker']['lcd'].segmentStyle())
-
-                self.store['content'][function]['weight_jacker_axis'] = QProgressBar()
-                self.store['content'][function]['weight_jacker_axis'].setTextVisible(False)
-                self.store['content'][function]['weight_jacker_axis'].setMinimum(0)
-                self.store['content'][function]['weight_jacker_axis'].setMaximum(100)
-
-                self.store['content'][function]['front_roll_bar_label'] = QLabel()
-                self.store['content'][function]['front_roll_bar_label'].setText(var.lang['front_roll_bar'])
-
-                self.store['content'][function]['front_roll_bar_lcd'] = QLCDNumber()
-                self.store['content'][function]['front_roll_bar_lcd'].display(0)
-
-                self.store['content'][function]['front_roll_bar_axis'] = QProgressBar()
-                self.store['content'][function]['front_roll_bar_axis'].setTextVisible(False)
-                self.store['content'][function]['front_roll_bar_axis'].setMinimum(0)
-                self.store['content'][function]['front_roll_bar_axis'].setMaximum(100)
-
-                self.store['content'][function]['rear_roll_bar_label'] = QLabel()
-                self.store['content'][function]['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'])
-
-                self.store['content'][function]['rear_roll_bar_lcd'] = QLCDNumber()
-                self.store['content'][function]['rear_roll_bar_lcd'].display(0)
-
-                self.store['content'][function]['rear_roll_bar_axis'] = QProgressBar()
-                self.store['content'][function]['rear_roll_bar_axis'].setTextVisible(False)
-                self.store['content'][function]['rear_roll_bar_axis'].setMinimum(0)
-                self.store['content'][function]['rear_roll_bar_axis'].setMaximum(100)
-
-                self.store['content'][function]['fuel_map_label'] = QLabel()
-                self.store['content'][function]['fuel_map_label'].setText(var.lang['fuel_map'])
-
-                self.store['content'][function]['fuel_map_lcd'] = QLCDNumber()
-                self.store['content'][function]['fuel_map_lcd'].display(0)
-
-                self.store['content'][function]['fuel_map_axis'] = QProgressBar()
-                self.store['content'][function]['fuel_map_axis'].setTextVisible(False)
-                self.store['content'][function]['fuel_map_axis'].setMinimum(0)
-                self.store['content'][function]['fuel_map_axis'].setMaximum(100)
-
-                self.store['content'][function]['clutch_label'] = QLabel()
-                self.store['content'][function]['clutch_label'].setText(var.lang['clutch'])
-
-                self.store['content'][function]['clutch_lcd'] = QLCDNumber()
-                self.store['content'][function]['clutch_lcd'].display(0)
-
-                self.store['content'][function]['clutch_axis'] = QProgressBar()
-                self.store['content'][function]['clutch_axis'].setTextVisible(False)
-                self.store['content'][function]['clutch_axis'].setMinimum(0)
-                self.store['content'][function]['clutch_axis'].setMaximum(100)
-
-                self.store['content'][function]['throttle_label'] = QLabel()
-                self.store['content'][function]['throttle_label'].setText(var.lang['throttle'])
-
-                self.store['content'][function]['throttle_lcd'] = QLCDNumber()
-                self.store['content'][function]['throttle_lcd'].display(0)
-
-                self.store['content'][function]['throttle_axis'] = QProgressBar()
-                self.store['content'][function]['throttle_axis'].setTextVisible(False)
-                self.store['content'][function]['throttle_axis'].setMinimum(0)
-                self.store['content'][function]['throttle_axis'].setMaximum(100)
-            elif function == "hybrid":
-                self.store['content'][function]['soc_label'] = QLabel()
-                self.store['content'][function]['soc_label'].setText(var.lang['soc'])
-                self.store['content'][function]['soc_label'].setStyleSheet("color: red;")
-
-                self.store['content'][function]['soc_lcd'] = QLCDNumber()
-                self.store['content'][function]['soc_lcd'].display(str(0.00))
-
-                self.store['content'][function]['soc_axis'] = QProgressBar()
-                self.store['content'][function]['soc_axis'].setTextVisible(False)
-                self.store['content'][function]['soc_axis'].setMinimum(0)
-                self.store['content'][function]['soc_axis'].setMaximum(100)
-
-                self.store['content'][function]['deploy_lim_label'] = QLabel()
-                self.store['content'][function]['deploy_lim_label'].setText(var.lang['deploy_lim'])
-                self.store['content'][function]['deploy_lim_label'].setStyleSheet("color: red;")
-
-                self.store['content'][function]['deploy_lim_lcd'] = QLCDNumber()
-                self.store['content'][function]['deploy_lim_lcd'].display(str(0.00))
-
-                self.store['content'][function]['deploy_lim_axis'] = QProgressBar()
-                self.store['content'][function]['deploy_lim_axis'].setTextVisible(False)
-                self.store['content'][function]['deploy_lim_axis'].setMinimum(0)
-                self.store['content'][function]['deploy_lim_axis'].setMaximum(100)
-            elif function == "sounds":
-                self.store['content'][function]['sound_label'] = QLabel()
-                self.store['content'][function]['sound_label'].setText(var.lang['sound_label'])
-
-                self.store['content'][function]['sound'] = CustomComboBox()
-                self.store['content'][function]['sound'].setFixedSize(70, 25)
-                self.store['content'][function]['sound'].addItem("Yes")
-                self.store['content'][function]['sound'].addItem("No")
-                self.store['content'][function]['sound'].setCurrentText("No")
-                self.store['content'][function]['sound'].currentIndexChanged.connect(lambda: self.settings_set('sound'))
-
-                self.store['content'][function]['volume_label'] = QLabel()
-                self.store['content'][function]['volume_label'].setText(var.lang['volume_label'])
-
-                self.store['content'][function]['volume'] = CustomSpinBox()
-                self.store['content'][function]['volume'].setFixedSize(70, 25)
-                self.store['content'][function]['volume'].setRange(0, 100)
-                self.store['content'][function]['volume'].valueChanged.connect(lambda: self.settings_set('volume'))
-
-                self.store['content'][function]['hybrid_low_audio_label'] = QLabel()
-                self.store['content'][function]['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'])
-
-                self.store['content'][function]['hybrid_low_audio'] = CustomComboBox()
-                self.store['content'][function]['hybrid_low_audio'].setFixedSize(70, 25)
-                self.store['content'][function]['hybrid_low_audio'].addItem("Yes")
-                self.store['content'][function]['hybrid_low_audio'].addItem("No")
-                self.store['content'][function]['hybrid_low_audio'].setCurrentText(str(var.settings['local']['hybrid_low_audio']))
-                self.store['content'][function]['hybrid_low_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_low_audio'))
-
-                self.store['content'][function]['hybrid_low_test'] = QPushButton()
-                self.store['content'][function]['hybrid_low_test'].setFixedSize(70, 25)
-                self.store['content'][function]['hybrid_low_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['hybrid_low_test'].clicked.connect(lambda: self.test_play("low"))
-
-                self.store['content'][function]['hybrid_high_audio_label'] = QLabel()
-                self.store['content'][function]['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'])
-
-                self.store['content'][function]['hybrid_high_audio'] = CustomComboBox()
-                self.store['content'][function]['hybrid_high_audio'].setFixedSize(70, 25)
-                self.store['content'][function]['hybrid_high_audio'].addItem("Yes")
-                self.store['content'][function]['hybrid_high_audio'].addItem("No")
-                self.store['content'][function]['hybrid_high_audio'].setCurrentText(str(var.settings['local']['hybrid_high_audio']))
-                self.store['content'][function]['hybrid_high_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_high_audio'))
-
-                self.store['content'][function]['hybrid_high_test'] = QPushButton()
-                self.store['content'][function]['hybrid_high_test'].setFixedSize(70, 25)
-                self.store['content'][function]['hybrid_high_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['hybrid_high_test'].clicked.connect(lambda: self.test_play("high"))
-
-                self.store['content'][function]['hybrid_limit_audio_label'] = QLabel()
-                self.store['content'][function]['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'])
-
-                self.store['content'][function]['hybrid_limit_audio'] = CustomComboBox()
-                self.store['content'][function]['hybrid_limit_audio'].setFixedSize(70, 25)
-                self.store['content'][function]['hybrid_limit_audio'].addItem("Yes")
-                self.store['content'][function]['hybrid_limit_audio'].addItem("No")
-                self.store['content'][function]['hybrid_limit_audio'].setCurrentText(str(var.settings['local']['hybrid_limit_audio']))
-                self.store['content'][function]['hybrid_limit_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_limit_audio'))
-
-                self.store['content'][function]['hybrid_limit_test'] = QPushButton()
-                self.store['content'][function]['hybrid_limit_test'].setFixedSize(70, 25)
-                self.store['content'][function]['hybrid_limit_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['hybrid_limit_test'].clicked.connect(lambda: self.test_play("limit"))
-
-                self.store['content'][function]['hybrid_low_label'] = QLabel()
-                self.store['content'][function]['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
-
-                self.store['content'][function]['hybrid_low_val'] = CustomSpinBox()
-                self.store['content'][function]['hybrid_low_val'].setFixedSize(70, 20)
-                self.store['content'][function]['hybrid_low_val'].setRange(0, 99)
-                self.store['content'][function]['hybrid_low_val'].setValue(int(var.settings['local']['hybrid_low_val']))
-                self.store['content'][function]['hybrid_low_val'].valueChanged.connect(lambda: self.settings_set('hybrid_low_val'))
-
-                self.store['content'][function]['hybrid_high_label'] = QLabel()
-                self.store['content'][function]['hybrid_high_label'].setText(var.lang['hybrid_high_label'])
-
-                self.store['content'][function]['hybrid_high_val'] = CustomSpinBox()
-                self.store['content'][function]['hybrid_high_val'].setFixedSize(70, 20)
-                self.store['content'][function]['hybrid_high_val'].setRange(1, 99)
-                self.store['content'][function]['hybrid_high_val'].setValue(int(var.settings['local']['hybrid_high_val']))
-                self.store['content'][function]['hybrid_high_val'].valueChanged.connect(lambda: self.settings_set('hybrid_high_val'))
-
-                self.store['content'][function]['hybrid_limit_label'] = QLabel()
-                self.store['content'][function]['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'])
-
-                self.store['content'][function]['hybrid_limit_val'] = CustomSpinBox()
-                self.store['content'][function]['hybrid_limit_val'].setFixedSize(70, 20)
-                self.store['content'][function]['hybrid_limit_val'].setRange(1, 100)
-                self.store['content'][function]['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
-                self.store['content'][function]['hybrid_limit_val'].valueChanged.connect(lambda: self.settings_set('hybrid_limit_val'))
-
-                self.store['content'][function]['upshift_beep_label'] = QLabel()
-                self.store['content'][function]['upshift_beep_label'].setText(var.lang['upshift_beep_label'])
-
-                self.store['content'][function]['upshift_beep'] = CustomComboBox()
-                self.store['content'][function]['upshift_beep'].setFixedSize(70, 25)
-                self.store['content'][function]['upshift_beep'].addItem("Yes")
-                self.store['content'][function]['upshift_beep'].addItem("No")
-                self.store['content'][function]['upshift_beep'].setCurrentText(str(var.settings['local']['upshift_beep']))
-                self.store['content'][function]['upshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('upshift_beep'))
-
-                self.store['content'][function]['upshift_beep_test'] = QPushButton()
-                self.store['content'][function]['upshift_beep_test'].setFixedSize(70, 25)
-                self.store['content'][function]['upshift_beep_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['upshift_beep_test'].clicked.connect(lambda: self.test_play("upshift_beep"))
-
-                self.store['content'][function]['downshift_beep_label'] = QLabel()
-                self.store['content'][function]['downshift_beep_label'].setText(var.lang['downshift_beep_label'])
-
-                self.store['content'][function]['downshift_beep'] = CustomComboBox()
-                self.store['content'][function]['downshift_beep'].setFixedSize(70, 25)
-                self.store['content'][function]['downshift_beep'].addItem("Yes")
-                self.store['content'][function]['downshift_beep'].addItem("No")
-                self.store['content'][function]['downshift_beep'].setCurrentText(str(var.settings['local']['downshift_beep']))
-                self.store['content'][function]['downshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('downshift_beep'))
-
-                self.store['content'][function]['downshift_beep_test'] = QPushButton()
-                self.store['content'][function]['downshift_beep_test'].setFixedSize(70, 25)
-                self.store['content'][function]['downshift_beep_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['downshift_beep_test'].clicked.connect(lambda: self.test_play("downshift_beep"))
-
-                self.store['content'][function]['beep_mode_label'] = QLabel()
-                self.store['content'][function]['beep_mode_label'].setText(var.lang['beep_mode_label'])
-
-                self.store['content'][function]['beep_mode'] = CustomComboBox()
-                self.store['content'][function]['beep_mode'].setFixedSize(70, 25)
-                self.store['content'][function]['beep_mode'].addItem("Fixed")
-                # self.store['content'][function]['beep_mode'].addItem("Dynamic")
-                self.store['content'][function]['beep_mode'].setCurrentText(str(var.settings['local']['beep_mode']))
-                self.store['content'][function]['beep_mode'].currentIndexChanged.connect(lambda: self.settings_set('beep_mode'))
-
-                #dynamic mode offset
-                self.store['content'][function]['dynamic_mode_offset_label'] = QLabel()
-                self.store['content'][function]['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'])
-
-                self.store['content'][function]['dynamic_mode_offset'] = CustomSpinBox()
-                self.store['content'][function]['dynamic_mode_offset'].setFixedSize(70, 20)
-                self.store['content'][function]['dynamic_mode_offset'].setRange(-10000, 10000)
-                self.store['content'][function]['dynamic_mode_offset'].setValue(int(var.settings['local']['dynamic_mode_offset']))
-                self.store['content'][function]['dynamic_mode_offset'].valueChanged.connect(lambda: self.settings_set('dynamic_mode_offset'))
-
-                #upshift offset
-                self.store['content'][function]['upshift_offset_label'] = QLabel()
-                self.store['content'][function]['upshift_offset_label'].setText(var.lang['upshift_offset_label'])
-
-                self.store['content'][function]['upshift_offset'] = CustomSpinBox()
-                self.store['content'][function]['upshift_offset'].setFixedSize(70, 20)
-                self.store['content'][function]['upshift_offset'].setRange(-10000, 10000)
-                self.store['content'][function]['upshift_offset'].setValue(int(var.settings['local']['upshift_offset']))
-                self.store['content'][function]['upshift_offset'].valueChanged.connect(lambda: self.settings_set('upshift_offset'))
-
-                #downshift offset
-                self.store['content'][function]['downshift_offset_label'] = QLabel()
-                self.store['content'][function]['downshift_offset_label'].setText(var.lang['downshift_offset_label'])
-
-                self.store['content'][function]['downshift_offset'] = CustomSpinBox()
-                self.store['content'][function]['downshift_offset'].setFixedSize(70, 20)
-                self.store['content'][function]['downshift_offset'].setRange(-10000, 10000)
-                self.store['content'][function]['downshift_offset'].setValue(int(var.settings['local']['downshift_offset']))
-                self.store['content'][function]['downshift_offset'].valueChanged.connect(lambda: self.settings_set('downshift_offset'))
-
-                # p2p behind audio enabled
-                self.store['content'][function]['p2p_behind_audio_label'] = QLabel()
-                self.store['content'][function]['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'])
-
-                self.store['content'][function]['p2p_behind_audio'] = CustomComboBox()
-                self.store['content'][function]['p2p_behind_audio'].setFixedSize(70, 25)
-                self.store['content'][function]['p2p_behind_audio'].addItem("Yes")
-                self.store['content'][function]['p2p_behind_audio'].addItem("No")
-                self.store['content'][function]['p2p_behind_audio'].setCurrentText(str(var.settings['local']['p2p_behind_audio']))
-                self.store['content'][function]['p2p_behind_audio'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_audio'))
-
-                self.store['content'][function]['p2p_behind_test'] = QPushButton()
-                self.store['content'][function]['p2p_behind_test'].setFixedSize(70, 25)
-                self.store['content'][function]['p2p_behind_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['p2p_behind_test'].clicked.connect(lambda: self.test_play("p2p_active"))
-
-                # p2p behind audio continuous enabled
-                self.store['content'][function]['p2p_behind_audio_cont_label'] = QLabel()
-                self.store['content'][function]['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'])
-
-                self.store['content'][function]['p2p_behind_audio_cont'] = CustomComboBox()
-                self.store['content'][function]['p2p_behind_audio_cont'].setFixedSize(70, 25)
-                self.store['content'][function]['p2p_behind_audio_cont'].addItem("Yes")
-                self.store['content'][function]['p2p_behind_audio_cont'].addItem("No")
-                self.store['content'][function]['p2p_behind_audio_cont'].setCurrentText(str(var.settings['local']['p2p_behind_audio_cont']))
-                self.store['content'][function]['p2p_behind_audio_cont'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_audio_cont'))
-
-                self.store['content'][function]['p2p_behind_cont_test'] = QPushButton()
-                self.store['content'][function]['p2p_behind_cont_test'].setFixedSize(70, 25)
-                self.store['content'][function]['p2p_behind_cont_test'].setText(var.lang['play_sound'])
-                self.store['content'][function]['p2p_behind_cont_test'].clicked.connect(lambda: self.test_play_loop("p2p_active"))
-
-                # p2p behind stop audio under braking
-                self.store['content'][function]['p2p_behind_nobrake_label'] = QLabel()
-                self.store['content'][function]['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'])
-
-                self.store['content'][function]['p2p_behind_nobrake'] = CustomComboBox()
-                self.store['content'][function]['p2p_behind_nobrake'].setFixedSize(70, 25)
-                self.store['content'][function]['p2p_behind_nobrake'].addItem("Yes")
-                self.store['content'][function]['p2p_behind_nobrake'].addItem("No")
-                self.store['content'][function]['p2p_behind_nobrake'].setCurrentText(str(var.settings['local']['p2p_behind_nobrake']))
-                self.store['content'][function]['p2p_behind_nobrake'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_nobrake'))
-
-                # p2p behind single warning threshold
-                self.store['content'][function]['p2p_behind_thresh_label'] = QLabel()
-                self.store['content'][function]['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'])
-
-                self.store['content'][function]['p2p_behind_thresh'] = CustomSpinBox()
-                self.store['content'][function]['p2p_behind_thresh'].setFixedSize(70, 20)
-                self.store['content'][function]['p2p_behind_thresh'].setRange(-1, 1000000)
-                self.store['content'][function]['p2p_behind_thresh'].setValue(int(var.settings['local']['p2p_behind_thresh']))
-                self.store['content'][function]['p2p_behind_thresh'].valueChanged.connect(lambda: self.settings_set('p2p_behind_thresh'))
-
-                # p2p behind continuous warning threshold
-                self.store['content'][function]['p2p_behind_thresh_cont_label'] = QLabel()
-                self.store['content'][function]['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'])
-
-                self.store['content'][function]['p2p_behind_thresh_cont'] = CustomSpinBox()
-                self.store['content'][function]['p2p_behind_thresh_cont'].setFixedSize(70, 20)
-                self.store['content'][function]['p2p_behind_thresh_cont'].setRange(-1, 1000000)
-                self.store['content'][function]['p2p_behind_thresh_cont'].setValue(int(var.settings['local']['p2p_behind_thresh_cont']))
-                self.store['content'][function]['p2p_behind_thresh_cont'].valueChanged.connect(lambda: self.settings_set('p2p_behind_thresh_cont'))
-
-                # p2p behind audio for any car within range vs closest car only
-                self.store['content'][function]['p2p_behind_closest_car_label'] = QLabel()
-                self.store['content'][function]['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'])
-
-                self.store['content'][function]['p2p_behind_closest_car'] = CustomComboBox()
-                self.store['content'][function]['p2p_behind_closest_car'].setFixedSize(70, 25)
-                self.store['content'][function]['p2p_behind_closest_car'].addItem("Yes")
-                self.store['content'][function]['p2p_behind_closest_car'].addItem("No")
-                self.store['content'][function]['p2p_behind_closest_car'].setCurrentText(str(var.settings['local']['p2p_behind_closest_car']))
-                self.store['content'][function]['p2p_behind_closest_car'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_closest_car'))
-            elif function == "settings":
-                self.store['content'][function]['high_threshold_label'] = QLabel()
-                self.store['content'][function]['high_threshold_label'].setText(var.lang['high_threshold'])
-
-                self.store['content'][function]['high_threshold'] = CustomSpinBox()
-                self.store['content'][function]['high_threshold'].setFixedSize(70, 20)
-                self.store['content'][function]['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
-                self.store['content'][function]['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
-                self.store['content'][function]['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
-
-                self.store['content'][function]['low_threshold_label'] = QLabel()
-                self.store['content'][function]['low_threshold_label'].setText(var.lang['low_threshold'])
-
-                self.store['content'][function]['low_threshold'] = CustomSpinBox()
-                self.store['content'][function]['low_threshold'].setFixedSize(70, 20)
-                self.store['content'][function]['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
-                self.store['content'][function]['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
-                self.store['content'][function]['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
-
-                self.store['content'][function]['axis_rollover_label'] = QLabel()
-                self.store['content'][function]['axis_rollover_label'].setText(var.lang['axis_rollover'])
-
-                self.store['content'][function]['axis_rollover'] = CustomComboBox()
-                self.store['content'][function]['axis_rollover'].setFixedSize(70, 25)
-                self.store['content'][function]['axis_rollover'].addItem("Yes")
-                self.store['content'][function]['axis_rollover'].addItem("No")
-                self.store['content'][function]['axis_rollover'].setCurrentText("No")
-                self.store['content'][function]['axis_rollover'].currentIndexChanged.connect(lambda: self.settings_set('axis_rollover'))
-
-                # self.store['content'][function]['axis_samples_label'] = QLabel()
-                # self.store['content'][function]['axis_samples_label'].setText(var.lang['axis_samples'])
-
-                # self.store['content'][function]['axis_samples'] = QSpinBox()
-                # self.store['content'][function]['axis_samples'].setFixedSize(60, 20)
-                # self.store['content'][function]['axis_samples'].setRange(2, 10)
-                # self.store['content'][function]['axis_samples'].valueChanged.connect(lambda: self.settings_set('axis_samples'))
-
-                self.store['content'][function]['scale_label'] = QLabel()
-                self.store['content'][function]['scale_label'].setText(var.lang['scale'])
-
-                self.store['content'][function]['scale'] = CustomComboBox()
-                self.store['content'][function]['scale'].setFixedSize(70, 22)
-                self.store['content'][function]['scale'].addItem("0.5" + "x")
-                self.store['content'][function]['scale'].addItem("0.75" + "x")
-                self.store['content'][function]['scale'].addItem("1.0" + "x")
-                self.store['content'][function]['scale'].addItem("1.25" + "x")
-                self.store['content'][function]['scale'].addItem("1.5" + "x")
-                self.store['content'][function]['scale'].currentTextChanged.connect(self.scale)
-
-                self.store['content'][function]['timer_first_label'] = QLabel()
-                self.store['content'][function]['timer_first_label'].setText(var.lang['timer_first'])
-
-                self.store['content'][function]['timer_first'] = CustomSpinBox()
-                self.store['content'][function]['timer_first'].setFixedSize(70, 20)
-                self.store['content'][function]['timer_first'].setRange(1, 1000)
-                self.store['content'][function]['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
-
-                self.store['content'][function]['timer_loop_label'] = QLabel()
-                self.store['content'][function]['timer_loop_label'].setText(var.lang['timer_loop'])
-
-                self.store['content'][function]['timer_loop'] = CustomSpinBox()
-                self.store['content'][function]['timer_loop'].setFixedSize(70, 20)
-                self.store['content'][function]['timer_loop'].setRange(1, 1000)
-                self.store['content'][function]['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
-
-                self.store['content'][function]['profile_create_label'] = QLabel()
-                self.store['content'][function]['profile_create_label'].setText(var.lang['profile_create'])
-
-                self.store['content'][function]['profile_create_name'] = QLineEdit()
-                self.store['content'][function]['profile_create_name'].setFixedSize(100, 25)
-                # self.store['content'][function]['profile_create_name'].setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-                self.store['content'][function]['profile_create'] = QPushButton()
-                self.store['content'][function]['profile_create'].setFixedSize(100, 25)
-                self.store['content'][function]['profile_create'].setText(var.lang['create'])
-                self.store['content'][function]['profile_create'].clicked.connect(lambda: self.create_profile(self.store['content'][function]['profile_create_name'].text()))
-
-                self.store['content'][function]['profile_select_label'] = QLabel()
-                self.store['content'][function]['profile_select_label'].setText(var.lang['profile_select'])
-
-                self.store['content'][function]['profile_select'] = CustomComboBox()
-                self.store['content'][function]['profile_select'].setFixedSize(100, 25)
-                self.store['content'][function]['profile_select'].addItem(var.settings['profile']['current'])
-                self.store['content'][function]['profile_select'].setCurrentText(var.settings['profile']['current'])
-                self.store['content'][function]['profile_select'].activated.connect(lambda: self.refresh_profile_list())
-                self.store['content'][function]['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content'][function]['profile_select'].currentText()))
-
-                self.store['content'][function]['profile_delete'] = QPushButton()
-                self.store['content'][function]['profile_delete'].setFixedSize(100, 25)
-                self.store['content'][function]['profile_delete'].setText(var.lang['delete'])
-                self.store['content'][function]['profile_delete'].clicked.connect(lambda: self.delete_profile(self.store['content'][function]['profile_select'].currentText()))
-
-                self.store['content'][function]['donate'] = QPushButton()
-                self.store['content'][function]['donate'].setFixedSize(200, 25)
-                self.store['content'][function]['donate'].setText(var.lang['donate'])
-                self.store['content'][function]['donate'].clicked.connect(lambda: fn.open_browser(var.lang['donate_link']))
-
-                self.store['content'][function]['I5GYT'] = QPushButton()
-                self.store['content'][function]['I5GYT'].setFixedSize(200, 25)
-                self.store['content'][function]['I5GYT'].setText(var.lang['I5GYT'])
-                self.store['content'][function]['I5GYT'].clicked.connect(lambda: fn.open_browser(var.lang['I5GYT_link']))
-
-                self.store['content'][function]['discord'] = QPushButton()
-                self.store['content'][function]['discord'].setFixedSize(200, 25)
-                self.store['content'][function]['discord'].setText(var.lang['discord'])
-                self.store['content'][function]['discord'].clicked.connect(lambda: fn.open_browser(var.lang['discord_link']))
-
-                self.store['content'][function]['github'] = QPushButton()
-                self.store['content'][function]['github'].setFixedSize(200, 25)
-                self.store['content'][function]['github'].setText(var.lang['github'])
-                self.store['content'][function]['github'].clicked.connect(lambda: fn.open_browser(var.lang['github_link']))
-
-            row, column = 0, 0
-            for element in self.store['content'][function]:
-                if element == "profile_create" or element == "profile_delete":
-                    self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)#, alignment=Qt.AlignmentFlag.AlignRight)
-                else:
-                    self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
-                column += 1
-                if element != "profile_create_name" and element != "profile_select":
-                    # column += 1
-                    if (function == "settings" or function == "rpm"):
-                        if element == 'donate' or element == 'I5GYT' or element == 'discord':
-                            column = 0
-                            row += 1
-                        elif column > 1:
-                            column = 0
-                            row += 1
-                    elif function == "sounds":
-                        if not(element == 'hybrid_low_audio' or element == "hybrid_high_audio" or element == "hybrid_limit_audio" or element == "upshift_beep" or element == "downshift_beep" or element == "p2p_behind_audio" or element == "p2p_behind_audio_cont"):
-                            if column > 1:
-                                column = 0
-                                row += 1
-                    else:
-                        if column > 2:
-                            column = 0
-                            row += 1
-            del row, column
-            self.tabs[function].setLayout(self.tabs[function].layout)
+        def hybrid_tab(self):
+            self.tabs['hybrid'].layout = QGridLayout()
+
+            self.store['content']['hybrid']['soc_label'] = QLabel()
+            self.store['content']['hybrid']['soc_label'].setText(var.lang['soc'])
+            self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_label'], 0, 0)
+
+            self.store['content']['hybrid']['soc_lcd'] = QLCDNumber()
+            self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_lcd'], 0, 1)
+
+            self.store['content']['hybrid']['soc_axis'] = QProgressBar()
+            self.store['content']['hybrid']['soc_axis'].setTextVisible(False)
+            self.store['content']['hybrid']['soc_axis'].setMinimum(0)
+            self.store['content']['hybrid']['soc_axis'].setMaximum(100)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 2)
+
+            self.store['content']['hybrid']['deploy_lim_label'] = QLabel()
+            self.store['content']['hybrid']['deploy_lim_label'].setText(var.lang['deploy_lim'])
+            self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_label'], 1, 0)
+
+            self.store['content']['hybrid']['deploy_lim_lcd'] = QLCDNumber()
+            self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_lcd'], 1, 1)
+
+            self.store['content']['hybrid']['deploy_lim_axis'] = QProgressBar()
+            self.store['content']['hybrid']['deploy_lim_axis'].setTextVisible(False)
+            self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
+            self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 2)
+
+            self.tabs['hybrid'].setLayout(self.tabs['hybrid'].layout)
+
+        def fuel_tab(self):
+            self.tabs['fuel'].layout = QGridLayout()
+
+            self.store['content']['fuel']['wip'] = QLabel()
+            self.store['content']['fuel']['wip'].setText("Coming soon!")
+            self.tabs['fuel'].layout.addWidget(self.store['content']['fuel']['wip'], 0, 0)
+
+            self.tabs['fuel'].setLayout(self.tabs['fuel'].layout)
+
+        def display_tab(self):
+            self.tabs['display'].layout = QGridLayout()
+
+            self.store['content']['display']['car_id_label'] = QLabel()
+            self.store['content']['display']['car_id_label'].setText(var.lang['car_id'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_label'], 0, 0)
+
+            self.store['content']['display']['car_id'] = QLabel()
+            self.store['content']['display']['car_id'].setText("None")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id'], 0, 1)
+
+            self.store['content']['display']['car_id_limits'] = QLabel()
+            self.store['content']['display']['car_id_limits'].setText("Placeholder")
+            self.store['content']['display']['car_id_limits'].setWordWrap(True)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_limits'], 0, 2)
+
+            self.store['content']['display']['weight_jacker_label'] = QLabel()
+            self.store['content']['display']['weight_jacker_label'].setText(var.lang['weight_jacker'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_label'], 1, 0)
+
+            self.store['content']['display']['weight_jacker_lcd'] = QLCDNumber()
+            self.store['content']['display']['weight_jacker_lcd'].display(0)
+            self.store['content']['display']['weight_jacker_lcd'].setSegmentStyle(self.store['content']['weight_jacker']['lcd'].segmentStyle())
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_lcd'], 1, 1)
+
+            self.store['content']['display']['weight_jacker_axis'] = QProgressBar()
+            self.store['content']['display']['weight_jacker_axis'].setTextVisible(False)
+            self.store['content']['display']['weight_jacker_axis'].setMinimum(0)
+            self.store['content']['display']['weight_jacker_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 2)
+
+            self.store['content']['display']['front_roll_bar_label'] = QLabel()
+            self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_label'], 2, 0)
+
+            self.store['content']['display']['front_roll_bar_lcd'] = QLCDNumber()
+            self.store['content']['display']['front_roll_bar_lcd'].display(0)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_lcd'], 2, 1)
+
+            self.store['content']['display']['front_roll_bar_axis'] = QProgressBar()
+            self.store['content']['display']['front_roll_bar_axis'].setTextVisible(False)
+            self.store['content']['display']['front_roll_bar_axis'].setMinimum(0)
+            self.store['content']['display']['front_roll_bar_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_axis'], 2, 2)
+
+            self.store['content']['display']['rear_roll_bar_label'] = QLabel()
+            self.store['content']['display']['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_label'], 3, 0)
+
+            self.store['content']['display']['rear_roll_bar_lcd'] = QLCDNumber()
+            self.store['content']['display']['rear_roll_bar_lcd'].display(0)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_lcd'], 3, 1)
+
+            self.store['content']['display']['rear_roll_bar_axis'] = QProgressBar()
+            self.store['content']['display']['rear_roll_bar_axis'].setTextVisible(False)
+            self.store['content']['display']['rear_roll_bar_axis'].setMinimum(0)
+            self.store['content']['display']['rear_roll_bar_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_axis'], 3, 2)
+
+            self.store['content']['display']['fuel_map_label'] = QLabel()
+            self.store['content']['display']['fuel_map_label'].setText(var.lang['fuel_map'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_label'], 4, 0)
+
+            self.store['content']['display']['fuel_map_lcd'] = QLCDNumber()
+            self.store['content']['display']['fuel_map_lcd'].display(0)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_lcd'], 4, 1)
+
+            self.store['content']['display']['fuel_map_axis'] = QProgressBar()
+            self.store['content']['display']['fuel_map_axis'].setTextVisible(False)
+            self.store['content']['display']['fuel_map_axis'].setMinimum(0)
+            self.store['content']['display']['fuel_map_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_axis'], 4, 2)
+
+            self.store['content']['display']['clutch_label'] = QLabel()
+            self.store['content']['display']['clutch_label'].setText(var.lang['clutch'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_label'], 5, 0)
+
+            self.store['content']['display']['clutch_lcd'] = QLCDNumber()
+            self.store['content']['display']['clutch_lcd'].display(0)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_lcd'], 5, 1)
+
+            self.store['content']['display']['clutch_axis'] = QProgressBar()
+            self.store['content']['display']['clutch_axis'].setTextVisible(False)
+            self.store['content']['display']['clutch_axis'].setMinimum(0)
+            self.store['content']['display']['clutch_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_axis'], 5, 2)
+
+            self.store['content']['display']['throttle_label'] = QLabel()
+            self.store['content']['display']['throttle_label'].setText(var.lang['throttle'])
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_label'], 6, 0)
+
+            self.store['content']['display']['throttle_lcd'] = QLCDNumber()
+            self.store['content']['display']['throttle_lcd'].display(0)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_lcd'], 6, 1)
+
+            self.store['content']['display']['throttle_axis'] = QProgressBar()
+            self.store['content']['display']['throttle_axis'].setTextVisible(False)
+            self.store['content']['display']['throttle_axis'].setMinimum(0)
+            self.store['content']['display']['throttle_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 2)
+
+            self.tabs['display'].setLayout(self.tabs['display'].layout)
+
+        def sounds_tab(self):
+            self.tabs['sounds'].layout = QGridLayout()
+            
+            self.store['content']['sounds']['sound_label'] = QLabel()
+            self.store['content']['sounds']['sound_label'].setText(var.lang['sound_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['sound_label'], 0, 0)
+
+            self.store['content']['sounds']['sound'] = CustomComboBox()
+            self.store['content']['sounds']['sound'].setFixedSize(70, 25)
+            self.store['content']['sounds']['sound'].addItem("Yes")
+            self.store['content']['sounds']['sound'].addItem("No")
+            self.store['content']['sounds']['sound'].setCurrentText("No")
+            self.store['content']['sounds']['sound'].currentIndexChanged.connect(lambda: self.settings_set('sound'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['sound'], 0, 1)
+
+            self.store['content']['sounds']['volume_label'] = QLabel()
+            self.store['content']['sounds']['volume_label'].setText(var.lang['volume_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['volume_label'], 1, 0)
+
+            self.store['content']['sounds']['volume'] = CustomSpinBox()
+            self.store['content']['sounds']['volume'].setFixedSize(70, 25)
+            self.store['content']['sounds']['volume'].setRange(0, 100)
+            self.store['content']['sounds']['volume'].valueChanged.connect(lambda: self.settings_set('volume'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['volume'], 1, 1)
+
+            self.store['content']['sounds']['hybrid_low_audio_label'] = QLabel()
+            self.store['content']['sounds']['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_audio_label'], 2, 0)
+
+            self.store['content']['sounds']['hybrid_low_audio'] = CustomComboBox()
+            self.store['content']['sounds']['hybrid_low_audio'].setFixedSize(70, 25)
+            self.store['content']['sounds']['hybrid_low_audio'].addItem("Yes")
+            self.store['content']['sounds']['hybrid_low_audio'].addItem("No")
+            self.store['content']['sounds']['hybrid_low_audio'].setCurrentText(str(var.settings['local']['hybrid_low_audio']))
+            self.store['content']['sounds']['hybrid_low_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_low_audio'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_audio'], 2, 1)
+
+            self.store['content']['sounds']['hybrid_low_test'] = QPushButton()
+            self.store['content']['sounds']['hybrid_low_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['hybrid_low_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['hybrid_low_test'].clicked.connect(lambda: self.test_play("low"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_test'], 2, 2)
+
+            self.store['content']['sounds']['hybrid_high_audio_label'] = QLabel()
+            self.store['content']['sounds']['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_audio_label'], 3, 0)
+
+            self.store['content']['sounds']['hybrid_high_audio'] = CustomComboBox()
+            self.store['content']['sounds']['hybrid_high_audio'].setFixedSize(70, 25)
+            self.store['content']['sounds']['hybrid_high_audio'].addItem("Yes")
+            self.store['content']['sounds']['hybrid_high_audio'].addItem("No")
+            self.store['content']['sounds']['hybrid_high_audio'].setCurrentText(str(var.settings['local']['hybrid_high_audio']))
+            self.store['content']['sounds']['hybrid_high_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_high_audio'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_audio'], 3, 1)
+
+            self.store['content']['sounds']['hybrid_high_test'] = QPushButton()
+            self.store['content']['sounds']['hybrid_high_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['hybrid_high_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['hybrid_high_test'].clicked.connect(lambda: self.test_play("high"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_test'], 3, 2)
+
+            self.store['content']['sounds']['hybrid_limit_audio_label'] = QLabel()
+            self.store['content']['sounds']['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_audio_label'], 4, 0)
+
+            self.store['content']['sounds']['hybrid_limit_audio'] = CustomComboBox()
+            self.store['content']['sounds']['hybrid_limit_audio'].setFixedSize(70, 25)
+            self.store['content']['sounds']['hybrid_limit_audio'].addItem("Yes")
+            self.store['content']['sounds']['hybrid_limit_audio'].addItem("No")
+            self.store['content']['sounds']['hybrid_limit_audio'].setCurrentText(str(var.settings['local']['hybrid_limit_audio']))
+            self.store['content']['sounds']['hybrid_limit_audio'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_limit_audio'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_audio'], 4, 1)
+
+            self.store['content']['sounds']['hybrid_limit_test'] = QPushButton()
+            self.store['content']['sounds']['hybrid_limit_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['hybrid_limit_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['hybrid_limit_test'].clicked.connect(lambda: self.test_play("limit"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_test'], 4, 2)
+
+            self.store['content']['sounds']['hybrid_low_label'] = QLabel()
+            self.store['content']['sounds']['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_label'], 5, 0)
+
+            self.store['content']['sounds']['hybrid_low_val'] = CustomSpinBox()
+            self.store['content']['sounds']['hybrid_low_val'].setFixedSize(70, 20)
+            self.store['content']['sounds']['hybrid_low_val'].setRange(0, 99)
+            self.store['content']['sounds']['hybrid_low_val'].setValue(int(var.settings['local']['hybrid_low_val']))
+            self.store['content']['sounds']['hybrid_low_val'].valueChanged.connect(lambda: self.settings_set('hybrid_low_val'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_val'], 5, 1)
+
+            self.store['content']['sounds']['hybrid_high_label'] = QLabel()
+            self.store['content']['sounds']['hybrid_high_label'].setText(var.lang['hybrid_high_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_label'], 6, 0)
+
+            self.store['content']['sounds']['hybrid_high_val'] = CustomSpinBox()
+            self.store['content']['sounds']['hybrid_high_val'].setFixedSize(70, 20)
+            self.store['content']['sounds']['hybrid_high_val'].setRange(1, 99)
+            self.store['content']['sounds']['hybrid_high_val'].setValue(int(var.settings['local']['hybrid_high_val']))
+            self.store['content']['sounds']['hybrid_high_val'].valueChanged.connect(lambda: self.settings_set('hybrid_high_val'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_val'], 6, 1)
+
+            self.store['content']['sounds']['hybrid_limit_label'] = QLabel()
+            self.store['content']['sounds']['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_label'], 7, 0)
+
+            self.store['content']['sounds']['hybrid_limit_val'] = CustomSpinBox()
+            self.store['content']['sounds']['hybrid_limit_val'].setFixedSize(70, 20)
+            self.store['content']['sounds']['hybrid_limit_val'].setRange(1, 100)
+            self.store['content']['sounds']['hybrid_limit_val'].setValue(int(var.settings['local']['hybrid_limit_val']))
+            self.store['content']['sounds']['hybrid_limit_val'].valueChanged.connect(lambda: self.settings_set('hybrid_limit_val'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_val'], 7, 1)
+
+            self.store['content']['sounds']['upshift_beep_label'] = QLabel()
+            self.store['content']['sounds']['upshift_beep_label'].setText(var.lang['upshift_beep_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_label'], 8, 0)
+
+            self.store['content']['sounds']['upshift_beep'] = CustomComboBox()
+            self.store['content']['sounds']['upshift_beep'].setFixedSize(70, 25)
+            self.store['content']['sounds']['upshift_beep'].addItem("Yes")
+            self.store['content']['sounds']['upshift_beep'].addItem("No")
+            self.store['content']['sounds']['upshift_beep'].setCurrentText(str(var.settings['local']['upshift_beep']))
+            self.store['content']['sounds']['upshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('upshift_beep'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep'], 8, 1)
+
+            self.store['content']['sounds']['upshift_beep_test'] = QPushButton()
+            self.store['content']['sounds']['upshift_beep_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['upshift_beep_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['upshift_beep_test'].clicked.connect(lambda: self.test_play("upshift_beep"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_test'], 8, 2)
+
+            self.store['content']['sounds']['downshift_beep_label'] = QLabel()
+            self.store['content']['sounds']['downshift_beep_label'].setText(var.lang['downshift_beep_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_label'], 9, 0)
+
+            self.store['content']['sounds']['downshift_beep'] = CustomComboBox()
+            self.store['content']['sounds']['downshift_beep'].setFixedSize(70, 25)
+            self.store['content']['sounds']['downshift_beep'].addItem("Yes")
+            self.store['content']['sounds']['downshift_beep'].addItem("No")
+            self.store['content']['sounds']['downshift_beep'].setCurrentText(str(var.settings['local']['downshift_beep']))
+            self.store['content']['sounds']['downshift_beep'].currentIndexChanged.connect(lambda: self.settings_set('downshift_beep'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep'], 9, 1)
+
+            self.store['content']['sounds']['downshift_beep_test'] = QPushButton()
+            self.store['content']['sounds']['downshift_beep_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['downshift_beep_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['downshift_beep_test'].clicked.connect(lambda: self.test_play("downshift_beep"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_test'], 9, 2)
+
+            self.store['content']['sounds']['beep_mode_label'] = QLabel()
+            self.store['content']['sounds']['beep_mode_label'].setText(var.lang['beep_mode_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['beep_mode_label'], 10, 0)
+
+            self.store['content']['sounds']['beep_mode'] = CustomComboBox()
+            self.store['content']['sounds']['beep_mode'].setFixedSize(70, 25)
+            self.store['content']['sounds']['beep_mode'].addItem("Fixed")
+            # self.store['content']['sounds']['beep_mode'].addItem("Dynamic")
+            self.store['content']['sounds']['beep_mode'].setCurrentText(str(var.settings['local']['beep_mode']))
+            self.store['content']['sounds']['beep_mode'].currentIndexChanged.connect(lambda: self.settings_set('beep_mode'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['beep_mode'], 10, 1)
+
+            # dynamic mode offset
+            self.store['content']['sounds']['dynamic_mode_offset_label'] = QLabel()
+            self.store['content']['sounds']['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['dynamic_mode_offset_label'], 11, 0)
+
+            self.store['content']['sounds']['dynamic_mode_offset'] = CustomSpinBox()
+            self.store['content']['sounds']['dynamic_mode_offset'].setFixedSize(70, 20)
+            self.store['content']['sounds']['dynamic_mode_offset'].setRange(-10000, 10000)
+            self.store['content']['sounds']['dynamic_mode_offset'].setValue(int(var.settings['local']['dynamic_mode_offset']))
+            self.store['content']['sounds']['dynamic_mode_offset'].valueChanged.connect(lambda: self.settings_set('dynamic_mode_offset'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['dynamic_mode_offset'], 11, 1)
+
+            # upshift offset
+            self.store['content']['sounds']['upshift_offset_label'] = QLabel()
+            self.store['content']['sounds']['upshift_offset_label'].setText(var.lang['upshift_offset_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_offset_label'], 12, 0)
+
+            self.store['content']['sounds']['upshift_offset'] = CustomSpinBox()
+            self.store['content']['sounds']['upshift_offset'].setFixedSize(70, 20)
+            self.store['content']['sounds']['upshift_offset'].setRange(-10000, 10000)
+            self.store['content']['sounds']['upshift_offset'].setValue(int(var.settings['local']['upshift_offset']))
+            self.store['content']['sounds']['upshift_offset'].valueChanged.connect(lambda: self.settings_set('upshift_offset'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_offset'], 12, 1)
+
+            # downshift offset
+            self.store['content']['sounds']['downshift_offset_label'] = QLabel()
+            self.store['content']['sounds']['downshift_offset_label'].setText(var.lang['downshift_offset_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_offset_label'], 13, 0)
+
+            self.store['content']['sounds']['downshift_offset'] = CustomSpinBox()
+            self.store['content']['sounds']['downshift_offset'].setFixedSize(70, 20)
+            self.store['content']['sounds']['downshift_offset'].setRange(-10000, 10000)
+            self.store['content']['sounds']['downshift_offset'].setValue(int(var.settings['local']['downshift_offset']))
+            self.store['content']['sounds']['downshift_offset'].valueChanged.connect(lambda: self.settings_set('downshift_offset'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_offset'], 13, 1)
+
+            # p2p behind audio enabled
+            self.store['content']['sounds']['p2p_behind_audio_label'] = QLabel()
+            self.store['content']['sounds']['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_label'], 14, 0)
+
+            self.store['content']['sounds']['p2p_behind_audio'] = CustomComboBox()
+            self.store['content']['sounds']['p2p_behind_audio'].setFixedSize(70, 25)
+            self.store['content']['sounds']['p2p_behind_audio'].addItem("Yes")
+            self.store['content']['sounds']['p2p_behind_audio'].addItem("No")
+            self.store['content']['sounds']['p2p_behind_audio'].setCurrentText(str(var.settings['local']['p2p_behind_audio']))
+            self.store['content']['sounds']['p2p_behind_audio'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_audio'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio'], 14, 1)
+
+            self.store['content']['sounds']['p2p_behind_test'] = QPushButton()
+            self.store['content']['sounds']['p2p_behind_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['p2p_behind_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['p2p_behind_test'].clicked.connect(lambda: self.test_play("p2p_active"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_test'], 14, 2)
+
+            # p2p behind audio continuous enabled
+            self.store['content']['sounds']['p2p_behind_audio_cont_label'] = QLabel()
+            self.store['content']['sounds']['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_cont_label'], 15, 0)
+
+            self.store['content']['sounds']['p2p_behind_audio_cont'] = CustomComboBox()
+            self.store['content']['sounds']['p2p_behind_audio_cont'].setFixedSize(70, 25)
+            self.store['content']['sounds']['p2p_behind_audio_cont'].addItem("Yes")
+            self.store['content']['sounds']['p2p_behind_audio_cont'].addItem("No")
+            self.store['content']['sounds']['p2p_behind_audio_cont'].setCurrentText(str(var.settings['local']['p2p_behind_audio_cont']))
+            self.store['content']['sounds']['p2p_behind_audio_cont'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_audio_cont'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_cont'], 15, 1)
+
+            self.store['content']['sounds']['p2p_behind_cont_test'] = QPushButton()
+            self.store['content']['sounds']['p2p_behind_cont_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['p2p_behind_cont_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['p2p_behind_cont_test'].clicked.connect(lambda: self.test_play_loop("p2p_active"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_cont_test'], 15, 2)
+
+            # p2p behind stop audio under braking
+            self.store['content']['sounds']['p2p_behind_nobrake_label'] = QLabel()
+            self.store['content']['sounds']['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_nobrake_label'], 16, 0)
+
+            self.store['content']['sounds']['p2p_behind_nobrake'] = CustomComboBox()
+            self.store['content']['sounds']['p2p_behind_nobrake'].setFixedSize(70, 25)
+            self.store['content']['sounds']['p2p_behind_nobrake'].addItem("Yes")
+            self.store['content']['sounds']['p2p_behind_nobrake'].addItem("No")
+            self.store['content']['sounds']['p2p_behind_nobrake'].setCurrentText(str(var.settings['local']['p2p_behind_nobrake']))
+            self.store['content']['sounds']['p2p_behind_nobrake'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_nobrake'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_nobrake'], 16, 1)
+
+            # p2p behind single warning threshold
+            self.store['content']['sounds']['p2p_behind_thresh_label'] = QLabel()
+            self.store['content']['sounds']['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_label'], 17, 0)
+
+            self.store['content']['sounds']['p2p_behind_thresh'] = CustomSpinBox()
+            self.store['content']['sounds']['p2p_behind_thresh'].setFixedSize(70, 20)
+            self.store['content']['sounds']['p2p_behind_thresh'].setRange(-1, 1000000)
+            self.store['content']['sounds']['p2p_behind_thresh'].setValue(int(var.settings['local']['p2p_behind_thresh']))
+            self.store['content']['sounds']['p2p_behind_thresh'].valueChanged.connect(lambda: self.settings_set('p2p_behind_thresh'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh'], 17, 1)
+
+            # p2p behind continuous warning threshold
+            self.store['content']['sounds']['p2p_behind_thresh_cont_label'] = QLabel()
+            self.store['content']['sounds']['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_cont_label'], 18, 0)
+
+            self.store['content']['sounds']['p2p_behind_thresh_cont'] = CustomSpinBox()
+            self.store['content']['sounds']['p2p_behind_thresh_cont'].setFixedSize(70, 20)
+            self.store['content']['sounds']['p2p_behind_thresh_cont'].setRange(-1, 1000000)
+            self.store['content']['sounds']['p2p_behind_thresh_cont'].setValue(int(var.settings['local']['p2p_behind_thresh_cont']))
+            self.store['content']['sounds']['p2p_behind_thresh_cont'].valueChanged.connect(lambda: self.settings_set('p2p_behind_thresh_cont'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_cont'], 18, 1)
+
+            # p2p behind audio for any car within range vs closest car only
+            self.store['content']['sounds']['p2p_behind_closest_car_label'] = QLabel()
+            self.store['content']['sounds']['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'])
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_closest_car_label'], 19, 0)
+
+            self.store['content']['sounds']['p2p_behind_closest_car'] = CustomComboBox()
+            self.store['content']['sounds']['p2p_behind_closest_car'].setFixedSize(70, 25)
+            self.store['content']['sounds']['p2p_behind_closest_car'].addItem("Yes")
+            self.store['content']['sounds']['p2p_behind_closest_car'].addItem("No")
+            self.store['content']['sounds']['p2p_behind_closest_car'].setCurrentText(str(var.settings['local']['p2p_behind_closest_car']))
+            self.store['content']['sounds']['p2p_behind_closest_car'].currentIndexChanged.connect(lambda: self.settings_set('p2p_behind_closest_car'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_closest_car'], 19, 1)
+
+            self.tabs['sounds'].setLayout(self.tabs['sounds'].layout)
+
+        def settings_tab(self):
+            self.tabs['settings'].layout = QGridLayout()
+
+            self.store['content']['settings']['spacer'] = QLabel()
+            self.store['content']['settings']['spacer'].setText(" " * 60)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['spacer'], 0, 1)
+
+            self.store['content']['settings']['scale_label'] = QLabel()
+            self.store['content']['settings']['scale_label'].setText(var.lang['scale'])
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], 0, 0)
+    
+            self.store['content']['settings']['scale'] = CustomComboBox()
+            self.store['content']['settings']['scale'].setFixedSize(70, 22)
+            self.store['content']['settings']['scale'].addItem("0.5" + "x")
+            self.store['content']['settings']['scale'].addItem("0.75" + "x")
+            self.store['content']['settings']['scale'].addItem("1.0" + "x")
+            self.store['content']['settings']['scale'].addItem("1.25" + "x")
+            self.store['content']['settings']['scale'].addItem("1.5" + "x")
+            self.store['content']['settings']['scale'].currentTextChanged.connect(self.scale)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale'], 0, 2, alignment=Qt.AlignmentFlag.AlignRight)
+    
+            self.store['content']['settings']['timer_first_label'] = QLabel()
+            self.store['content']['settings']['timer_first_label'].setText(var.lang['timer_first'])
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first_label'], 1, 0)
+    
+            self.store['content']['settings']['timer_first'] = CustomSpinBox()
+            self.store['content']['settings']['timer_first'].setFixedSize(70, 20)
+            self.store['content']['settings']['timer_first'].setRange(1, 1000)
+            self.store['content']['settings']['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first'], 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['settings']['timer_loop_label'] = QLabel()
+            self.store['content']['settings']['timer_loop_label'].setText(var.lang['timer_loop'])
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop_label'], 2, 0)
+    
+            self.store['content']['settings']['timer_loop'] = CustomSpinBox()
+            self.store['content']['settings']['timer_loop'].setFixedSize(70, 20)
+            self.store['content']['settings']['timer_loop'].setRange(1, 1000)
+            self.store['content']['settings']['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop'], 2, 2, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['settings']['profile_create_label'] = QLabel()
+            self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'])
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], 3, 0)
+    
+            self.store['content']['settings']['profile_create_name'] = QLineEdit()
+            self.store['content']['settings']['profile_create_name'].setFixedSize(100, 25)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_name'], 3, 2, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['settings']['profile_create'] = QPushButton()
+            self.store['content']['settings']['profile_create'].setFixedSize(100, 25)
+            self.store['content']['settings']['profile_create'].setText(var.lang['create'])
+            self.store['content']['settings']['profile_create'].clicked.connect(lambda: self.create_profile(self.store['content']['settings']['profile_create_name'].text()))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create'], 3, 3, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['settings']['profile_select_label'] = QLabel()
+            self.store['content']['settings']['profile_select_label'].setText(var.lang['profile_select'])
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select_label'], 4, 0)
+    
+            self.store['content']['settings']['profile_select'] = CustomComboBox()
+            self.store['content']['settings']['profile_select'].setFixedSize(100, 25)
+            self.store['content']['settings']['profile_select'].addItem(var.settings['profile']['current'])
+            self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
+            self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
+            self.store['content']['settings']['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content']['settings']['profile_select'].currentText()))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select'], 4, 2, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['settings']['profile_delete'] = QPushButton()
+            self.store['content']['settings']['profile_delete'].setFixedSize(100, 25)
+            self.store['content']['settings']['profile_delete'].setText(var.lang['delete'])
+            self.store['content']['settings']['profile_delete'].clicked.connect(lambda: self.delete_profile(self.store['content']['settings']['profile_select'].currentText()))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_delete'], 4, 3, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.tabs['settings'].setLayout(self.tabs['settings'].layout)
+
+        def about_tab(self):
+            self.tabs['about'].layout = QGridLayout()
+
+            self.store['content']['about']['donate'] = QPushButton()
+            self.store['content']['about']['donate'].setFixedSize(125, 25)
+            self.store['content']['about']['donate'].setText(var.lang['donate'])
+            self.store['content']['about']['donate'].clicked.connect(lambda: fn.open_browser(var.lang['donate_link']))
+            self.tabs['about'].layout.addWidget(self.store['content']['about']['donate'], 0, 0)
+
+            self.store['content']['about']['I5GYT'] = QPushButton()
+            self.store['content']['about']['I5GYT'].setFixedSize(125, 25)
+            self.store['content']['about']['I5GYT'].setText(var.lang['I5GYT'])
+            self.store['content']['about']['I5GYT'].clicked.connect(lambda: fn.open_browser(var.lang['I5GYT_link']))
+            self.tabs['about'].layout.addWidget(self.store['content']['about']['I5GYT'], 0, 1)
+
+            self.store['content']['about']['discord'] = QPushButton()
+            self.store['content']['about']['discord'].setFixedSize(125, 25)
+            self.store['content']['about']['discord'].setText(var.lang['discord'])
+            self.store['content']['about']['discord'].clicked.connect(lambda: fn.open_browser(var.lang['discord_link']))
+            self.tabs['about'].layout.addWidget(self.store['content']['about']['discord'], 0, 2)
+
+            self.store['content']['about']['github'] = QPushButton()
+            self.store['content']['about']['github'].setFixedSize(125, 25)
+            self.store['content']['about']['github'].setText(var.lang['github'])
+            self.store['content']['about']['github'].clicked.connect(lambda: fn.open_browser(var.lang['github_link']))
+            self.tabs['about'].layout.addWidget(self.store['content']['about']['github'], 0, 3)
+
+            self.tabs['about'].setLayout(self.tabs['about'].layout)
 
         def updater(self):
             for function in var.status:
@@ -793,8 +877,8 @@ class MainWindow(QMainWindow):
                         check = False
                     else:
                         index -= 1
-                if self.store['content']['axes_display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
-                    self.store['content']['axes_display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
+                if self.store['content']['display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
+                    self.store['content']['display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                     self.update_limits()
                 if self.lastval['CarIdx'] != index:
                     self.lastval['CarIdx'] = index
@@ -819,12 +903,12 @@ class MainWindow(QMainWindow):
                         var.status['downshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['downshift_offset']
                     except:
                         print("upshift and downshift values failed in updater()")
-                if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont'])):
+                if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']):
                     self.irsdk_audio()
                 # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
-            elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
+            elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['display']['car_id'] != "None":
                 self.ir.shutdown()
-                self.store['content']['axes_display']['car_id'] = "None"
+                self.store['content']['display']['car_id'] = "None"
                 self.store['content']['hybrid']['soc_axis'].setValue(0)
                 self.store['content']['hybrid']['soc_axis'].update()
                 self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
@@ -848,34 +932,34 @@ class MainWindow(QMainWindow):
                     # print("display check1: ", func, pct)
                     self.store['content'][func]['axis'].setValue(int(pct * 100))
                     self.store['content'][func]['axis'].update()
-                    self.store['content']['axes_display'][func + '_axis'].setValue(int(pct * 100))
-                    self.store['content']['axes_display'][func + '_axis'].update()
+                    self.store['content']['display'][func + '_axis'].setValue(int(pct * 100))
+                    self.store['content']['display'][func + '_axis'].update()
 
                     if func == 'clutch' or func == "throttle":
                         if (pct*100)%1 == 0:
                             self.store['content'][func]['lcd'].display(str(round(pct*100)) + ".0") # bad hack to get the lcd to always display one decimal place
-                            self.store['content']['axes_display'][func + '_lcd'].display(str(round(pct*100)) + ".0")
+                            self.store['content']['display'][func + '_lcd'].display(str(round(pct*100)) + ".0")
                         else:
                             self.store['content'][func]['lcd'].display(round(pct*100, 1))
-                            self.store['content']['axes_display'][func + '_lcd'].display(round(pct*100, 1))
+                            self.store['content']['display'][func + '_lcd'].display(round(pct*100, 1))
                     elif func == 'regen' or func == "deploy":
                         value = round(pct * (self.store['content'][func]['switch'].maximum() - self.store['content'][func]['switch'].minimum()) + self.store['content'][func]['switch'].minimum(), 1)
                         if value%1 == 0:
                             self.store['content'][func]['lcd'].display(str(round(value)) + ".0") # bad hack to get the lcd to always display one decimal place
-                            self.store['content']['axes_display'][func + '_lcd'].display(str(round(value)) + ".0")
+                            self.store['content']['display'][func + '_lcd'].display(str(round(value)) + ".0")
                         else:
                             self.store['content'][func]['lcd'].display(round(value, 1))
-                            self.store['content']['axes_display'][func + '_lcd'].display(round(value, 1))
+                            self.store['content']['display'][func + '_lcd'].display(round(value, 1))
                     else:
                         value = round(pct * (self.store['content'][func]['switch'].maximum() - self.store['content'][func]['switch'].minimum()) + self.store['content'][func]['switch'].minimum(), 1)
                         self.store['content'][func]['lcd'].display(round(value))
-                        self.store['content']['axes_display'][func + '_lcd'].display(round(value))
+                        self.store['content']['display'][func + '_lcd'].display(round(value))
                     self.store['content'][func]['lcd'].update()
-                    self.store['content']['axes_display'][func + '_lcd'].update()
-            if (self.store['content']['axes_display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['axes_display']['car_id']]:
+                    self.store['content']['display'][func + '_lcd'].update()
+            if (self.store['content']['display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['display']['car_id']]:
                 self.store['content']['hybrid']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['axes_display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
+                if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
                     soc_pct = self.ir['EnergyERSBatteryPct']
                     self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
                     self.store['content']['hybrid']['soc_axis'].update()
@@ -997,35 +1081,29 @@ class MainWindow(QMainWindow):
             fn.write_profile()
 
         @pyqtSlot()
+        def rollover_mode(self, func):
+            if self.store['content'][func]['rollover_mode'].currentText() == "Unlocked":
+                var.settings[func]['rollover_mode'] = True
+            elif self.store['content'][func]['rollover_mode'].currentText() == "Locked":
+                var.settings[func]['rollover_mode'] = False
+            fn.write_profile()
+
+        @pyqtSlot()
+        def axis_threshold(self, func):
+            var.settings[func]["axis_threshold"] = self.store['content'][func]['axis_threshold'].value() / 100
+            fn.reset_bind_thresh(func, var.settings[func]["axis_threshold"])
+            print("axis_threshold, func = " + func + ", ", var.settings[func]["axis_threshold"])
+            fn.write_profile()
+
+        @pyqtSlot()
         def settings_set(self, func):
             if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
-            elif func == 'axis_rollover':
-                value = self.store['content']['settings'][func].currentText()
             else:
                 value = self.store['content']['settings'][func].value()
-            if func == 'high_threshold':
-                print("settings_set, func = high_threshold, ", value)
-                if value/100 > var.settings['local']['low_threshold']:
-                    print("changing low")
-                    self.store['content']['settings']['low_threshold'].setRange(1, value-1)
-                    fn.reset_bind_thresh(func, value/100)
-                    var.settings['local'][func] = value/100
-                    fn.write_profile()
-            elif func == 'low_threshold':
-                print("settings_set, func = low_threshold, ", value)
-                if value/100 < var.settings['local']['high_threshold']:
-                    print("changing high")
-                    self.store['content']['settings']['high_threshold'].setRange(value+1, 99)
-                    fn.reset_bind_thresh(func, value/100)
-                    var.settings['local'][func] = value/100
-                    fn.write_profile()
-            elif func == 'axis_rollover':
-                var.settings['local']['axis_rollover'] = (value == "Yes")
-                fn.write_profile()
-            elif func == 'sound':
+            if func == 'sound':
                 var.settings['local']['audio'] = (value == "Yes")
                 fn.write_profile()
             elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
@@ -1091,21 +1169,23 @@ class MainWindow(QMainWindow):
                                 "input": True,
                             }
                         else:
-                            if var.event['value'] >= var.settings['local']['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                            if var.event['value'] >= var.settings[function]['axis_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
                                 var.potential_bind = {
                                 "label": "Unknown device",
                                     "guid": var.event['guid'],
                                     "type": var.event['type'],
                                     "num": var.event['num'],
-                                    "value": var.settings['local']['high_threshold']
+                                    "inverted": False,
+                                    "value": var.settings[function]['axis_threshold']
                                 }
-                            if var.event['value'] <= var.settings['local']['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                            if var.event['value'] <= round(1 - var.settings[function]['axis_threshold'], 2) and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
                                 var.potential_bind = {
                                 "label": "Unknown device",
                                     "guid": var.event['guid'],
                                     "type": var.event['type'],
                                     "num": var.event['num'],
-                                    "value": var.settings['local']['low_threshold']
+                                    "inverted": True,
+                                    "value": round(1 - var.settings[function]['axis_threshold'], 2)
                                 }
                     elif var.event['type'] == "hat":
                         if var.event['value'] != "none" and not var.bindings['status']['input']:
@@ -1201,15 +1281,15 @@ class MainWindow(QMainWindow):
 
         @pyqtSlot()
         def update_limits(self):
-            if self.store['content']['axes_display']['car_id'] == "None":
+            if self.store['content']['display']['car_id'] == "None":
                 self.store['index']['car_id'].setText("None")
                 print("Updating car_id to None")
-                self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
-            elif self.store['content']['axes_display']['car_id'] in car_settings:
-                car_id = self.store['content']['axes_display']['car_id']
+                self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
+            elif self.store['content']['display']['car_id'] in car_settings:
+                car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(car_settings[car_id]['name'])
                 print("Updating for car_id: " + str(car_id) + " " + car_settings[car_id]['name'])
                 if 'weight_jacker' in car_settings[car_id]:
@@ -1217,46 +1297,46 @@ class MainWindow(QMainWindow):
                     max = car_settings[car_id]['weight_jacker'][1]
                     var.step['weight_jacker'] = 1 / (max - min)
                     self.store['content']['weight_jacker']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
                 if 'front_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['front_roll_bar'][0]
                     max = car_settings[car_id]['front_roll_bar'][1]
                     var.step['front_roll_bar'] = 1 / (max - min)
                     self.store['content']['front_roll_bar']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
                 if 'rear_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['rear_roll_bar'][0]
                     max = car_settings[car_id]['rear_roll_bar'][1]
                     var.step['rear_roll_bar'] = 1 / (max - min)
                     self.store['content']['rear_roll_bar']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
                 if 'fuel_map' in car_settings[car_id]:
                     min = car_settings[car_id]['fuel_map'][0]
                     max = car_settings[car_id]['fuel_map'][1]
                     var.step['fuel_map'] = 1 / (max - min)
                     self.store['content']['fuel_map']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
             else:
-                car_id = self.store['content']['axes_display']['car_id']
+                car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
                 print("current_car " + str(car_id) + " not in car_settings!")
-                self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
             text = "WJ: " + str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
             text += ", FARB: " + str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
             text += ", RARB: " + str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
             text += ", Fuel Map: " + str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
-            self.store['content']['axes_display']['car_id_limits'].setText(text)
+            self.store['content']['display']['car_id_limits'].setText(text)
 
         @pyqtSlot()
         def update_label(self, function, control):
@@ -1300,6 +1380,7 @@ class MainWindow(QMainWindow):
                     if type == "adjustment" or type == "input":
                         self.store['content'][function]['increment'].setValue(var.settings[function]['increment'])
                         self.store['content'][function]['switch'].setValue(var.settings[function]['switch_value'])
+                        self.store['content'][function]['axis_threshold'].setValue(int(var.settings[function]['axis_threshold'] * 100))
                         if var.settings[function]['continuous']:
                             self.store['content'][function]['increment_mode'].setCurrentText(var.lang['continuous'])
                         else:
@@ -1308,6 +1389,10 @@ class MainWindow(QMainWindow):
                             self.store['content'][function]['switch_mode'].setCurrentText(var.lang['toggle'])
                         else:
                             self.store['content'][function]['switch_mode'].setCurrentText(var.lang['hold'])
+                        if var.settings[function]['rollover_mode']:
+                            self.store['content'][function]['rollover_mode'].setCurrentText(var.lang['unlocked'])
+                        else:
+                            self.store['content'][function]['rollover_mode'].setCurrentText(var.lang['locked'])
 
             # self.store['content']['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
             self.store['content']['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
@@ -1320,22 +1405,11 @@ class MainWindow(QMainWindow):
                         self.store['content']['sounds']['sound'].setCurrentText('Yes')
                     else:
                         self.store['content']['sounds']['sound'].setCurrentText('No')
-                elif setting == 'low_threshold' or setting == 'high_threshold':
-                    print("apply_settings before ", setting)
-                    self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
-                    self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
-                    self.store['content']['settings']['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
-                    self.store['content']['settings']['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
-                    print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
-                    if setting == "axis_rollover":
-                        tab = 'settings'
-                    else:
-                        tab = 'sounds'
                     if var.settings['local'][setting]:
-                        self.store['content'][tab][setting].setCurrentText('Yes')
+                        self.store['content']['sounds'][setting].setCurrentText('Yes')
                     else:
-                        self.store['content'][tab][setting].setCurrentText('No')
+                        self.store['content']['sounds'][setting].setCurrentText('No')
                 elif isinstance(var.settings['local'][setting], (float, int)):
                     if setting == 'volume':
                         self.store['content']['sounds']['volume'].setValue(int(var.settings['local']['volume']*100))

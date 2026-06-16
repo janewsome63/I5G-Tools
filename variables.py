@@ -2,12 +2,11 @@ import copy
 import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b']
+                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.2b",
-    "settings_version": "v0.7.2b", # identical to version now, compatibility list stored above
+    "version": "v0.7.3b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -20,34 +19,37 @@ lang = {
     "increment_mode": "Increment Mode:",
     "continuous": "Continuous",
     "single": "Single",
+    "axis_threshold": "Axis Threshold:",
+    "rollover_mode": "Rollover Mode:",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
     "bind": "Bind",
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
     "calibrating": "<-Calibrating->",
-    "high_threshold": "High Axis Threshold:",
-    "low_threshold": "Low Axis Threshold:",
-    "axis_rollover": "Axis Rollover:",
     # "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor (Requires Restart):",
     "timer_loop": "Continuous Mode Loop Timer (in ms):",
     "timer_first": "Continuous Mode Initial Loop Timer (in ms):",
     "none": "None",
-    "weight_jacker": "Weight Jacker",
-    "front_roll_bar": "Front Bar",
-    "rear_roll_bar": "Rear Bar",
-    "fuel_map": "Fuel Map",
+    "weight_jacker": "WJ",
+    "front_roll_bar": "FARB",
+    "rear_roll_bar": "RARB",
+    "fuel_map": "Map",
     "clutch": "Clutch",
     "throttle": "Throttle",
     "regen": "Regen",
     "deploy": "Deploy",
     "deploy_lim": "Deploy Limit:",
+    "fuel": "Fuel",
     "sounds": "Sounds",
     "settings": "Settings",
+    "about": "About",
     "create": "Create",
     "delete": "Delete",
     "profile_create": "Create Profile:",
     "profile_select": "Select Profile:",
-    "axes_display": "Display",
+    "display": "Display",
     "car_id": "Car ID:",
     "soc": "SoC",
     "hybrid": "Hybrid",
@@ -106,26 +108,26 @@ lang = {
                     "Proceed?",
         },
     },
-    "donate": "Support this app on Ko-Fi",
+    "donate": "Support on Ko-Fi",
     "donate_link": "https://ko-fi.com/cmdracer",
     "I5GYT": "Team I5G YouTube",
     "I5GYT_link": "https://www.youtube.com/@TeamI5G",
-    "discord": "App Discord (TODO)",
+    "discord": "Discord",
     "discord_link": "https://www.discord.com",
-    "github": "Github Repo (TODO)",
+    "github": "Github",
     "github_link": "https://www.github.com",
 }
+lang['settings_version'] = lang['version'] # identical to version now, compatibility list stored above
 
 step = {
-    "weight_jacker": 1 / (41 - 1),
-    "front_roll_bar": 1 / (6 - 1),
-    "rear_roll_bar": 1 / (6 - 1),
-    "fuel_map": 1 / (8 - 1),
-    "clutch": 1 / (201 - 1),
-    "throttle": 1 / (201 - 1),
-    "brake": 1 / (201 - 1),
-    "regen": 1 / (1.0 - 0.5),
-    "deploy": 1 / (1.0 - 0.1),
+    "weight_jacker": 1 / 40,
+    "front_roll_bar": 1 / 5,
+    "rear_roll_bar": 1 / 5,
+    "fuel_map": 1 / 7,
+    "clutch": 1 / 1000,
+    "throttle": 1 / 1000,
+    "deploy": 1 / 9,
+    "regen": 1 / 5,
 }
 
 bindings = {
@@ -272,6 +274,7 @@ bindings_cache = copy.deepcopy(bindings)
 
 settings = {
     "frequency": 0.1,
+    "global_threshold": 0.9,
     "scale": 1.25,
     "axis_samples": 2, # constant, not really a setting anymore
     "timer_loop": 150,
@@ -295,9 +298,6 @@ settings = {
     },
 
     "local": {
-        "high_threshold": 0.90,
-        "low_threshold": 0.10,
-        "axis_rollover": False,
         "audio": False,
         "volume": 0.5,
         "hybrid_low_audio": True,
@@ -325,36 +325,64 @@ settings = {
         "toggle": False,
         "increment": 1,
         "switch_value": -20,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
     },
     "front_roll_bar": {
         "continuous": False,
         "toggle": False,
         "increment": 1,
         "switch_value": 1,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
     },
     "rear_roll_bar": {
         "continuous": False,
         "toggle": False,
         "increment": 1,
         "switch_value": 6,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
     },
     "fuel_map": {
         "continuous": False,
         "toggle": True,
         "increment": 1,
         "switch_value": 8,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
     },
     "clutch": {
         "continuous": False,
         "toggle": False,
         "increment": 0.1,
         "switch_value": 50,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
     },
     "throttle": {
         "continuous": False,
         "toggle": False,
         "increment": 0.1,
         "switch_value": 50,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
+    },
+    "deploy": {
+        "continuous": False,
+        "toggle": False,
+        "increment": 0.1,
+        "switch_value": 50,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
+    },
+    "regen": {
+        "continuous": False,
+        "toggle": False,
+        "increment": 0.1,
+        "switch_value": 50,
+        "axis_threshold": 0.90,
+        "rollover_mode": False,
     },
 }
 
@@ -457,9 +485,22 @@ status = {
             "waiting": False,
         },
     },
-    "brake": {
-        "primary": 0.0,
-        "secondary": 0.2,
+    "deploy": {
+        "primary": 1.0,
+        "secondary": 0.0,
+        "switched": False,
+        "thread": {
+            "current": 0,
+            "running": {
+                "up": False,
+                "down": False
+            },
+            "waiting": False,
+        },
+    },
+    "regen": {
+        "primary": 1.0,
+        "secondary": 0.0,
         "switched": False,
         "thread": {
             "current": 0,
@@ -484,6 +525,7 @@ backend = {
                   693475, 778565, 292374, 909283, 1177562),
 }
 
+obsolete = ("previous", "axis_rollover", "high_threshold", "low_threshold")
 
 profile_list = []
 

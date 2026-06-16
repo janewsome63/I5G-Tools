@@ -32,16 +32,16 @@ def controls():
     except Exception as e:
         fn.error_handling(e)
 
-def check_pressed(bind):
+def check_pressed(bind, function):
     if bind['type'] == "button":
         if dev.device_info[bind['guid']]['buttons'][bind['num']]:
             pressed = True
         else:
             pressed = False
     elif bind['type'] == "axis":
-        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['local']['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['local']['high_threshold']:
+        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings[function]['axis_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings[function]['axis_threshold']:
             pressed = True
-        elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['local']['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['local']['low_threshold']:
+        elif dev.device_info[bind['guid']]['axes'][bind['num']] <= round(1 - var.settings[function]['axis_threshold'], 2) and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == round(1 - var.settings[function]['axis_threshold'], 2):
             pressed = True
         else:
             pressed = False
@@ -78,7 +78,7 @@ def increment(bind, function, control):
             else:
                 offset = 0.0
         # print("offset: ", offset)
-        if check_pressed(bind):
+        if check_pressed(bind, function):
 
             if var.status[function]['switched']:
                 vjoy.set(function, var.status[function]['secondary'] + offset)
@@ -95,7 +95,7 @@ def increment(bind, function, control):
                 count = 1
                 #print("count check1: ", count)
                 timer = var.settings['timer_first']/1000
-                while check_pressed(bind) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
+                while check_pressed(bind, function) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
                     if count % interval == 0:
                         #print("count check2: ", count, var.status[function]['switched'])
                         #print("continuous loop")
@@ -111,7 +111,7 @@ def increment(bind, function, control):
                     sleep(timer/interval)
                     count += 1
             else:
-                while check_pressed(bind) and var.status['calibration']== "None" and not var.bindings['status']['active']:
+                while check_pressed(bind, function) and var.status['calibration']== "None" and not var.bindings['status']['active']:
                     sleep(var.settings['timer_first']/(1000*interval))
         #else:
             #print("bind check_pressed failed: ", bind)
@@ -122,7 +122,7 @@ def increment(bind, function, control):
 
 def switch(bind, function):
     try:
-        if check_pressed(bind):
+        if check_pressed(bind, function):
             if var.status[function]['switched']:
                 var.status[function]['switched'] = False
                 vjoy.set(function, var.status[function]['primary'])
@@ -130,7 +130,7 @@ def switch(bind, function):
                 var.status[function]['switched'] = True
                 vjoy.set(function, var.status[function]['secondary'])
 
-            while check_pressed(bind) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
+            while check_pressed(bind, function) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
                 sleep(0.05)
 
             if not var.settings[function]['toggle']:

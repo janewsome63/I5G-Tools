@@ -4,9 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.7.1b - Added axis rollover setting">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.7.1b - Fixed missing version in compatible list">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controls.py" beforeDir="false" afterPath="$PROJECT_DIR$/controls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/history.py" beforeDir="false" afterPath="$PROJECT_DIR$/history.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_console.spec" beforeDir="false" afterPath="$PROJECT_DIR$/main_console.spec" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vjoy.py" beforeDir="false" afterPath="$PROJECT_DIR$/vjoy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,7 +86,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="Shell Script.Compile">
+  <component name="RunManager" selected="Python.Run">
     <configuration name="Run" type="PythonConfigurationType" factoryName="Python">
       <module name="I5G-Tools" />
       <option name="ENV_FILES" value="" />
@@ -450,7 +458,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780900277445</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="v0.7.1b - Fixed missing version in compatible list">
+      <option name="closed" value="true" />
+      <created>1780900716603</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1780900716603</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -465,7 +481,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Rework controller polling system, weight jacker tool section functional" />
     <MESSAGE value="Implement options on WJ tab, add axis threshold setting" />
     <MESSAGE value="Work on config file started; fix issue #2" />
     <MESSAGE value="Rework control loop; now triggered by creating new thread on device event" />
@@ -490,6 +505,7 @@
     <MESSAGE value="v0.4.9b - Added support for binding keyboard keys to controls." />
     <MESSAGE value="Update compiler, installer and license." />
     <MESSAGE value="v0.7.1b - Added axis rollover setting" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.7.1b - Added axis rollover setting" />
+    <MESSAGE value="v0.7.1b - Fixed missing version in compatible list" />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.7.1b - Fixed missing version in compatible list" />
   </component>
 </project>

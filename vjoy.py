@@ -12,9 +12,8 @@ axis_ref = {
     "fuel_map": vjoy.HID_USAGE_RX,
     "clutch": vjoy.HID_USAGE_RY,
     "throttle": vjoy.HID_USAGE_RZ,
-    "regen": vjoy.HID_USAGE_SL0,
     "deploy": vjoy.HID_USAGE_SL1,
-    "brake": vjoy.HID_USAGE_WHL,
+    "regen": vjoy.HID_USAGE_SL0,
 }
 
 axis_values = {
@@ -24,9 +23,8 @@ axis_values = {
     "fuel_map": 0.0,
     "clutch": 0.0,
     "throttle": 0.0,
-    "regen": 0.0,
-    "deploy": 0.0,
-    "brake": 0.0,
+    "regen": 1.0,
+    "deploy": 1.0,
 }
 
 axis_busy = {
@@ -38,7 +36,6 @@ axis_busy = {
     "throttle": False,
     "regen": False,
     "deploy": False,
-    "brake": False,
 }
 
 try:
@@ -64,11 +61,17 @@ def set(axis, pct):
             print("queue order error in vjoy.py!!!")
     axis_busy[axis] = True
     switched = var.status[axis]['switched']
-    if var.settings['local']['axis_rollover']:
-        if pct < 0.0:
+    if var.settings[axis]['rollover_mode']:
+        if pct < -0.004:
             pct = 1.0
-        elif pct > 1.0:
+        elif pct > 1.004:
             pct = 0.0
+    if pct > 1.0:
+        pct = 1.0
+    elif pct < 0.0:
+        pct = 0.0
+    else:
+        pct = round(pct, 5)
     raw = round(pct * 32768)
     if raw <= 0:
         raw = 1
@@ -118,9 +121,8 @@ def intialize():
     set("fuel_map", 0.0)
     set("clutch", 0.0)
     set("throttle", 0.0)
-    # set("regen", 4/9) # 0.5 in sim
-    # set("deploy", 4/9) # 0.5 in sim
-    set("brake", 0.0)
+    set("deploy", 1.0)
+    set("regen", 1.0)
 
 def find_instance():
     for device in dev.device_info:

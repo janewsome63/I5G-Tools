@@ -203,8 +203,7 @@ def format_device(function, control):
             num = str(var.bindings[function][control]['num'])
             dev_pretty = name + " - " + type + " " + num
             if control != 'pedal':
-                axis_dir = var.bindings[function][control]['value'] >= var.settings['local']['high_threshold']
-                if axis_dir:
+                if not var.bindings[function][control]['inverted']:
                     dev_pretty += "+"
                 else:
                     dev_pretty += "-"
