@@ -94,7 +94,13 @@ def log_event(instance_id, type, num, value):
             if guid in device_info and "axes" in device_info[guid] and num in device_info[guid]['axes']:
                 value = round((value + 1) / 2, 3)
                 device_info[guid]['axes'][num] = value
-                history.add(guid,num,value)
+
+                check = fn.is_bind()
+                if check:
+                    function = check[0]['function'] #only uses first bind threshold atm
+                else:
+                    function = None
+                history.add(guid,num,function,value)
         elif type == "hat":
             if guid in device_info and "hats" in device_info[guid] and num in device_info[guid]['hats']:
                 if value[1] == 1:

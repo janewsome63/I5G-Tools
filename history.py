@@ -4,7 +4,7 @@ guidnum_list = []
 hist_list = []
 length_list = []
 
-def add(guid, num, value):
+def add(guid, num, function, value):
     global guidnum_list
     global hist_list
     global length_list
@@ -18,10 +18,14 @@ def add(guid, num, value):
     length = length_list[index]
 
     #print("add1 ", length, hist)
+    if function:
+        threshold = var.settings[function]['axis_threshold']
+    else:
+        threshold = var.settings['global_threshold']
     if length == var.settings['axis_samples'] and not (hist[var.settings['axis_samples']-1] == -1):
         start = 0 #index to start shifting values in hist[]
-        if hist[0] < var.settings['global_threshold'] <= value or hist[0] > 1 - var.settings['global_threshold'] >= value: #if the history crosses a threshold barrier in the correct direction, do not overwrite the oldest entry in hist[] to preserve that information
-            start = 0
+        if hist[0] < threshold <= value or hist[0] > round(1 - threshold, 2) >= value: #if the history crosses a threshold barrier in the correct direction, do not overwrite the oldest entry in hist[] to preserve that information
+            start = 1
         for ind in range(start, var.settings['axis_samples']-1):
             hist[ind] = hist[ind+1]
         hist[var.settings['axis_samples']-1] = value
