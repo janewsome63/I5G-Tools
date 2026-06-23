@@ -11,7 +11,8 @@ from car_settings_list import car_settings
 from PyQt6.QtCore import (pyqtSlot, QSize, Qt, QThreadPool, QTimer)
 from PyQt6.QtGui import (QIcon, QColor, QWheelEvent)
 from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayout, QLabel, QLCDNumber, QLineEdit,
-    QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget, QScrollArea)
+                             QMainWindow, QProgressBar, QPushButton, QSpinBox, QTabWidget, QVBoxLayout, QWidget,
+                             QScrollArea)
 from time import sleep
 import math
 
@@ -29,7 +30,7 @@ class MainWindow(QMainWindow):
                 applicationPath = "C:\\"
 
             self.store = {
-                "width": 700,
+                "width": 675,
                 "height": 250,
                 "running": False,
                 "profile_busy": False,
@@ -52,7 +53,7 @@ class MainWindow(QMainWindow):
                 "types": {
                     "adjustment": ("weight_jacker", "front_roll_bar", "rear_roll_bar", "fuel_map"),
                     "input": ("throttle", "clutch"),
-                    "other": ("axes_display", "hybrid", "sounds", "settings")
+                    "other": ("display", "hybrid", "sounds", "settings")
                 }
             }
             for type in self.tabs['types']:
@@ -79,12 +80,12 @@ class MainWindow(QMainWindow):
             self.apply_settings(var.settings['profile']['current'])
             self.refresh_profile_list()
 
-            self.store['index']['car_id'] = self.store['content']['axes_display']['car_id']
+            self.store['index']['car_id'] = self.store['content']['display']['car_id']
 
             self.ir = irsdk.IRSDK()
             self.ir.startup()
             fn.check_uid(self.ir)
-            self.store['content']['axes_display']['car_id'] = "None"
+            self.store['content']['display']['car_id'] = "None"
             self.update_limits()
 
             self.lastval = {
@@ -287,7 +288,7 @@ class MainWindow(QMainWindow):
         try:
             self.tabs[function].layout = QGridLayout()
 
-            if function == "axes_display":
+            if function == "display":
                 self.store['content'][function]['car_id_label'] = QLabel()
                 self.store['content'][function]['car_id_label'].setText(var.lang['car_id'])
 
@@ -802,8 +803,8 @@ class MainWindow(QMainWindow):
                         check = False
                     else:
                         index -= 1
-                if self.store['content']['axes_display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
-                    self.store['content']['axes_display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
+                if self.store['content']['display']['car_id'] != int(self.ir['DriverInfo']['Drivers'][index]['CarID']):
+                    self.store['content']['display']['car_id'] = int(self.ir['DriverInfo']['Drivers'][index]['CarID'])
                     self.update_limits()
                 if self.lastval['CarIdx'] != index:
                     self.lastval['CarIdx'] = index
@@ -831,9 +832,9 @@ class MainWindow(QMainWindow):
                 if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont'])):
                     self.irsdk_audio()
                 # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
-            elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['axes_display']['car_id'] != "None":
+            elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['display']['car_id'] != "None":
                 self.ir.shutdown()
-                self.store['content']['axes_display']['car_id'] = "None"
+                self.store['content']['display']['car_id'] = "None"
                 self.store['content']['hybrid']['soc_axis'].setValue(0)
                 self.store['content']['hybrid']['soc_axis'].update()
                 self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
@@ -860,34 +861,34 @@ class MainWindow(QMainWindow):
                     # print("display check1: ", func, pct)
                     self.store['content'][func]['axis'].setValue(int(pct * 100))
                     self.store['content'][func]['axis'].update()
-                    self.store['content']['axes_display'][func + '_axis'].setValue(int(pct * 100))
-                    self.store['content']['axes_display'][func + '_axis'].update()
+                    self.store['content']['display'][func + '_axis'].setValue(int(pct * 100))
+                    self.store['content']['display'][func + '_axis'].update()
 
                     if func == 'clutch' or func == "throttle":
                         if (pct*100)%1 == 0:
                             self.store['content'][func]['lcd'].display(str(round(pct*100)) + ".0") # bad hack to get the lcd to always display one decimal place
-                            self.store['content']['axes_display'][func + '_lcd'].display(str(round(pct*100)) + ".0")
+                            self.store['content']['display'][func + '_lcd'].display(str(round(pct*100)) + ".0")
                         else:
                             self.store['content'][func]['lcd'].display(round(pct*100, 1))
-                            self.store['content']['axes_display'][func + '_lcd'].display(round(pct*100, 1))
+                            self.store['content']['display'][func + '_lcd'].display(round(pct*100, 1))
                     elif func == 'regen' or func == "deploy":
                         value = round(pct * (self.store['content'][func]['switch'].maximum() - self.store['content'][func]['switch'].minimum()) + self.store['content'][func]['switch'].minimum(), 1)
                         if value%1 == 0:
                             self.store['content'][func]['lcd'].display(str(round(value)) + ".0") # bad hack to get the lcd to always display one decimal place
-                            self.store['content']['axes_display'][func + '_lcd'].display(str(round(value)) + ".0")
+                            self.store['content']['display'][func + '_lcd'].display(str(round(value)) + ".0")
                         else:
                             self.store['content'][func]['lcd'].display(round(value, 1))
-                            self.store['content']['axes_display'][func + '_lcd'].display(round(value, 1))
+                            self.store['content']['display'][func + '_lcd'].display(round(value, 1))
                     else:
                         value = round(pct * (self.store['content'][func]['switch'].maximum() - self.store['content'][func]['switch'].minimum()) + self.store['content'][func]['switch'].minimum(), 1)
                         self.store['content'][func]['lcd'].display(round(value))
-                        self.store['content']['axes_display'][func + '_lcd'].display(round(value))
+                        self.store['content']['display'][func + '_lcd'].display(round(value))
                     self.store['content'][func]['lcd'].update()
-                    self.store['content']['axes_display'][func + '_lcd'].update()
-            if (self.store['content']['axes_display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['axes_display']['car_id']]:
+                    self.store['content']['display'][func + '_lcd'].update()
+            if (self.store['content']['display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['display']['car_id']]:
                 self.store['content']['hybrid']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['axes_display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
+                if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
                     soc_pct = self.ir['EnergyERSBatteryPct']
                     self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
                     self.store['content']['hybrid']['soc_axis'].update()
@@ -1255,15 +1256,15 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def update_limits(self):
         try:
-            if self.store['content']['axes_display']['car_id'] == "None":
+            if self.store['content']['display']['car_id'] == "None":
                 self.store['index']['car_id'].setText("None")
                 print("Updating car_id to None")
-                self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
-            elif self.store['content']['axes_display']['car_id'] in car_settings:
-                car_id = self.store['content']['axes_display']['car_id']
+                self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
+            elif self.store['content']['display']['car_id'] in car_settings:
+                car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(car_settings[car_id]['name'])
                 print("Updating for car_id: " + str(car_id) + " " + car_settings[car_id]['name'])
                 if 'weight_jacker' in car_settings[car_id]:
@@ -1271,46 +1272,46 @@ class MainWindow(QMainWindow):
                     max = car_settings[car_id]['weight_jacker'][1]
                     var.step['weight_jacker'] = 1 / (max - min)
                     self.store['content']['weight_jacker']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
                 if 'front_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['front_roll_bar'][0]
                     max = car_settings[car_id]['front_roll_bar'][1]
                     var.step['front_roll_bar'] = 1 / (max - min)
                     self.store['content']['front_roll_bar']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
                 if 'rear_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['rear_roll_bar'][0]
                     max = car_settings[car_id]['rear_roll_bar'][1]
                     var.step['rear_roll_bar'] = 1 / (max - min)
                     self.store['content']['rear_roll_bar']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
                 if 'fuel_map' in car_settings[car_id]:
                     min = car_settings[car_id]['fuel_map'][0]
                     max = car_settings[car_id]['fuel_map'][1]
                     var.step['fuel_map'] = 1 / (max - min)
                     self.store['content']['fuel_map']['switch'].setRange(min, max)
-                    self.store['content']['axes_display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
-                    self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
             else:
-                car_id = self.store['content']['axes_display']['car_id']
+                car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
                 print("current_car " + str(car_id) + " not in car_settings!")
-                self.store['content']['axes_display']['weight_jacker_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['front_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['rear_roll_bar_label'].setStyleSheet("color: red;")
-                self.store['content']['axes_display']['fuel_map_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
             text = "WJ: " + str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
             text += ", FARB: " + str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
             text += ", RARB: " + str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
             text += ", Fuel Map: " + str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
-            self.store['content']['axes_display']['car_id_limits'].setText(text)
+            self.store['content']['display']['car_id_limits'].setText(text)
         except Exception as e:
             fn.error_handling(e)
 
