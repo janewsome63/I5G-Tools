@@ -983,7 +983,7 @@ class MainWindow(QMainWindow):
                     self.store['content']['hybrid']['deploy_lim_lcd'].update()
                     self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
                     self.lastval['deploy_lim'] = 999.0
-                if self.store['content']['settings']['sound'].currentText() == "Yes":
+                if self.store['content']['sounds']['sound'].currentText() == "Yes":
                     if self.lastval['soc'] != 999.0:
                         if self.store['content']['hybrid']['soc_axis'].value() <= var.settings['local']['hybrid_low_val'] < self.lastval['soc'] and var.settings['local']['hybrid_low_audio']:
                             print("call play low")
