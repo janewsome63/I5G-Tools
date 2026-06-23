@@ -33,32 +33,35 @@ def controls():
         fn.error_handling(e)
 
 def check_pressed(bind):
-    if bind['type'] == "button":
-        if dev.device_info[bind['guid']]['buttons'][bind['num']]:
-            pressed = True
+    try:
+        if bind['type'] == "button":
+            if dev.device_info[bind['guid']]['buttons'][bind['num']]:
+                pressed = True
+            else:
+                pressed = False
+        elif bind['type'] == "axis":
+            if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['local']['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['local']['high_threshold']:
+                pressed = True
+            elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['local']['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['local']['low_threshold']:
+                pressed = True
+            else:
+                pressed = False
+        elif bind['type'] == "hat":
+            if bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
+                pressed = True
+            else:
+                pressed = False
+        elif bind['type'] == "key":
+            if bind['value'] == dev.device_info[bind['guid']]['keys'][bind['num']]:
+                pressed = True
+            else:
+                pressed = False
         else:
             pressed = False
-    elif bind['type'] == "axis":
-        if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['local']['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['local']['high_threshold']:
-            pressed = True
-        elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['local']['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['local']['low_threshold']:
-            pressed = True
-        else:
-            pressed = False
-    elif bind['type'] == "hat":
-        if bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
-            pressed = True
-        else:
-            pressed = False
-    elif bind['type'] == "key":
-        if bind['value'] == dev.device_info[bind['guid']]['keys'][bind['num']]:
-            pressed = True
-        else:
-            pressed = False
-    else:
-        pressed = False
 
-    return pressed
+        return pressed
+    except Exception as e:
+        fn.error_handling(e)
 
 def increment(bind, function, control):
     try:
@@ -145,7 +148,10 @@ def switch(bind, function):
         fn.error_handling(e)
 
 def pedal(function, value):
-    if value is not None:
-        var.status[function]['primary'] = value
-        if not var.status[function]['switched']:
-            vjoy.set(function, value)
+    try:
+        if value is not None:
+            var.status[function]['primary'] = value
+            if not var.status[function]['switched']:
+                vjoy.set(function, value)
+    except Exception as e:
+        fn.error_handling(e)

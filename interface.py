@@ -17,8 +17,8 @@ import math
 
 # noinspection PyUnresolvedReferences,PyProtectedMember
 class MainWindow(QMainWindow):
-    try:
-        def __init__(self):
+    def __init__(self):
+        try:
             super().__init__()
 
             if getattr(sys, 'frozen', False):
@@ -133,8 +133,11 @@ class MainWindow(QMainWindow):
             # if var.status['rewrite']['profile']:
             #     fn.write_profile()
             #     var.status['rewrite']['profile'] = False
+        except Exception as e:
+            fn.error_handling(e)
 
-        def tool_tabs(self, type, function):
+    def tool_tabs(self, type, function):
+        try:
             local_store = {
                 "binds": ["up", "down", "switch"],
                 "decimals": 0,
@@ -277,8 +280,11 @@ class MainWindow(QMainWindow):
                     "device": self.store['content'][function][control + '_device'],
                     "label": self.store['content'][function][control + '_label'],
                 }
+        except Exception as e:
+            fn.error_handling(e)
 
-        def other_tabs(self, function):
+    def other_tabs(self, function):
+        try:
             self.tabs[function].layout = QGridLayout()
 
             if function == "axes_display":
@@ -755,8 +761,11 @@ class MainWindow(QMainWindow):
                             row += 1
             del row, column
             self.tabs[function].setLayout(self.tabs[function].layout)
+        except Exception as e:
+            fn.error_handling(e)
 
-        def updater(self):
+    def updater(self):
+        try:
             for function in var.status:
                 if function in self.store['content']:
                     value = var.status[function]['secondary']
@@ -840,8 +849,11 @@ class MainWindow(QMainWindow):
             if var.status['refresh_labels']:
                 self.update_label_all()
                 var.status['refresh_labels'] = False
+        except Exception as e:
+            fn.error_handling(e)
 
-        def display(self):
+    def display(self):
+        try:
             for func in vjoy.axis_values:
                 if func in self.store['content']: #only because not every tab has been developed yet...
                     pct = vjoy.axis_values[func]
@@ -918,10 +930,13 @@ class MainWindow(QMainWindow):
                 var.status['set_list_count'] = 1
             else:
                 var.status['set_list_count'] += 1
-            
+        except Exception as e:
+            fn.error_handling(e)
+        
 
-        @pyqtSlot()
-        def calibrate(self):
+    @pyqtSlot()
+    def calibrate(self):
+        try:
             if self.store['axis'] in self.store['content']:
                 self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrating'])
             else:
@@ -933,9 +948,12 @@ class MainWindow(QMainWindow):
                 sleep(0.1)
             self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
             vjoy.set(self.store['axis'], self.store['pct'])
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def calibrate_start(self, func):
+    @pyqtSlot()
+    def calibrate_start(self, func):
+        try:
             if not self.store['running'] and var.status['calibration'] == "None":
                 self.store['axis'] = func
                 self.store['running'] = True
@@ -958,14 +976,20 @@ class MainWindow(QMainWindow):
                     if function + "Done" == func_pass:
                         func_pass = function
                 self.start_flash_tab(func_pass)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def increment(self, func):
+    @pyqtSlot()
+    def increment(self, func):
+        try:
             var.settings[func]['increment'] = self.store['content'][func]['increment'].value()
             fn.write_profile()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def switch(self, func):
+    @pyqtSlot()
+    def switch(self, func):
+        try:
             value = self.store['content'][func]['switch'].value()
             var.settings[func]['switch_value'] = value
             if func == "weight_jacker":
@@ -977,17 +1001,23 @@ class MainWindow(QMainWindow):
             if var.status[func]['switched']:
                 vjoy.set(func, var.status[func]['secondary'])
             fn.write_profile()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def increment_mode(self, func):
+    @pyqtSlot()
+    def increment_mode(self, func):
+        try:
             if self.store['content'][func]['increment_mode'].currentText() == "Continuous":
                 var.settings[func]['continuous'] = True
             elif self.store['content'][func]['increment_mode'].currentText() == "Single":
                 var.settings[func]['continuous'] = False
             fn.write_profile()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def switch_mode(self, func):
+    @pyqtSlot()
+    def switch_mode(self, func):
+        try:
             if self.store['content'][func]['switch_mode'].currentText() == "Toggle":
                 var.settings[func]['toggle'] = True
             elif self.store['content'][func]['switch_mode'].currentText() == "Hold":
@@ -995,9 +1025,12 @@ class MainWindow(QMainWindow):
                 vjoy.set(func, var.status[func]['primary'])
                 var.settings[func]['toggle'] = False
             fn.write_profile()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def settings_set(self, func):
+    @pyqtSlot()
+    def settings_set(self, func):
+        try:
             if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
@@ -1043,16 +1076,22 @@ class MainWindow(QMainWindow):
             else:
                 var.settings[func] = value
                 fn.write_config()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def scale(self):
+    @pyqtSlot()
+    def scale(self):
+        try:
             scale = self.store['content']['settings']['scale'].currentText()
             scale = scale.replace("x", "")
             var.settings['scale'] = scale
             fn.write_config()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def bind(self):
+    @pyqtSlot()
+    def bind(self):
+        try:
             # self.store['running'] = True
             function = var.bindings['status']['function']
             control = var.bindings['status']['control']
@@ -1145,9 +1184,12 @@ class MainWindow(QMainWindow):
             fn.write_profile()
             var.status['refresh_labels'] = True
             # self.store['running'] = False
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def bind_start(self, func, ctrl, input=False):
+    @pyqtSlot()
+    def bind_start(self, func, ctrl, input=False):
+        try:
             if not var.bindings['status']['active']:
                 var.bindings['status'] = {
                     "active": True,
@@ -1169,9 +1211,12 @@ class MainWindow(QMainWindow):
                     "input": input,
                 }
                 self.store['thread_pool'].start(self.bind)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def refresh_profile_list(self):
+    @pyqtSlot()
+    def refresh_profile_list(self):
+        try:
             self.store['profile_busy'] = True
             file = self.store['content']['settings']['profile_select'].currentText()
             self.store['content']['settings']['profile_select'].clear()
@@ -1179,16 +1224,22 @@ class MainWindow(QMainWindow):
                 self.store['content']['settings']['profile_select'].addItem(name)
             self.store['content']['settings']['profile_select'].setCurrentText(file)
             self.store['profile_busy'] = False
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def create_profile(self, name):
+    @pyqtSlot()
+    def create_profile(self, name):
+        try:
             if name not in fn.get_profiles():
                 fn.write_profile(name)
             self.refresh_profile_list()
             self.store['content']['settings']['profile_select'].setCurrentText(name)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def delete_profile(self, name):
+    @pyqtSlot()
+    def delete_profile(self, name):
+        try:
             fn.delete_profile(name)
             if len(fn.get_profiles()) == 0:
                 var.settings['profile']['current'] = 'Default'
@@ -1198,9 +1249,12 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['profile_select'].setCurrentIndex(0)
             var.settings['profile']['current'] = self.store['content']['settings']['profile_select'].currentText()
             fn.read_profile()
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def update_limits(self):
+    @pyqtSlot()
+    def update_limits(self):
+        try:
             if self.store['content']['axes_display']['car_id'] == "None":
                 self.store['index']['car_id'].setText("None")
                 print("Updating car_id to None")
@@ -1257,36 +1311,39 @@ class MainWindow(QMainWindow):
             text += ", RARB: " + str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
             text += ", Fuel Map: " + str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
             self.store['content']['axes_display']['car_id_limits'].setText(text)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def update_label(self, function, control):
-            try:
-                if var.bindings[function][control]:
-                    if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
-                        self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
-                    else:
-                        self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                    if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
-                        var.status['rewrite']['profile'] = True
-                        self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
-                        if var.status['rewrite']['profile']:
-                            fn.write_profile()
-                            var.status['rewrite']['profile'] = False
-                    self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
-            except KeyError as error:
-                print("in update_label(func,ctrl): ", error)
-        
-        def update_label_all(self):
-            try:
-                for function in var.bindings:
-                    if function != "status":
-                        for control in var.bindings[function]:
-                            self.update_label(function, control)
-            except KeyError as error:
-                print("in update_label_all(): ", error)
+    @pyqtSlot()
+    def update_label(self, function, control):
+        try:
+            if var.bindings[function][control]:
+                if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
+                    self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
+                else:
+                    self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
+                    var.status['rewrite']['profile'] = True
+                    self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
+                    if var.status['rewrite']['profile']:
+                        fn.write_profile()
+                        var.status['rewrite']['profile'] = False
+                self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
+        except KeyError as error:
+            print("in update_label(func,ctrl): ", error)
+    
+    def update_label_all(self):
+        try:
+            for function in var.bindings:
+                if function != "status":
+                    for control in var.bindings[function]:
+                        self.update_label(function, control)
+        except KeyError as error:
+            print("in update_label_all(): ", error)
 
-        @pyqtSlot()
-        def apply_settings(self, file):
+    @pyqtSlot()
+    def apply_settings(self, file):
+        try:
             # print("try apply_settings")
             if self.store['profile_busy']: #if list is getting cleared or current text is being reset during list refresh, skip this function
                 return
@@ -1345,9 +1402,12 @@ class MainWindow(QMainWindow):
                     if not setting == 'version':
                         print("isinstance check failed", setting, var.settings['local'][setting])
             print ("end apply_settings")
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def start_flash_tab(self, func):
+    @pyqtSlot()
+    def start_flash_tab(self, func):
+        try:
             if not func in var.status['flash_tab']:
                 var.status['flash_tab'].append(func)
                 index = self.tabs['obj'].indexOf(self.tabs[func])
@@ -1356,29 +1416,41 @@ class MainWindow(QMainWindow):
                 self.flashtimer[func] = QTimer()
                 self.flashtimer[func].timeout.connect(lambda: self.alt_flash(index))
                 self.flashtimer[func].start(250)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def stop_flash_tab(self, func):
+    @pyqtSlot()
+    def stop_flash_tab(self, func):
+        try:
             self.flashtimer[func].stop()
             index = self.tabs['obj'].indexOf(self.tabs[func])
             self.default_tab_color = self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def stop_flash_tab_all(self):
+    @pyqtSlot()
+    def stop_flash_tab_all(self):
+        try:
             for func in var.status['flash_tab']:
                 self.flashtimer[func].stop()
                 index = self.tabs['obj'].indexOf(self.tabs[func])
                 self.default_tab_color = self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def alt_flash(self, index):
+    @pyqtSlot()
+    def alt_flash(self, index):
+        try:
             if self.tabs['obj'].tabBar().tabTextColor(index) == self.default_tab_color:
                     self.tabs['obj'].tabBar().setTabTextColor(index, QColor("red"))
             else:
                 self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
-        
-        @pyqtSlot()
-        def test_play(self, sound):
+        except Exception as e:
+            fn.error_handling(e)
+    
+    @pyqtSlot()
+    def test_play(self, sound):
+        try:
             if sound == "upshift_beep" or sound == "downshift_beep":
                 sfx.play(sound)
                 sfx.status[sound] = False
@@ -1387,13 +1459,19 @@ class MainWindow(QMainWindow):
                 sfx.status["p2p_active_single"] = False
             else:
                 fn.start_thread(sfx.play(sound))
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def test_play_loop(self, sound): # right now, hardcoded to do 3 loops
+    @pyqtSlot()
+    def test_play_loop(self, sound): # right now, hardcoded to do 3 loops
+        try:
             fn.start_thread(sfx.play_num_loop(sound, 3))
+        except Exception as e:
+            fn.error_handling(e)
 
-        @pyqtSlot()
-        def irsdk_audio(self):
+    @pyqtSlot()
+    def irsdk_audio(self):
+        try:
             # print("shift_beep() start")
             if self.lastval['SessionTick'] != self.ir['SessionTick']: # if the information is not new, do nothing because there is no new information
                 # ideally would copy a snapshot of self.ir at this moment to make sure all the information is from the same set, but this is probably close enough
@@ -1535,20 +1613,29 @@ class MainWindow(QMainWindow):
                     sfx.status['upshift_beep'] = False # maybe only do this after upshifting?
                     sfx.status['downshift_beep'] = False # maybe only reset this when an upshift happens?
             # print("shift_beep() end")
-    except Exception as e:
-        fn.error_handling(e)
+        except Exception as e:
+            fn.error_handling(e)
 
 class CustomComboBox(QComboBox):
     def wheelEvent(self ,event: QWheelEvent):
-        event.ignore() # ignores mouse scroll inputs while hovering over
+        try:
+            event.ignore() # ignores mouse scroll inputs while hovering over
+        except Exception as e:
+            fn.error_handling(e)
 
 class CustomSpinBox(QSpinBox):
     def wheelEvent(self, event: QWheelEvent):
-        event.ignore() # ignores mouse scroll inputs while hovering over
+        try:
+            event.ignore() # ignores mouse scroll inputs while hovering over
+        except Exception as e:
+            fn.error_handling(e)
 
 class CustomDoubleSpinBox(QDoubleSpinBox):
     def wheelEvent(self, event: QWheelEvent):
-        event.ignore() # ignores mouse scroll inputs while hovering over
+        try:
+            event.ignore() # ignores mouse scroll inputs while hovering over
+        except Exception as e:
+            fn.error_handling(e)
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])

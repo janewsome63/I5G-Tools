@@ -4,6 +4,7 @@ import pyvjoy as vjoy
 
 import devices as dev
 import variables as var
+import functions as fn
 
 axis_ref = {
     "weight_jacker": vjoy.HID_USAGE_X,
@@ -50,79 +51,91 @@ queue = []
 number = 0
 
 def set(axis, pct):
-    global number
-    print("vjoy set check1")
-    if axis_busy[axis]:
-        local_number = number
-        queue.append(local_number)
-        # print("queue number ", local_number)
-        number += 1
-        while queue[0] != local_number: # queue
-            sleep(0.01)
-        check = queue.pop()
-        if check != local_number: # only for debugging
-            print("queue order error in vjoy.py!!!")
-    axis_busy[axis] = True
-    switched = var.status[axis]['switched']
-    if var.settings['local']['axis_rollover']:
-        if pct < 0.0:
-            pct = 1.0
-        elif pct > 1.0:
+    try:
+        global number
+        print("vjoy set check1")
+        if axis_busy[axis]:
+            local_number = number
+            queue.append(local_number)
+            # print("queue number ", local_number)
+            number += 1
+            while queue[0] != local_number: # queue
+                sleep(0.01)
+            check = queue.pop()
+            if check != local_number: # only for debugging
+                print("queue order error in vjoy.py!!!")
+        axis_busy[axis] = True
+        switched = var.status[axis]['switched']
+        if var.settings['local']['axis_rollover']:
+            if pct < 0.0:
+                pct = 1.0
+            elif pct > 1.0:
+                pct = 0.0
+        raw = round(pct * 32768)
+        if raw <= 0:
+            raw = 1
             pct = 0.0
-    raw = round(pct * 32768)
-    if raw <= 0:
-        raw = 1
-        pct = 0.0
-    elif raw > 32768:
-        raw = 32768
-        pct = 1.0
-    print("try set using: ", axis, raw, pct)
-    j.set_axis(axis_ref[axis], raw)
-    axis_values[axis] = pct
-    if switched:
-        var.status[axis]['secondary'] = axis_values[axis]
-        print("new secondary: ", var.status[axis]['secondary'])
-    else:
-        var.status[axis]['primary'] = axis_values[axis]
-        print("new primary: ", var.status[axis]['primary'])
-    axis_busy[axis] = False
+        elif raw > 32768:
+            raw = 32768
+            pct = 1.0
+        print("try set using: ", axis, raw, pct)
+        j.set_axis(axis_ref[axis], raw)
+        axis_values[axis] = pct
+        if switched:
+            var.status[axis]['secondary'] = axis_values[axis]
+            print("new secondary: ", var.status[axis]['secondary'])
+        else:
+            var.status[axis]['primary'] = axis_values[axis]
+            print("new primary: ", var.status[axis]['primary'])
+        axis_busy[axis] = False
+    except Exception as e:
+        fn.error_handling(e)
 
 def calibrate(axis):
-    #var.status['calibration'] = True
-    while var.status[axis]['thread']['waiting']: #wait for any hold loops to finish
-        sleep(0.05)
-    step = 0.01
-    pct = 0.0
-    while pct < 1.0:
-        set(axis, pct)
-        pct = pct + step
-        sleep(0.005)
-    set(axis,pct)
-    sleep(0.05) # make sure iRacing reads the max value
-    set(axis,pct)
-    sleep(0.125)
-    while pct > 0:
-        set(axis, pct)
-        pct = pct - step
-        sleep(0.005)
-    set(axis,0.0)
-    sleep(0.25)
+    try:
+        #var.status['calibration'] = True
+        while var.status[axis]['thread']['waiting']: #wait for any hold loops to finish
+            sleep(0.05)
+        step = 0.01
+        pct = 0.0
+        while pct < 1.0:
+            set(axis, pct)
+            pct = pct + step
+            sleep(0.005)
+        set(axis,pct)
+        sleep(0.05) # make sure iRacing reads the max value
+        set(axis,pct)
+        sleep(0.125)
+        while pct > 0:
+            set(axis, pct)
+            pct = pct - step
+            sleep(0.005)
+        set(axis,0.0)
+        sleep(0.25)
 
-    #var.status['calibration'] = False
+        #var.status['calibration'] = False
+    except Exception as e:
+        fn.error_handling(e)
 
 def intialize():
-    j.update()
-    set("weight_jacker", 0.5)
-    set("front_roll_bar", 1.0)
-    set("rear_roll_bar", 0.0)
-    set("fuel_map", 0.0)
-    set("clutch", 0.0)
-    set("throttle", 0.0)
-    # set("regen", 4/9) # 0.5 in sim
-    # set("deploy", 4/9) # 0.5 in sim
-    set("brake", 0.0)
+    try:
+        j.update()
+        set("weight_jacker", 0.5)
+        set("front_roll_bar", 1.0)
+        set("rear_roll_bar", 0.0)
+        set("fuel_map", 0.0)
+        set("clutch", 0.0)
+        set("throttle", 0.0)
+        # set("regen", 4/9) # 0.5 in sim
+        # set("deploy", 4/9) # 0.5 in sim
+        set("brake", 0.0)
+    except Exception as e:
+        fn.error_handling(e)
 
 def find_instance():
-    for device in dev.device_info:
-        if "vJoy" in dev.device_info[device]['name']:
-            var.status['vjoy_instance'] = dev.device_info[device]['instance']
+    try:
+        for device in dev.device_info:
+            if "vJoy" in dev.device_info[device]['name']:
+                var.status['vjoy_instance'] = dev.device_info[device]['instance']
+    except Exception as e:
+        fn.error_handling(e)
