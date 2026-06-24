@@ -120,6 +120,7 @@ lang = {
     "github": "Github",
     "github_link": "https://www.github.com",
 }
+lang['settings_version'] = lang['version']
 
 step = {
     "weight_jacker": 1 / (41 - 1),
@@ -302,7 +303,6 @@ settings = {
     "local": {
         "high_threshold": 0.90,
         "low_threshold": 0.10,
-        "axis_rollover": False,
         "audio": False,
         "volume": 0.5,
         "hybrid_low_audio": True,
@@ -330,36 +330,42 @@ settings = {
         "toggle": False,
         "increment": 1,
         "switch_value": -20,
+        "rollover_mode": False,
     },
     "front_roll_bar": {
         "continuous": False,
         "toggle": False,
         "increment": 1,
         "switch_value": 1,
+        "rollover_mode": False,
     },
     "rear_roll_bar": {
         "continuous": False,
         "toggle": False,
         "increment": 1,
         "switch_value": 6,
+        "rollover_mode": False,
     },
     "fuel_map": {
         "continuous": False,
         "toggle": True,
         "increment": 1,
         "switch_value": 8,
+        "rollover_mode": False,
     },
     "clutch": {
         "continuous": False,
         "toggle": False,
         "increment": 0.1,
         "switch_value": 50,
+        "rollover_mode": False,
     },
     "throttle": {
         "continuous": False,
         "toggle": False,
         "increment": 0.1,
         "switch_value": 50,
+        "rollover_mode": False,
     },
 }
 

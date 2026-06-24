@@ -35,7 +35,7 @@ def add(guid, num, value):
         hist_list[index] = hist
         length_list[index] = length
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "history.add()")
 
 def check_valid(guid, num, threshold, ascending):
     try:
@@ -68,7 +68,7 @@ def check_valid(guid, num, threshold, ascending):
                 #print("Check False2: ", hist[0], threshold, ascending, hist[var.settings['axis_samples']-1])
                 return False
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "history.check_valid()")
 
 def clear():
     try:
@@ -79,4 +79,4 @@ def clear():
         hist_list = []
         length_list = []
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "history.clear()")

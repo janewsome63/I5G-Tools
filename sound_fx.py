@@ -89,7 +89,7 @@ def play(notif):
         else:
             print(notif, " sound status is already True in sfx.play")
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "sound_fx.play()")
 
 def play_loop(notif):
     try:
@@ -107,7 +107,7 @@ def play_loop(notif):
         else:
             print(notif, " is not valid in sfx.play_loop")
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "sound_fx.play_loop()")
 
 def play_num_loop(notif, num):
     try:
@@ -127,7 +127,7 @@ def play_num_loop(notif, num):
         else:
             print(notif, " is not valid in sfx.play_num_loop")
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "sound_fx.play_num_lop()")
 
 def stop_loop(notif):
     try:
@@ -140,4 +140,4 @@ def stop_loop(notif):
         else:
             print(notif, " sound status is already True in sfx.stop_loop")
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "sound_fx.stop_loop()")

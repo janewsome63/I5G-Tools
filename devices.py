@@ -62,7 +62,7 @@ def add_device(startup):
         if not startup:
             fn.read_profile(var.settings['profile']['current'])
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "devices.add_device()")
 
 def remove_device(instance):
     try:
@@ -76,7 +76,7 @@ def remove_device(instance):
                 break
         fn.read_profile(var.settings['profile']['current'])
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "devices.remove_device()")
 
 
 def log_event(instance_id, type, num, value):
@@ -141,7 +141,7 @@ def log_event(instance_id, type, num, value):
         # else:
             # print("guid in device_info failed: ", guid, device_info)
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "devices.log_event()")
 
 
 def device_detection():
@@ -197,7 +197,7 @@ def device_detection():
 
         p.quit()
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "devices.device_detection()")
 
 def format_device(function, control):
     try:
@@ -237,4 +237,4 @@ def format_device(function, control):
         else:
             return 'None'
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "devices.format_device()")

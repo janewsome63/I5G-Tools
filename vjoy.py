@@ -66,11 +66,11 @@ def set(axis, pct):
                 print("queue order error in vjoy.py!!!")
         axis_busy[axis] = True
         switched = var.status[axis]['switched']
-        if var.settings['local']['axis_rollover']:
-            if pct < 0.0:
-                pct = 1.0
-            elif pct > 1.0:
-                pct = 0.0
+        # if var.settings['local']['axis_rollover']:
+        #     if pct < 0.0:
+        #         pct = 1.0
+        #     elif pct > 1.0:
+        #         pct = 0.0
         raw = round(pct * 32768)
         if raw <= 0:
             raw = 1
@@ -89,7 +89,7 @@ def set(axis, pct):
             print("new primary: ", var.status[axis]['primary'])
         axis_busy[axis] = False
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "vjoy.set()")
 
 def calibrate(axis):
     try:
@@ -115,7 +115,7 @@ def calibrate(axis):
 
         #var.status['calibration'] = False
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "vjoy.calibrate()")
 
 def intialize():
     try:
@@ -128,9 +128,8 @@ def intialize():
         set("throttle", 0.0)
         # set("regen", 4/9) # 0.5 in sim
         # set("deploy", 4/9) # 0.5 in sim
-        set("brake", 0.0)
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "vjoy.initialize()")
 
 def find_instance():
     try:
@@ -138,4 +137,4 @@ def find_instance():
             if "vJoy" in dev.device_info[device]['name']:
                 var.status['vjoy_instance'] = dev.device_info[device]['instance']
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "vjoy.find_instance()")

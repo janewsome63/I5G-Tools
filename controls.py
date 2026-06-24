@@ -30,7 +30,7 @@ def controls():
                             var.status[function]['thread']['waiting'] = True
                             fn.start_thread(lambda: switch(bind, function))
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "controls.controls()")
 
 def check_pressed(bind):
     try:
@@ -61,7 +61,7 @@ def check_pressed(bind):
 
         return pressed
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "controls.check_pressed()")
 
 def increment(bind, function, control):
     try:
@@ -120,7 +120,7 @@ def increment(bind, function, control):
             #print("bind check_pressed failed: ", bind)
         var.status[function]['thread']['running'][control] = False
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "controls.increment()")
 
 
 def switch(bind, function):
@@ -145,7 +145,7 @@ def switch(bind, function):
                     vjoy.set(function, var.status[function]['secondary'])
         var.status[function]['thread']['waiting'] = False
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "controls.switch()")
 
 def pedal(function, value):
     try:
@@ -154,4 +154,4 @@ def pedal(function, value):
             if not var.status[function]['switched']:
                 vjoy.set(function, value)
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "controls.pedal()")

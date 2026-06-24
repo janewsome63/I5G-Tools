@@ -80,7 +80,7 @@ def read_config():
             write_config()
         read_profile()
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.read_config()")
 
 def read_profile(profile=None):
     try:
@@ -203,7 +203,7 @@ def read_profile(profile=None):
         # print(var.settings)
         print("read_profile() end")
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.read_profile()")
 
 def write_config():
     try:
@@ -231,7 +231,7 @@ def write_config():
             # noinspection PyTypeChecker
             config.write(file)
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.write_config()")
         
 def write_profile(profile=None):
     try:
@@ -267,7 +267,7 @@ def write_profile(profile=None):
             config.write(file)
         print("write_profile() end")
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.write_profile()")
 
 def delete_profile(profile):
     try:
@@ -287,7 +287,7 @@ def get_profiles():
                 var.status['profile_list'].append(name.split('.', 1)[0])
         return var.status['profile_list']
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.get_profiles()")
 
 def is_bind():
     try:
@@ -342,7 +342,7 @@ def is_bind():
             result = False
         return result
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.is_bind()")
 
 def check_uid(irsdk):
     try:
@@ -352,7 +352,7 @@ def check_uid(irsdk):
                 if response == 1:
                     sys.exit(0)
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.check_uid()")
 
 def reset_bind_thresh(thresh, value):
     try:
@@ -366,14 +366,14 @@ def reset_bind_thresh(thresh, value):
                         if (var.bindings[function][control]['value'] == var.settings['local']['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['local']['low_threshold'] and thresh == 'low_threshold'):
                             var.bindings[function][control]['value'] = value
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.reset_bind_thresh()")
 
 def start_thread(target):
     try:
         thread = threading.Thread(target=target, daemon=True)
         thread.start()
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.start_thread()")
 
 def check_ver(file, type):
     try:
@@ -390,7 +390,7 @@ def check_ver(file, type):
         # else:
         #     sys.exit(0)
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.check_ver()")
 
 def translate(file, type, name, ver): # as of right now, this should only ever be called to translate a v0.4.4b config file into a current profile file
     try:
@@ -485,16 +485,17 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
             write_profile()
             var.status['rewrite']['profile'] = False
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.translate()")
 
 def open_browser(link):
     try:
         webbrowser.open(link)
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.open_browser()")
 
-def error_handling(e):
+def error_handling(e, loc):
+    print("An error has occured :(")
     now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
     with open("I5G_Tools_err_" + now + ".log", "w") as f:
         f.write(now + "\n") 
-        f.write(f"Error occurred: {str(e)}\n")
+        f.write(f"Error occurred: {str(e)}\n" + loc)

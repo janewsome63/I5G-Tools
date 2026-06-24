@@ -50,4 +50,4 @@ def run():
                     except Exception as e:
                         print("Error moving file {file}: {e}")
     except Exception as e:
-        fn.error_handling(e)
+        fn.error_handling(e, "check_dir.run()")
