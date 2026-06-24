@@ -766,34 +766,34 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['high_threshold_label'] = QLabel()
             self.store['content']['settings']['high_threshold_label'].setText(var.lang['high_threshold'])
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold_label'], row, column)
-            column += 1
+            column += 2
 
             self.store['content']['settings']['high_threshold'] = CustomSpinBox()
             self.store['content']['settings']['high_threshold'].setFixedSize(70, 20)
             self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
             self.store['content']['settings']['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
             self.store['content']['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold'], row, column)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
 
             self.store['content']['settings']['low_threshold_label'] = QLabel()
             self.store['content']['settings']['low_threshold_label'].setText(var.lang['low_threshold'])
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold_label'], row, column)
-            column += 1
+            column += 2
 
             self.store['content']['settings']['low_threshold'] = CustomSpinBox()
             self.store['content']['settings']['low_threshold'].setFixedSize(70, 20)
             self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
             self.store['content']['settings']['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
             self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
 
             self.store['content']['settings']['scale_label'] = QLabel()
             self.store['content']['settings']['scale_label'].setText(var.lang['scale'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], 0, 0)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], row, column)
             column += 2
 
             self.store['content']['settings']['scale'] = CustomComboBox()
@@ -804,57 +804,57 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['scale'].addItem("1.25" + "x")
             self.store['content']['settings']['scale'].addItem("1.5" + "x")
             self.store['content']['settings']['scale'].currentTextChanged.connect(self.scale)
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale'], 0, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
 
             self.store['content']['settings']['timer_first_label'] = QLabel()
             self.store['content']['settings']['timer_first_label'].setText(var.lang['timer_first'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first_label'], 1, 0)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first_label'], row, column)
             column += 2
 
             self.store['content']['settings']['timer_first'] = CustomSpinBox()
             self.store['content']['settings']['timer_first'].setFixedSize(70, 20)
             self.store['content']['settings']['timer_first'].setRange(1, 1000)
             self.store['content']['settings']['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first'], 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
 
             self.store['content']['settings']['timer_loop_label'] = QLabel()
             self.store['content']['settings']['timer_loop_label'].setText(var.lang['timer_loop'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop_label'], 2, 0)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop_label'], row, column)
             column += 2
 
             self.store['content']['settings']['timer_loop'] = CustomSpinBox()
             self.store['content']['settings']['timer_loop'].setFixedSize(70, 20)
             self.store['content']['settings']['timer_loop'].setRange(1, 1000)
             self.store['content']['settings']['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop'], 2, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
 
             self.store['content']['settings']['profile_create_label'] = QLabel()
             self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], 3, 0)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], row, column)
             column += 2
 
             self.store['content']['settings']['profile_create_name'] = QLineEdit()
             self.store['content']['settings']['profile_create_name'].setFixedSize(100, 25)
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_name'], 3, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_name'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
 
             self.store['content']['settings']['profile_create'] = QPushButton()
             self.store['content']['settings']['profile_create'].setFixedSize(100, 25)
             self.store['content']['settings']['profile_create'].setText(var.lang['create'])
             self.store['content']['settings']['profile_create'].clicked.connect(lambda: self.create_profile(self.store['content']['settings']['profile_create_name'].text()))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create'], 3, 3, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
 
             self.store['content']['settings']['profile_select_label'] = QLabel()
             self.store['content']['settings']['profile_select_label'].setText(var.lang['profile_select'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select_label'], 4, 0)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select_label'], row, column)
             column += 2
 
             self.store['content']['settings']['profile_select'] = CustomComboBox()
@@ -863,14 +863,14 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
             self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
             self.store['content']['settings']['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content']['settings']['profile_select'].currentText()))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select'], 4, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
 
             self.store['content']['settings']['profile_delete'] = QPushButton()
             self.store['content']['settings']['profile_delete'].setFixedSize(100, 25)
             self.store['content']['settings']['profile_delete'].setText(var.lang['delete'])
             self.store['content']['settings']['profile_delete'].clicked.connect(lambda: self.delete_profile(self.store['content']['settings']['profile_select'].currentText()))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_delete'], 4, 3, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_delete'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
 
             self.tabs['settings'].setLayout(self.tabs['settings'].layout)
         except Exception as e:
