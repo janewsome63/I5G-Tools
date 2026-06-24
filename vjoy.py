@@ -15,7 +15,6 @@ axis_ref = {
     "throttle": vjoy.HID_USAGE_RZ,
     "regen": vjoy.HID_USAGE_SL0,
     "deploy": vjoy.HID_USAGE_SL1,
-    "brake": vjoy.HID_USAGE_WHL,
 }
 
 axis_values = {
@@ -27,7 +26,6 @@ axis_values = {
     "throttle": 0.0,
     "regen": 0.0,
     "deploy": 0.0,
-    "brake": 0.0,
 }
 
 axis_busy = {
@@ -39,7 +37,6 @@ axis_busy = {
     "throttle": False,
     "regen": False,
     "deploy": False,
-    "brake": False,
 }
 
 try:
@@ -66,11 +63,17 @@ def set(axis, pct):
                 print("queue order error in vjoy.py!!!")
         axis_busy[axis] = True
         switched = var.status[axis]['switched']
-        # if var.settings['local']['axis_rollover']:
-        #     if pct < 0.0:
-        #         pct = 1.0
-        #     elif pct > 1.0:
-        #         pct = 0.0
+        if var.settings[axis]['rollover_mode']:
+            if pct < -0.004:
+                pct = 1.0
+            elif pct > 1.004:
+                pct = 0.0
+        if pct > 1.0:
+            pct = 1.0
+        elif pct < 0.0:
+            pct = 0.0
+        else:
+            pct = round(pct, 5)
         raw = round(pct * 32768)
         if raw <= 0:
             raw = 1

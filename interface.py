@@ -280,9 +280,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch_bind'].clicked.connect(lambda: self.bind_start(function, "switch"))
 
             row, column = 0, 0
-            print("function: " + function)
             for element in self.store['content'][function]:
-                print("element: " + element)
                 self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
                 if element == "rollover_mode":
                     column = 0
