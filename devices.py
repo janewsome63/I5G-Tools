@@ -165,9 +165,11 @@ def device_detection():
                 if e.type == p.JOYDEVICEADDED:
                     add_device(False)
                     var.status['refresh_labels'] = True
+                    var.status['refresh_guid_list'] = True
                 elif e.type == p.JOYDEVICEREMOVED:
                     remove_device(e.instance_id)
                     var.status['refresh_labels'] = True
+                    var.status['refresh_guid_list'] = True
                 if e.type == p.JOYBUTTONDOWN:
                     log_event(e.instance_id, "button", e.button, True)
                     fn.start_thread(con.controls)

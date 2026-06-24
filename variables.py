@@ -2,11 +2,11 @@ import copy
 import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3.1b']
+                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.3.1b",
+    "version": "v0.7.3.2b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -19,7 +19,7 @@ lang = {
     "increment_mode": "Increment Mode:",
     "continuous": "Continuous",
     "single": "Single",
-    "axis_threshold": "Axis Threshold:",
+    "axis_threshold": "Axis Threshold Setting for Device:",
     "rollover_mode": "Rollover Mode:",
     "locked": "Locked",
     "unlocked": "Unlocked",
@@ -377,6 +377,7 @@ status = {
     "profile_list": [],
     "first": False,
     "refresh_labels": False,
+    "refresh_guid_list": False,
     "rewrite":{
         "config": False,
         "profile": False,
