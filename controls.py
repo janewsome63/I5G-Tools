@@ -40,9 +40,9 @@ def check_pressed(bind):
             else:
                 pressed = False
         elif bind['type'] == "axis":
-            if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['local']['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['local']['high_threshold']:
+            if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['device_axis_thresh'][str(bind['guid'])]['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['device_axis_thresh'][str(bind['guid'])]['high_threshold']:
                 pressed = True
-            elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['local']['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['local']['low_threshold']:
+            elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['device_axis_thresh'][str(bind['guid'])]['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['device_axis_thresh'][str(bind['guid'])]['low_threshold']:
                 pressed = True
             else:
                 pressed = False
