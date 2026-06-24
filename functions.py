@@ -496,6 +496,7 @@ def open_browser(link):
 def error_handling(e, loc):
     print("An error has occured :(")
     now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+    sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
     with open("I5G_Tools_err_" + now + ".log", "w") as f:
         f.write(now + "\n") 
         f.write(f"Error occurred: {str(e)}\n" + loc)
