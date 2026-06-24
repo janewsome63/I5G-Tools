@@ -807,7 +807,7 @@ class MainWindow(QMainWindow):
             column += 2
 
             self.store['content']['settings']['profile_create_name'] = QLineEdit()
-            self.store['content']['settings']['profile_create_name'].setFixedSize(95, 25)
+            self.store['content']['settings']['profile_create_name'].setFixedSize(190, 25)
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_name'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
 
@@ -825,7 +825,7 @@ class MainWindow(QMainWindow):
             column += 2
 
             self.store['content']['settings']['profile_select'] = CustomComboBox()
-            self.store['content']['settings']['profile_select'].setFixedSize(95, 25)
+            self.store['content']['settings']['profile_select'].setFixedSize(190, 25)
             self.store['content']['settings']['profile_select'].addItem(var.settings['profile']['current'])
             self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
             self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
