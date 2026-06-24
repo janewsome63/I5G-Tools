@@ -2,11 +2,11 @@ import copy
 import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b']
+                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b', 'v0.7.3.3b', 'v0.7.3.4b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.3.2b",
+    "version": "v0.7.3.4b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -301,8 +301,8 @@ settings = {
     },
 
     "local": {
-        "high_threshold": 0.90,
-        "low_threshold": 0.10,
+        # "high_threshold": 0.90,
+        # "low_threshold": 0.10,
         "audio": False,
         "volume": 0.5,
         "hybrid_low_audio": True,
@@ -367,7 +367,16 @@ settings = {
         "switch_value": 50,
         "rollover_mode": False,
     },
+    "device_axis_thresh": {
+        "-2": {
+            "name": "None",
+            "high_threshold": 0.90,
+            "low_threshold": 0.10,
+        },
+                           },
 }
+
+id_table = [[-2,-2]] # index is the instance id, first value is the joystick index, second value is the guid; -1 is keyboard, so using -2 to avoid confusion
 
 status = {
     "calibration": "None",
@@ -378,6 +387,7 @@ status = {
     "first": False,
     "refresh_labels": False,
     "refresh_guid_list": False,
+    "rewrite_profile": False,
     "rewrite":{
         "config": False,
         "profile": False,

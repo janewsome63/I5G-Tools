@@ -144,7 +144,6 @@ class MainWindow(QMainWindow):
             fn.error_handling(e, "interface.__init__()")
 
     def tool_tabs(self, type, function):
-        print("tool_tabs() start for " + type + " " + function)
         try:
             local_store = {
                 "binds": ["up", "down", "switch"],
@@ -759,34 +758,6 @@ class MainWindow(QMainWindow):
             row = 0
             column = 0
 
-            self.store['content']['settings']['high_threshold_label'] = QLabel()
-            self.store['content']['settings']['high_threshold_label'].setText(var.lang['high_threshold'])
-            # self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold_label'], row, column)
-            # column += 2
-
-            self.store['content']['settings']['high_threshold'] = CustomSpinBox()
-            self.store['content']['settings']['high_threshold'].setFixedSize(95, 20)
-            self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
-            self.store['content']['settings']['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
-            self.store['content']['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
-            # self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
-            # row += 1
-            # column = 0
-
-            self.store['content']['settings']['low_threshold_label'] = QLabel()
-            self.store['content']['settings']['low_threshold_label'].setText(var.lang['low_threshold'])
-            # self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold_label'], row, column)
-            # column += 2
-
-            self.store['content']['settings']['low_threshold'] = CustomSpinBox()
-            self.store['content']['settings']['low_threshold'].setFixedSize(95, 20)
-            self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
-            self.store['content']['settings']['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
-            self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
-            # self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
-            # row += 1
-            # column = 0
-
             self.store['content']['settings']['scale_label'] = QLabel()
             self.store['content']['settings']['scale_label'].setText(var.lang['scale'])
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], row, column)
@@ -878,27 +849,39 @@ class MainWindow(QMainWindow):
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['axis_threshold_device_label'], row, column)
             column += 2
 
+            self.store['content']['settings']['high_threshold_label'] = QLabel()
+            self.store['content']['settings']['high_threshold_label'].setText(var.lang['high_threshold'])
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold_label'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
 
+            self.store['content']['settings']['low_threshold_label'] = QLabel()
+            self.store['content']['settings']['low_threshold_label'].setText(var.lang['low_threshold'])
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold_label'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
-
             self.store['content']['settings']['axis_threshold_device'] = CustomComboBox()
+            self.store['content']['settings']['axis_threshold_device_guid'] = "-2"
             self.store['content']['settings']['axis_threshold_device'].setFixedSize(285, 25)
-            for device in dev.device_info:
-                if dev.device_info[device]['name'] != "Keyboard":
-                    self.store['content']['settings']['axis_threshold_device'].addItem(dev.device_info[device]['name'])
-            self.store['content']['settings']['axis_threshold_device'].setCurrentText(dev.device_info[device]['name'])
-            # self.store['content']['settings']['axis_threshold_device'].activated.connect(lambda: self.refresh_profile_list())
-            # self.store['content']['settings']['axis_threshold_device'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content']['settings']['profile_select'].currentText()))
+            for data in var.id_table:
+                if data[0] != -2:
+                    self.store['content']['settings']['axis_threshold_device'].addItem(dev.device_info[data[1]]['name'])
+            self.store['content']['settings']['axis_threshold_device'].currentTextChanged.connect(lambda: self.replace_axis_thresh())
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['axis_threshold_device'], row, column)
             column += 2
 
+            self.store['content']['settings']['high_threshold'] = CustomSpinBox()
+            self.store['content']['settings']['high_threshold'].setFixedSize(95, 20)
+            self.store['content']['settings']['high_threshold'].setRange(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1, 99)
+            self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
+            self.store['content']['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
 
+            self.store['content']['settings']['low_threshold'] = CustomSpinBox()
+            self.store['content']['settings']['low_threshold'].setFixedSize(95, 20)
+            self.store['content']['settings']['low_threshold'].setRange(1, int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1)
+            self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
+            self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
 
             self.tabs['settings'].setLayout(self.tabs['settings'].layout)
@@ -1022,6 +1005,12 @@ class MainWindow(QMainWindow):
             if var.status['refresh_labels']:
                 self.update_label_all()
                 var.status['refresh_labels'] = False
+            if var.status['refresh_guid_list']:
+                self.refresh_guid_list()
+                var.status['refresh_guid_list'] = False
+            if var.status['rewrite_profile']:
+                fn.write_profile()
+                var.status['rewrite_profile'] = False
         except Exception as e:
             fn.error_handling(e, "interface.updater()")
 
@@ -1156,7 +1145,7 @@ class MainWindow(QMainWindow):
     def increment(self, func):
         try:
             var.settings[func]['increment'] = self.store['content'][func]['increment'].value()
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.increment()")
 
@@ -1173,7 +1162,7 @@ class MainWindow(QMainWindow):
                 var.status[func]['secondary'] = (value * var.step[func]) - var.step[func]
             if var.status[func]['switched']:
                 vjoy.set(func, var.status[func]['secondary'])
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.switch()")
 
@@ -1184,7 +1173,7 @@ class MainWindow(QMainWindow):
                 var.settings[func]['continuous'] = True
             elif self.store['content'][func]['increment_mode'].currentText() == "Single":
                 var.settings[func]['continuous'] = False
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.increment_mode()")
 
@@ -1197,7 +1186,7 @@ class MainWindow(QMainWindow):
                 var.status[func]['switched'] = False
                 vjoy.set(func, var.status[func]['primary'])
                 var.settings[func]['toggle'] = False
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.switch_mode()")
 
@@ -1208,7 +1197,7 @@ class MainWindow(QMainWindow):
                 var.settings[func]['rollover_mode'] = True
             elif self.store['content'][func]['rollover_mode'].currentText() == "Locked":
                 var.settings[func]['rollover_mode'] = False
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.rollover_mode()")
 
@@ -1218,13 +1207,14 @@ class MainWindow(QMainWindow):
             var.settings[func]["axis_threshold"] = self.store['content'][func]['axis_threshold'].value() / 100
             fn.reset_bind_thresh(func, var.settings[func]["axis_threshold"])
             print("axis_threshold, func = " + func + ", ", var.settings[func]["axis_threshold"])
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.axis_threshold()")
 
     @pyqtSlot()
     def settings_set(self, func):
         try:
+            print("settings_set ", func)
             if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
@@ -1235,41 +1225,72 @@ class MainWindow(QMainWindow):
                 value = self.store['content']['settings'][func].value()
             if func == 'high_threshold':
                 print("settings_set, func = high_threshold, ", value)
-                if value/100 > var.settings['local']['low_threshold']:
-                    print("changing low")
-                    self.store['content']['settings']['low_threshold'].setRange(1, value-1)
+                if value == var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    if value/100 > var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] and value/100 != var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']:
+                        print("changing low axis limits")
+                        self.store['content']['settings']['low_threshold'].setRange(1, value-1)
+                    else:
+                        print("not changing low axis limits")
                     fn.reset_bind_thresh(func, value/100)
-                    var.settings['local'][func] = value/100
-                    fn.write_profile()
+                    var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] = value/100
+                    var.status['rewrite_profile'] = True
             elif func == 'low_threshold':
-                print("settings_set, func = low_threshold, ", value)
-                if value/100 < var.settings['local']['high_threshold']:
-                    print("changing high")
-                    self.store['content']['settings']['high_threshold'].setRange(value+1, 99)
+                if value == var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    print("settings_set, func = low_threshold, ", value)
+                    if value/100 < var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] and value/100 != var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']:
+                        print("changing high axis limits")
+                        self.store['content']['settings']['high_threshold'].setRange(value+1, 99)
+                    else:
+                        print("not changing high axis limits")
                     fn.reset_bind_thresh(func, value/100)
-                    var.settings['local'][func] = value/100
-                    fn.write_profile()
+                    var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] = value/100
+                    var.status['rewrite_profile'] = True
             elif func == 'axis_rollover':
-                var.settings['local']['axis_rollover'] = (value == "Yes")
-                fn.write_profile()
+                if (value == "Yes") == var.settings['local']['axis_rollover']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['axis_rollover'] = (value == "Yes")
+                    var.status['rewrite_profile'] = True
             elif func == 'sound':
-                var.settings['local']['audio'] = (value == "Yes")
-                fn.write_profile()
+                if (value == "Yes") == var.settings['local']['audio']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['audio'] = (value == "Yes")
+                    var.status['rewrite_profile'] = True
             elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
-                var.settings['local'][func] = (value == "Yes")
-                fn.write_profile()
+                if (value == "Yes") == var.settings['local'][func]:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local'][func] = (value == "Yes")
+                    var.status['rewrite_profile'] = True
             elif func == 'beep_mode':
-                var.settings['local']['beep_mode'] = (value == "Fixed")
-                fn.write_profile()
+                if (value == "Fixed") == var.settings['local']['beep_mode']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['beep_mode'] = (value == "Fixed")
+                    var.status['rewrite_profile'] = True
             elif func == 'volume':
-                var.settings['local']['volume'] = value/100
-                fn.write_profile()
+                if value/100 == var.settings['local']['volume']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['volume'] = value/100
+                    var.status['rewrite_profile'] = True
             elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val" or func == "dynamic_mode_offset" or func == "upshift_offset" or func == "downshift_offset" or func == "p2p_behind_thresh" or func == "p2p_behind_thresh_cont":
-                var.settings['local'][func] = value
-                fn.write_profile()
+                if value == var.settings['local']['volume']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local'][func] = value
+                    var.status['rewrite_profile'] = True
             else:
-                var.settings[func] = value
-                fn.write_config()
+                if value == var.settings[func]:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings[func] = value
+                    var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.settings_set()")
 
@@ -1324,21 +1345,21 @@ class MainWindow(QMainWindow):
                                 "input": True,
                             }
                         else:
-                            if var.event['value'] >= var.settings['local']['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                            if var.event['value'] >= var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
                                 var.potential_bind = {
                                 "label": "Unknown device",
                                     "guid": var.event['guid'],
                                     "type": var.event['type'],
                                     "num": var.event['num'],
-                                    "value": var.settings['local']['high_threshold']
+                                    "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold']
                                 }
-                            if var.event['value'] <= var.settings['local']['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                            if var.event['value'] <= var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
                                 var.potential_bind = {
                                 "label": "Unknown device",
                                     "guid": var.event['guid'],
                                     "type": var.event['type'],
                                     "num": var.event['num'],
-                                    "value": var.settings['local']['low_threshold']
+                                    "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold']
                                 }
                     elif var.event['type'] == "hat":
                         if var.event['value'] != "none" and not var.bindings['status']['input']:
@@ -1375,7 +1396,7 @@ class MainWindow(QMainWindow):
                 "input": None,
             }
             var.potential_bind = {}
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
             var.status['refresh_labels'] = True
             # self.store['running'] = False
         except Exception as e:
@@ -1520,12 +1541,13 @@ class MainWindow(QMainWindow):
                     var.status['rewrite']['profile'] = True
                     self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
                     if var.status['rewrite']['profile']:
-                        fn.write_profile()
+                        var.status['rewrite_profile'] = True
                         var.status['rewrite']['profile'] = False
                 self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
         except Exception as e:
             fn.error_handling(e, "interface.update_label()")
     
+    @pyqtSlot()
     def update_label_all(self):
         try:
             for function in var.bindings:
@@ -1534,6 +1556,62 @@ class MainWindow(QMainWindow):
                         self.update_label(function, control)
         except Exception as e:
             fn.error_handling(e, "interface.update_label_all()")
+    
+    @pyqtSlot()
+    def refresh_guid_list(self):
+        try:
+            temp = self.store['content']['settings']['axis_threshold_device'].currentText()
+            self.store['content']['settings']['axis_threshold_device'].clear()
+            for data in var.id_table:
+                if data[0] != -2:
+                    if data[1] in dev.device_info:
+                        self.store['content']['settings']['axis_threshold_device'].addItem(dev.device_info[data[1]]['name'])
+                        if temp == dev.device_info[data[1]]['name']:
+                            self.store['content']['settings']['axis_threshold_device'].setCurrentText(temp)
+        except Exception as e:
+            fn.error_handling(e, "interface.refresh_guid_list()")
+        
+    @pyqtSlot()
+    def replace_axis_thresh(self):
+        try:
+            index = self.store['content']['settings']['axis_threshold_device'].currentIndex()
+            print("index in replace_axis_thresh is ", index)
+            if index >= 0:
+                i = 0
+                i2 = -1
+                while i < len(var.id_table) and i2 != index:
+                    if var.id_table[i][0] != -2:
+                        i2 += 1
+                    if i2 != index:
+                        i += 1
+                if i >= len(var.id_table):
+                    print("problem in interface.replace_axis_threshold()")
+                guid = var.id_table[i][1]
+                self.store['content']['settings']['axis_threshold_device_guid'] = str(guid)
+                old_high = self.store['content']['settings']['high_threshold'].value()
+                old_low = self.store['content']['settings']['low_threshold'].value()
+                new_high = int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)
+                new_low = int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)
+
+                print(i, i2, guid, new_high, new_low)
+
+                if old_high > new_low:
+                    print("starting with high threshold")
+                    self.store['content']['settings']['high_threshold'].setRange(new_low+1,99)
+                    self.store['content']['settings']['high_threshold'].setValue(new_high)
+                    self.store['content']['settings']['low_threshold'].setRange(1,new_high-1)
+                    self.store['content']['settings']['low_threshold'].setValue(new_low)
+                else:
+                    print("starting with low threshold")
+                    self.store['content']['settings']['low_threshold'].setRange(1,new_high-1)
+                    self.store['content']['settings']['low_threshold'].setValue(new_low)
+                    self.store['content']['settings']['high_threshold'].setRange(new_low+1,99)
+                    self.store['content']['settings']['high_threshold'].setValue(new_high)
+                self.settings_set('high_threshold')
+                self.settings_set('low_threshold')
+                print("new thresholds applied")
+        except Exception as e:
+            fn.error_handling(e, "interface.replace_axis_thresh()")
 
     @pyqtSlot()
     def apply_settings(self, file):
@@ -1573,10 +1651,10 @@ class MainWindow(QMainWindow):
                         self.store['content']['sounds']['sound'].setCurrentText('No')
                 elif setting == 'low_threshold' or setting == 'high_threshold':
                     print("apply_settings before ", setting)
-                    self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['local']['low_threshold']*100)+1,51), 99)
-                    self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['local']['high_threshold']*100)-1,49))
-                    self.store['content']['settings']['high_threshold'].setValue(int(var.settings['local']['high_threshold'] * 100))
-                    self.store['content']['settings']['low_threshold'].setValue(int(var.settings['local']['low_threshold'] * 100))
+                    self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1,51), 99)
+                    self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1,49))
+                    self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
+                    self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
                     print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
                     if setting == "axis_rollover":

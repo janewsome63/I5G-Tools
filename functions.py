@@ -151,6 +151,8 @@ def read_profile(profile=None):
                             var.bindings[section.lower()][item] = setting
                         else:
                             var.settings[section.lower()][item] = setting
+                    elif section == "DEVICE_AXIS_THRESH":
+                        var.settings['device_axis_thresh'][item] = setting
                     else:
                         if not section in errors:
                             errors.append(section)
@@ -198,7 +200,7 @@ def read_profile(profile=None):
                 elif response == 2:
                     sys.exit(0)
             var.settings['profile']['current'] = 'Default'
-            write_profile()
+            var.status['rewrite_profile'] = True
         var.status['refresh_labels'] = True
         # print(var.settings)
         print("read_profile() end")
@@ -258,6 +260,10 @@ def write_profile(profile=None):
                         config[bind.upper()][subbind] = str(var.bindings_cache[bind][subbind])
                     else:
                         config[bind.upper()][subbind] = str(var.bindings[bind][subbind])
+        config['DEVICE_AXIS_THRESH'] = {}
+        for guid in var.settings['device_axis_thresh']:
+            if guid != "-2":
+                config['DEVICE_AXIS_THRESH'][guid] = str(var.settings['device_axis_thresh'][guid])
 
         if not os.path.exists(var.settings['path'] + "\\" + var.settings['profile']['path']):
             os.mkdir(var.settings['path'] + "\\" + var.settings['profile']['path'])
@@ -298,10 +304,10 @@ def is_bind():
                 "num": var.event['num'],
                 "value": var.event['value']
             }
-            if event['value'] > var.settings['local']['high_threshold']:
-                event['value'] = var.settings['local']['high_threshold']
-            elif event['value'] < var.settings['local']['low_threshold']:
-                event['value'] = var.settings['local']['low_threshold']
+            if event['value'] > var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold']:
+                event['value'] = var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold']
+            elif event['value'] < var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold']:
+                event['value'] = var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold']
         elif var.event['type'] == "hat":
             event = {
                 "guid": var.event['guid'],
@@ -363,7 +369,8 @@ def reset_bind_thresh(thresh, value):
             if function != 'status':
                 for control in var.bindings[function]:
                     if var.bindings[function][control] is not None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
-                        if (var.bindings[function][control]['value'] == var.settings['local']['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['local']['low_threshold'] and thresh == 'low_threshold'):
+                        guid = var.bindings[function][control]['guid']
+                        if (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
                             var.bindings[function][control]['value'] = value
     except Exception as e:
         error_handling(e, "functions.reset_bind_thresh()")
@@ -482,7 +489,7 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
             var.status['rewrite']['config'] = False
 
         if var.status['rewrite']['profile']:
-            write_profile()
+            var.status['rewrite_profile'] = True
             var.status['rewrite']['profile'] = False
     except Exception as e:
         error_handling(e, "functions.translate()")
@@ -494,9 +501,10 @@ def open_browser(link):
         error_handling(e, "functions.open_browser()")
 
 def error_handling(e, loc):
-    print("An error has occured :(")
+    print("!!! An error has occured !!! :(")
     now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
     sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
-    with open("I5G_Tools_err_" + now + ".log", "w") as f:
+    with open("I5G_Tools_err_" + now + ".log", "a") as f:
         f.write(now + "\n") 
-        f.write(f"Error occurred: {str(e)}\n" + loc)
+        f.write(f"Error occurred: {str(e)}\n" + loc + "\n\n")
+    # sys.exit(0) # exit program to make it obvious an error occured. Otherwise, the app could continue partially functioning with only part of it in a broken state
