@@ -3,11 +3,11 @@ import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
                        'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b', 'v0.7.3.3b', 'v0.7.3.4b',
-                       'v0.7.3.5b']
+                       'v0.7.3.5b', 'v0.7.3.6b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.3.5b",
+    "version": "v0.7.3.6b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -506,9 +506,6 @@ backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985,
                   693475, 778565, 292374, 909283, 1177562),
 }
-
-
-profile_list = []
 
 potential_bind = {}
 

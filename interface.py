@@ -827,7 +827,7 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['profile_select'].setFixedSize(190, 25)
             self.store['content']['settings']['profile_select'].addItem(var.settings['profile']['current'])
             self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
-            self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
+            # self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
             self.store['content']['settings']['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content']['settings']['profile_select'].currentText()))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
@@ -1086,11 +1086,8 @@ class MainWindow(QMainWindow):
                             fn.start_thread(sfx.play('limit'))
                     self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
                     self.lastval['deploy_lim'] = self.store['content']['hybrid']['deploy_lim_axis'].value()
-            if var.status['set_list_count'] % 50 == 0:
+            if self.check_profile_list():
                 self.refresh_profile_list()
-                var.status['set_list_count'] = 1
-            else:
-                var.status['set_list_count'] += 1
         except Exception as e:
             fn.error_handling(e, "interface.display()")
         
@@ -1427,6 +1424,17 @@ class MainWindow(QMainWindow):
                 self.store['thread_pool'].start(self.bind)
         except Exception as e:
             fn.error_handling(e, "interface.bind_start()")
+
+    @pyqtSlot()
+    def check_profile_list(self): # returns True if the profile list needs to be refreshed, False if it's okay as is
+        try:
+            old_list = var.status['profile_list']
+            new_list = fn.get_profiles()
+            if old_list != new_list:
+                return True
+            return False
+        except Exception as e:
+            fn.error_handling(e, "interface.check_profile_list()")    
 
     @pyqtSlot()
     def refresh_profile_list(self):
