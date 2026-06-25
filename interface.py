@@ -24,6 +24,8 @@ class MainWindow(QMainWindow):
         try:
             super().__init__()
 
+            fn.startup_time()
+
             if getattr(sys, 'frozen', False):
                 applicationPath = sys._MEIPASS
             elif __file__:
@@ -346,33 +348,33 @@ class MainWindow(QMainWindow):
             self.store['content']['hybrid']['regen_label'].setText(var.lang['regen'])
             self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_label'], 2, 0)
 
-            self.store['content']['hybrid']['regen_device'] = QLineEdit()
-            self.store['content']['hybrid']['regen_device'].setFixedHeight(25)
-            self.store['content']['hybrid']['regen_device'].setReadOnly(True)
-            self.store['content']['hybrid']['regen_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_device'], 2, 1)
-
             self.store['content']['hybrid']['regen_bind'] = QPushButton()
             self.store['content']['hybrid']['regen_bind'].setFixedSize(95, 25)
             self.store['content']['hybrid']['regen_bind'].setText(var.lang['bind'])
             self.store['content']['hybrid']['regen_bind'].clicked.connect(lambda: self.bind_start("hybrid", "regen"))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_bind'], 2, 2)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_bind'], 2, 1)
+
+            self.store['content']['hybrid']['regen_device'] = QLineEdit()
+            self.store['content']['hybrid']['regen_device'].setFixedHeight(25)
+            self.store['content']['hybrid']['regen_device'].setReadOnly(True)
+            self.store['content']['hybrid']['regen_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_device'], 2, 2)
 
             self.store['content']['hybrid']['deploy_label'] = QLabel()
             self.store['content']['hybrid']['deploy_label'].setText(var.lang['deploy'])
             self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_label'], 3, 0)
 
-            self.store['content']['hybrid']['deploy_device'] = QLineEdit()
-            self.store['content']['hybrid']['deploy_device'].setFixedHeight(25)
-            self.store['content']['hybrid']['deploy_device'].setReadOnly(True)
-            self.store['content']['hybrid']['deploy_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_device'], 3, 1)
-
             self.store['content']['hybrid']['deploy_bind'] = QPushButton()
             self.store['content']['hybrid']['deploy_bind'].setFixedSize(95, 25)
             self.store['content']['hybrid']['deploy_bind'].setText(var.lang['bind'])
             self.store['content']['hybrid']['deploy_bind'].clicked.connect(lambda: self.bind_start("hybrid", "deploy"))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_bind'], 3, 2)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_bind'], 3, 1)
+
+            self.store['content']['hybrid']['deploy_device'] = QLineEdit()
+            self.store['content']['hybrid']['deploy_device'].setFixedHeight(25)
+            self.store['content']['hybrid']['deploy_device'].setReadOnly(True)
+            self.store['content']['hybrid']['deploy_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_device'], 3, 2)
 
             self.tabs['hybrid'].setLayout(self.tabs['hybrid'].layout)
 
@@ -429,6 +431,74 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['weight_jacker_axis'].setMinimum(0)
             self.store['content']['display']['weight_jacker_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 3)
+
+            self.store['content']['display']['sounds'] = QLabel()
+            self.store['content']['display']['sounds'].setText("Audio")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['sounds'], 0, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['soc_low_spacer'] = QLabel()
+            self.store['content']['display']['soc_low_spacer'].setText(" " * 5)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_low_spacer'], 1, 4)
+
+            self.store['content']['display']['soc_low'] = QLabel()
+            self.store['content']['display']['soc_low'].setText("SoC Low")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_low'], 1, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_low_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_low_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_low_led'].state(False)
+            self.store['content']['display']['hybrid_low_led'].sound = 'low'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_low_led'], 1, 6)
+
+            self.store['content']['display']['soc_high'] = QLabel()
+            self.store['content']['display']['soc_high'].setText("SoC High")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_high'], 2, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_high_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_high_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_high_led'].state(False)
+            self.store['content']['display']['hybrid_high_led'].sound = 'high'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_high_led'], 2, 6)
+
+            self.store['content']['display']['deploy_limit'] = QLabel()
+            self.store['content']['display']['deploy_limit'].setText("Deploy Lim")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_limit'], 3, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_limit_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_limit_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_limit_led'].state(False)
+            self.store['content']['display']['hybrid_limit_led'].sound = 'limit'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_limit_led'], 3, 6)
+
+            self.store['content']['display']['upshift'] = QLabel()
+            self.store['content']['display']['upshift'].setText("Upshift")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift'], 4, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['upshift_beep_led'] = CustomLEDLabel()
+            self.store['content']['display']['upshift_beep_led'].setFixedSize(16, 16)
+            self.store['content']['display']['upshift_beep_led'].state(False)
+            self.store['content']['display']['upshift_beep_led'].sound = 'upshift_beep'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift_beep_led'], 4, 6)
+
+            self.store['content']['display']['downshift'] = QLabel()
+            self.store['content']['display']['downshift'].setText("Downshift")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift'], 5, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['downshift_beep_led'] = CustomLEDLabel()
+            self.store['content']['display']['downshift_beep_led'].setFixedSize(16, 16)
+            self.store['content']['display']['downshift_beep_led'].state(False)
+            self.store['content']['display']['downshift_beep_led'].sound = 'downshift_beep'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift_beep_led'], 5, 6)
+
+            self.store['content']['display']['p2p_active'] = QLabel()
+            self.store['content']['display']['p2p_active'].setText("P2P Warn")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active'], 6, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['p2p_active_led'] = CustomLEDLabel()
+            self.store['content']['display']['p2p_active_led'].setFixedSize(16, 16)
+            self.store['content']['display']['p2p_active_led'].state(False)
+            self.store['content']['display']['p2p_active_led'].sound = 'p2p_active'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active_led'], 6, 6)
 
             self.store['content']['display']['front_roll_bar_label'] = QLabel()
             self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'])
@@ -1084,7 +1154,7 @@ class MainWindow(QMainWindow):
     def display(self):
         try:
             for func in vjoy.axis_values:
-                if func in self.store['content']: #only because not every tab has been developed yet...
+                if func in self.store['content']:
                     pct = vjoy.axis_values[func]
                     # print("display check1: ", func, pct)
                     self.store['content'][func]['axis'].setValue(int(pct * 100))
@@ -1154,6 +1224,18 @@ class MainWindow(QMainWindow):
                             fn.start_thread(sfx.play('limit'))
                     self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
                     self.lastval['deploy_lim'] = self.store['content']['hybrid']['deploy_lim_axis'].value()
+            for item in self.store['content']['display']: # update audio LEDs
+                if '_led' in item and item[:-4] in sfx.audio:
+                    sound = item[:-4]
+                    if sound == 'p2p_active':
+                        if sfx.audio['p2p_active'].get_num_channels() != 0:
+                            self.store['content']['display'][item].state(True)
+                        else:
+                            self.store['content']['display'][item].state(False)
+                    elif sfx.audio[sound].get_num_channels() != 0:
+                        self.store['content']['display'][item].state(True)
+                    else:
+                        self.store['content']['display'][item].state(False)
             if self.check_profile_list():
                 self.refresh_profile_list()
         except Exception as e:
@@ -1893,7 +1975,7 @@ class MainWindow(QMainWindow):
                     if var.settings['local']['p2p_behind_nobrake'] and self.lastval['Brake'] > 0.05:
                         var.status['p2p_sound_active']['single'] = False
                         var.status['p2p_sound_active']['loop'] = False
-                        sfx.p2p_active.stop()
+                        sfx.audio['p2p_active'].stop()
                     else:
                         if var.settings['local']['p2p_behind_audio_cont']:
                             if self.lastval['CarIdx_Within_Cont_p2p_Range'] == []:
@@ -2018,6 +2100,36 @@ class CustomDoubleSpinBox(QDoubleSpinBox):
             event.ignore() # ignores mouse scroll inputs while hovering over
         except Exception as e:
             fn.error_handling(e, "interface.wheelEvent() QDoubleSpinBox")
+
+class CustomLEDLabel(QLabel):
+    greenLED = """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #33ff33, stop:1 #008800);
+                border-radius: 8px;
+                border: 1px;
+            """
+    redLED = """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #ff3333, stop:1 #880000);
+                border-radius: 8px;
+                border: 1px;
+            """
+    active = False
+    sound = "None"
+    def __init__(self):
+        super().__init__()
+        self.layout = QVBoxLayout()
+        self.label = QLabel()
+        self.setStyleSheet(self.redLED)
+    def state(self, signal): # True = on (green), False = off (red)
+        if signal and not self.active:
+            print(self.sound, "LED turning on")
+            self.setStyleSheet(self.greenLED)
+            self.active = True
+        elif not signal and self.active:
+            print(self.sound, "LED turning off")
+            self.setStyleSheet(self.redLED)
+            self.active = False
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])

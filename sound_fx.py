@@ -36,12 +36,14 @@ for sound in var.settings['sound']:
         if not os.path.exists(sounds[sound]):
             shutil.copyfile(source, sounds[sound])
 
-hybrid_low = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_low'])
-hybrid_high = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_high'])
-hybrid_limit = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_limit'])
-upshift_beep = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['upshift_beep'])
-downshift_beep = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['downshift_beep'])
-p2p_active = p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['p2p_active'])
+audio = {
+    'hybrid_low': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_low']),
+    'hybrid_high': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_high']),
+    'hybrid_limit': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_limit']),
+    'upshift_beep': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['upshift_beep']),
+    'downshift_beep': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['downshift_beep']),
+    'p2p_active': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['p2p_active']),
+}
 
 def play(notif):
     try:
@@ -50,38 +52,38 @@ def play(notif):
                 print("playing notif: ", notif)
             if notif == "low":
                 status[notif] = True
-                hybrid_low.set_volume(var.settings['local']['volume'])
-                hybrid_low.play()
+                audio['hybrid_low'].set_volume(var.settings['local']['volume'])
+                audio['hybrid_low'].play()
                 status[notif] = False
             elif notif == "high":
                 status[notif] = True
-                hybrid_high.set_volume(var.settings['local']['volume'])
-                hybrid_high.play()
+                audio['hybrid_high'].set_volume(var.settings['local']['volume'])
+                audio['hybrid_high'].play()
                 status[notif] = False
             elif notif == "limit":
                 status[notif] = True
-                hybrid_limit.set_volume(var.settings['local']['volume'])
-                hybrid_limit.play()
+                audio['hybrid_limit'].set_volume(var.settings['local']['volume'])
+                audio['hybrid_limit'].play()
                 status[notif] = False
             elif notif == "upshift_beep":
                 status[notif] = True
-                upshift_beep.set_volume(var.settings['local']['volume'])
-                upshift_beep.play()
+                audio['upshift_beep'].set_volume(var.settings['local']['volume'])
+                audio['upshift_beep'].play()
             elif notif == "downshift_beep":
                 status[notif] = True
-                downshift_beep.set_volume(var.settings['local']['volume'])
-                downshift_beep.play()
+                audio['downshift_beep'].set_volume(var.settings['local']['volume'])
+                audio['downshift_beep'].play()
             elif notif == "p2p_active" and status["p2p_active_single"] == False and status['p2p_active_loop'] == False:
-                if p2p_active.get_num_channels() == 0: # not currently playing at all
+                if audio['p2p_active'].get_num_channels() == 0: # not currently playing at all
                     print("playing notif: ", notif)
                     status[notif] = True
                     status["p2p_active_single"] = True
-                    p2p_active.set_volume(var.settings['local']['volume'])
-                    p2p_active.play()
+                    audio['p2p_active'].set_volume(var.settings['local']['volume'])
+                    audio['p2p_active'].play()
                     status[notif] = False
                     # status["p2p_active_single"] = False # latch this elsewhere, only release it to False once p2p single is eligible to be played again
                 else:
-                    print ("p2p_active already playing ", p2p_active.get_num_channels(), " times")
+                    print ("p2p_active already playing ", audio['p2p_active'].get_num_channels(), " times")
             elif notif == "p2p_active":
                 print ("in sfx.play for p2p_active, statuses are: ", status["p2p_active_single"], status['p2p_active_loop'])
             else:
@@ -96,12 +98,12 @@ def play_loop(notif):
         if notif == "p2p_active":
             if status["p2p_active_loop"] == False:
                 print("playing notif on loop: ", notif)
-                p2p_active.stop() # if currently playing single
+                audio['p2p_active'].stop() # if currently playing single
                 status['p2p_active_single'] = False
                 status[notif] = True
                 status["p2p_active_loop"] = True
-                p2p_active.set_volume(var.settings['local']['volume'])
-                p2p_active.play(loops=-1)
+                audio['p2p_active'].set_volume(var.settings['local']['volume'])
+                audio['p2p_active'].play(loops=-1)
             else:
                 print(notif, " sound status is already True in sfx.play_loop")
         else:
@@ -112,18 +114,18 @@ def play_loop(notif):
 def play_num_loop(notif, num):
     try:
         if notif == "p2p_active":
-            if status["p2p_active_loop"] == False and p2p_active.get_num_channels() == 0:
+            if status["p2p_active_loop"] == False and audio['p2p_active'].get_num_channels() == 0:
                 print("playing notif on finite loop: ", notif, num)
-                p2p_active.stop() # if currently playing single
+                audio['p2p_active'].stop() # if currently playing single
                 status['p2p_active_single'] = False
                 status[notif] = True
                 status["p2p_active_loop"] = True
-                p2p_active.set_volume(var.settings['local']['volume'])
-                p2p_active.play(loops=num-1)
+                audio['p2p_active'].set_volume(var.settings['local']['volume'])
+                audio['p2p_active'].play(loops=num-1)
                 status[notif] = False
                 status["p2p_active_loop"] = False
             else:
-                print(notif, " sound status is already True in sfx.play_num_loop", p2p_active.get_num_channels(),"times")
+                print(notif, " sound status is already True in sfx.play_num_loop", audio['p2p_active'].get_num_channels(),"times")
         else:
             print(notif, " is not valid in sfx.play_num_loop")
     except Exception as e:
@@ -134,7 +136,7 @@ def stop_loop(notif):
         if status[notif] == True:
             print("stopping notif on loop: ", notif)
             if notif == "p2p_active":
-                p2p_active.stop()
+                audio['p2p_active'].stop()
                 status[notif] = False
                 status["p2p_active_loop"] = False
         else:

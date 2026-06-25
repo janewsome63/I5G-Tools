@@ -509,11 +509,13 @@ def error_handling(e, loc):
     error = traceback.format_exc()
     print("!!! An error has occured !!! :(")
     print(error)
-    now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
     now_pretty = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
-    with open("I5G_Tools_err_" + now + ".log", "a") as f:
+    with open("I5G_Tools_err_" + var.startup_time + ".log", "a") as f:
         f.write(now_pretty + "\n")
         f.write(error)
         #f.write(f"{type(e)}: {str(e.args)}, {str(e)}\n" + loc + "\n\n")
     # sys.exit(0) # exit program to make it obvious an error occured. Otherwise, the app could continue partially functioning with only part of it in a broken state
+
+def startup_time():
+    var.startup_time = str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))

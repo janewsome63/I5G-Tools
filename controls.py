@@ -8,7 +8,7 @@ from time import sleep
 def controls():
     try:
         check = fn.is_bind()
-        print(check)
+        # print(check)
         if check:
             for entry in check:
                 function = entry['function']
