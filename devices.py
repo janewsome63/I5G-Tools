@@ -73,6 +73,7 @@ def remove_device(instance):
         for i, guid in enumerate(device_info):
             if device_info[guid]['instance'] == instance:
                 del device_info[guid]
+                var.id_table[instance] = [-2, -2]
                 break
         fn.read_profile(var.settings['profile']['current'])
     except Exception as e:
