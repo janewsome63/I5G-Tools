@@ -138,7 +138,8 @@ def log_event(instance_id, type, num, value):
                 "num": num,
                 "value": value,
             }
-            print(var.event)
+            if type != "key" or fn.is_bind(): # don't print keystrokes that aren't binds
+                print(var.event)
         # else:
             # print("guid in device_info failed: ", guid, device_info)
     except Exception as e:

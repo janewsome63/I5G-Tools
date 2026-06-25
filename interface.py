@@ -358,101 +358,121 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['car_id_label'] = QLabel()
             self.store['content']['display']['car_id_label'].setText(var.lang['car_id'])
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_label'], 0, 0)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_label'], 0, 2)
 
             self.store['content']['display']['car_id'] = QLabel()
             self.store['content']['display']['car_id'].setText("None")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id'], 0, 1)
-
-            self.store['content']['display']['car_id_limits'] = QLabel()
-            self.store['content']['display']['car_id_limits'].setText("Placeholder")
-            self.store['content']['display']['car_id_limits'].setWordWrap(True)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_limits'], 0, 2)
+            self.store['content']['display']['car_id'].setWordWrap(True)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id'], 0, 3)
 
             self.store['content']['display']['weight_jacker_label'] = QLabel()
             self.store['content']['display']['weight_jacker_label'].setText(var.lang['weight_jacker'])
             self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_label'], 1, 0)
 
+            self.store['content']['display']['weight_jacker_limits'] = QLabel()
+            self.store['content']['display']['weight_jacker_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_limits'], 1, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+
             self.store['content']['display']['weight_jacker_lcd'] = QLCDNumber()
             self.store['content']['display']['weight_jacker_lcd'].display(0)
             self.store['content']['display']['weight_jacker_lcd'].setSegmentStyle(self.store['content']['weight_jacker']['lcd'].segmentStyle())
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_lcd'], 1, 1)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_lcd'], 1, 2)
 
             self.store['content']['display']['weight_jacker_axis'] = QProgressBar()
             self.store['content']['display']['weight_jacker_axis'].setTextVisible(False)
             self.store['content']['display']['weight_jacker_axis'].setMinimum(0)
             self.store['content']['display']['weight_jacker_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 3)
 
             self.store['content']['display']['front_roll_bar_label'] = QLabel()
             self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'])
             self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_label'], 2, 0)
 
+            self.store['content']['display']['front_roll_bar_limits'] = QLabel()
+            self.store['content']['display']['front_roll_bar_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_limits'], 2, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+
             self.store['content']['display']['front_roll_bar_lcd'] = QLCDNumber()
             self.store['content']['display']['front_roll_bar_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_lcd'], 2, 1)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_lcd'], 2, 2)
 
             self.store['content']['display']['front_roll_bar_axis'] = QProgressBar()
             self.store['content']['display']['front_roll_bar_axis'].setTextVisible(False)
             self.store['content']['display']['front_roll_bar_axis'].setMinimum(0)
             self.store['content']['display']['front_roll_bar_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_axis'], 2, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_axis'], 2, 3)
 
             self.store['content']['display']['rear_roll_bar_label'] = QLabel()
             self.store['content']['display']['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'])
             self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_label'], 3, 0)
 
+            self.store['content']['display']['rear_roll_bar_limits'] = QLabel()
+            self.store['content']['display']['rear_roll_bar_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_limits'], 3, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+
             self.store['content']['display']['rear_roll_bar_lcd'] = QLCDNumber()
             self.store['content']['display']['rear_roll_bar_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_lcd'], 3, 1)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_lcd'], 3, 2)
 
             self.store['content']['display']['rear_roll_bar_axis'] = QProgressBar()
             self.store['content']['display']['rear_roll_bar_axis'].setTextVisible(False)
             self.store['content']['display']['rear_roll_bar_axis'].setMinimum(0)
             self.store['content']['display']['rear_roll_bar_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_axis'], 3, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_axis'], 3, 3)
 
             self.store['content']['display']['fuel_map_label'] = QLabel()
             self.store['content']['display']['fuel_map_label'].setText(var.lang['fuel_map'])
             self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_label'], 4, 0)
 
+            self.store['content']['display']['fuel_map_limits'] = QLabel()
+            self.store['content']['display']['fuel_map_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_limits'], 4, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+
             self.store['content']['display']['fuel_map_lcd'] = QLCDNumber()
             self.store['content']['display']['fuel_map_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_lcd'], 4, 1)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_lcd'], 4, 2)
 
             self.store['content']['display']['fuel_map_axis'] = QProgressBar()
             self.store['content']['display']['fuel_map_axis'].setTextVisible(False)
             self.store['content']['display']['fuel_map_axis'].setMinimum(0)
             self.store['content']['display']['fuel_map_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_axis'], 4, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_axis'], 4, 3)
 
             self.store['content']['display']['clutch_label'] = QLabel()
             self.store['content']['display']['clutch_label'].setText(var.lang['clutch'])
             self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_label'], 5, 0)
 
+            # self.store['content']['display']['clutch_limits'] = QLabel()
+            # self.store['content']['display']['clutch_limits'].setText("0 to 100")
+            # self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_limits'], 5, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+
             self.store['content']['display']['clutch_lcd'] = QLCDNumber()
             self.store['content']['display']['clutch_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_lcd'], 5, 1)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_lcd'], 5, 2)
 
             self.store['content']['display']['clutch_axis'] = QProgressBar()
             self.store['content']['display']['clutch_axis'].setTextVisible(False)
             self.store['content']['display']['clutch_axis'].setMinimum(0)
             self.store['content']['display']['clutch_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_axis'], 5, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_axis'], 5, 3)
 
             self.store['content']['display']['throttle_label'] = QLabel()
             self.store['content']['display']['throttle_label'].setText(var.lang['throttle'])
             self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_label'], 6, 0)
 
+            # self.store['content']['display']['throttle_limits'] = QLabel()
+            # self.store['content']['display']['throttle_limits'].setText("0 to 100")
+            # self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_limits'], 6, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+
             self.store['content']['display']['throttle_lcd'] = QLCDNumber()
             self.store['content']['display']['throttle_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_lcd'], 6, 1)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_lcd'], 6, 2)
 
             self.store['content']['display']['throttle_axis'] = QProgressBar()
             self.store['content']['display']['throttle_axis'].setTextVisible(False)
             self.store['content']['display']['throttle_axis'].setMinimum(0)
             self.store['content']['display']['throttle_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 3)
 
             self.tabs['display'].setLayout(self.tabs['display'].layout)
         except Exception as e:
@@ -780,7 +800,7 @@ class MainWindow(QMainWindow):
             column += 2
 
             self.store['content']['settings']['timer_first'] = CustomSpinBox()
-            self.store['content']['settings']['timer_first'].setFixedSize(95, 20)
+            self.store['content']['settings']['timer_first'].setFixedSize(70, 20)
             self.store['content']['settings']['timer_first'].setRange(1, 1000)
             self.store['content']['settings']['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
@@ -793,7 +813,7 @@ class MainWindow(QMainWindow):
             column += 2
 
             self.store['content']['settings']['timer_loop'] = CustomSpinBox()
-            self.store['content']['settings']['timer_loop'].setFixedSize(95, 20)
+            self.store['content']['settings']['timer_loop'].setFixedSize(70, 20)
             self.store['content']['settings']['timer_loop'].setRange(1, 1000)
             self.store['content']['settings']['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
@@ -811,7 +831,7 @@ class MainWindow(QMainWindow):
             column += 1
 
             self.store['content']['settings']['profile_create'] = QPushButton()
-            self.store['content']['settings']['profile_create'].setFixedSize(95, 25)
+            self.store['content']['settings']['profile_create'].setFixedSize(70, 25)
             self.store['content']['settings']['profile_create'].setText(var.lang['create'])
             self.store['content']['settings']['profile_create'].clicked.connect(lambda: self.create_profile(self.store['content']['settings']['profile_create_name'].text()))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
@@ -833,7 +853,7 @@ class MainWindow(QMainWindow):
             column += 1
 
             self.store['content']['settings']['profile_delete'] = QPushButton()
-            self.store['content']['settings']['profile_delete'].setFixedSize(95, 25)
+            self.store['content']['settings']['profile_delete'].setFixedSize(70, 25)
             self.store['content']['settings']['profile_delete'].setText(var.lang['delete'])
             self.store['content']['settings']['profile_delete'].clicked.connect(lambda: self.delete_profile(self.store['content']['settings']['profile_select'].currentText()))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_delete'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
@@ -869,7 +889,7 @@ class MainWindow(QMainWindow):
             column += 2
 
             self.store['content']['settings']['high_threshold'] = CustomSpinBox()
-            self.store['content']['settings']['high_threshold'].setFixedSize(95, 20)
+            self.store['content']['settings']['high_threshold'].setFixedSize(70, 20)
             self.store['content']['settings']['high_threshold'].setRange(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1, 99)
             self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
             self.store['content']['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
@@ -877,7 +897,7 @@ class MainWindow(QMainWindow):
             column += 1
 
             self.store['content']['settings']['low_threshold'] = CustomSpinBox()
-            self.store['content']['settings']['low_threshold'].setFixedSize(95, 20)
+            self.store['content']['settings']['low_threshold'].setFixedSize(70, 20)
             self.store['content']['settings']['low_threshold'].setRange(1, int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1)
             self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
             self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
@@ -1481,9 +1501,13 @@ class MainWindow(QMainWindow):
                 self.store['index']['car_id'].setText("None")
                 print("Updating car_id to None")
                 self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['weight_jacker_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['fuel_map_limits'].setStyleSheet("color: red;")
             elif self.store['content']['display']['car_id'] in car_settings:
                 car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(car_settings[car_id]['name'])
@@ -1494,45 +1518,60 @@ class MainWindow(QMainWindow):
                     var.step['weight_jacker'] = 1 / (max - min)
                     self.store['content']['weight_jacker']['switch'].setRange(min, max)
                     self.store['content']['display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['weight_jacker_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['weight_jacker_limits'].setStyleSheet("color: red;")
                 if 'front_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['front_roll_bar'][0]
                     max = car_settings[car_id]['front_roll_bar'][1]
                     var.step['front_roll_bar'] = 1 / (max - min)
                     self.store['content']['front_roll_bar']['switch'].setRange(min, max)
                     self.store['content']['display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['front_roll_bar_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['front_roll_bar_limits'].setStyleSheet("color: red;")
                 if 'rear_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['rear_roll_bar'][0]
                     max = car_settings[car_id]['rear_roll_bar'][1]
                     var.step['rear_roll_bar'] = 1 / (max - min)
                     self.store['content']['rear_roll_bar']['switch'].setRange(min, max)
                     self.store['content']['display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet("color: red;")
                 if 'fuel_map' in car_settings[car_id]:
                     min = car_settings[car_id]['fuel_map'][0]
                     max = car_settings[car_id]['fuel_map'][1]
                     var.step['fuel_map'] = 1 / (max - min)
                     self.store['content']['fuel_map']['switch'].setRange(min, max)
                     self.store['content']['display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['fuel_map_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['fuel_map_limits'].setStyleSheet("color: red;")
             else:
                 car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
                 print("current_car " + str(car_id) + " not in car_settings!")
                 self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['weight_jacker_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
-            text = "WJ: " + str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
-            text += ", FARB: " + str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
-            text += ", RARB: " + str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
-            text += ", Fuel Map: " + str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
-            self.store['content']['display']['car_id_limits'].setText(text)
+                self.store['content']['display']['fuel_map_limits'].setStyleSheet("color: red;")
+            text = str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
+            self.store['content']['display']['weight_jacker_limits'].setText(text)
+            text = str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
+            self.store['content']['display']['front_roll_bar_limits'].setText(text)
+            text = str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
+            self.store['content']['display']['rear_roll_bar_limits'].setText(text)
+            text = str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
+            self.store['content']['display']['fuel_map_limits'].setText(text)
         except Exception as e:
             fn.error_handling(e, "interface.update_limits()")
 
