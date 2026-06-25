@@ -145,7 +145,8 @@ def read_profile(profile=None):
                     else:
                         setting = eval(config[section][item])
                     if section == "LOCAL":
-                        var.settings['local'][item] = setting
+                        if item != 'high_threshold' and item != 'low_threshold':
+                            var.settings['local'][item] = setting
                     elif section.lower() in var.bindings:
                         if item == "up" or item == "down" or item == "switch" or item == "pedal" or item == "label":
                             var.bindings[section.lower()][item] = setting
@@ -372,6 +373,9 @@ def reset_bind_thresh(thresh, value):
                         guid = var.bindings[function][control]['guid']
                         if (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
                             var.bindings[function][control]['value'] = value
+                        elif (var.bindings[function][control]['label'][-1] == "+" and thresh == 'high_threshold') or (var.bindings[function][control]['label'][-1] == "-" and thresh == 'low_threshold'):
+                            var.bindings[function][control]['value'] = value
+                            print("using backup method in fn.reset_bind_thresh()")
     except Exception as e:
         error_handling(e, "functions.reset_bind_thresh()")
 
