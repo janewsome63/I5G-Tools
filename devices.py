@@ -45,6 +45,8 @@ def add_device(startup):
                 while len(var.id_table) <= device.get_instance_id():
                     var.id_table.append([-2,-2])
                 var.id_table[device.get_instance_id()] = [index, guid]
+                if guid not in var.settings['device_axis_thresh']:
+                    var.settings['device_axis_thresh'][guid] = {"name": device_info[guid]['name'], "high_threshold": 0.90, "low_threshold": 0.10,}
                 print("id_table is now ", var.id_table)
                 if device.get_numbuttons():
                     device_info[guid]['buttons'] = {}
