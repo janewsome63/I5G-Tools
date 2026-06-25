@@ -175,7 +175,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['calibrate'] = QPushButton()
             self.store['content'][function]['calibrate'].setFixedSize(95, 25)
             self.store['content'][function]['calibrate'].setText(var.lang['calibrate'])
-            self.store['content'][function]['calibrate'].clicked.connect(lambda: self.calibrate_start(function))
+            self.store['content'][function]['calibrate'].clicked.connect(lambda: self.calibrate_axis_start(function))
 
             self.store['content'][function]['increment_label'] = QLabel()
             self.store['content'][function]['increment_label'].setText(var.lang['increment'])
@@ -952,7 +952,7 @@ class MainWindow(QMainWindow):
                         value = float(value*100)
                     #elif function == "settings":
                         #self.refresh_profile_list()
-                    elif function == "regen" or function == "deploy":
+                    elif function == "regen_rate" or function == "deploy_rate":
                         value = value * (self.store['content'][function]['switch'].maximum() - self.store['content'][function]['switch'].minimum()) + self.store['content'][function]['switch'].minimum()
                     else:
                         # var.status[function]['secondary'] = (value * var.step[function]) - var.step[function]
@@ -991,7 +991,7 @@ class MainWindow(QMainWindow):
                     sleep(0.01)
                     var.bindings['status']['active'] = True
                     sleep(0.01)
-                    vjoy.set('weight_jacker', vjoy.axis_values['weight_jacker']) # bad hack to make sure vjoy is actually 'active'
+                    vjoy.set_axis('weight_jacker', vjoy.axis_values['weight_jacker']) # bad hack to make sure vjoy is actually 'active'
                     var.bindings['status']['active'] = False
                 self.lastval['IsOnTrack'] = self.ir['IsOnTrack']
                 if self.lastval['CarIdx'] in car_settings and 'limiter' in car_settings[self.lastval['CarIdx']]: # if limiter in car_settings, save limiter minus settings offset for up and down
@@ -1113,24 +1113,37 @@ class MainWindow(QMainWindow):
         
 
     @pyqtSlot()
-    def calibrate(self):
+    def calibrate_axis(self):
         try:
             if self.store['axis'] in self.store['content']:
                 self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrating'])
             else:
-                print("Warning: calibrate()")
+                print("Warning: calibrate_axis()")
 
-            vjoy.calibrate(self.store['axis'])
+            vjoy.calibrate_axis(self.store['axis'])
             var.status['calibration'] += "Done"
             while self.store['running']:
                 sleep(0.1)
             self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
-            vjoy.set(self.store['axis'], self.store['pct'])
+            vjoy.set_axis(self.store['axis'], self.store['pct'])
         except Exception as e:
-            fn.error_handling(e, "interface.calibrate()")
+            fn.error_handling(e, "interface.calibrate_axis()")
 
     @pyqtSlot()
-    def calibrate_start(self, func):
+    def calibrate_button(self):
+        try:
+            if self.store['button'] in self.store['content']:
+                self.store['content'][self.store['button']]['calibrate'].setText(var.lang['calibrating'])
+            else:
+                print("Warning: calibrate_button()")
+
+            vjoy.calibrate_button(self.store['button'])
+            self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
+        except Exception as e:
+            fn.error_handling(e, "interface.calibrate_button()")
+
+    @pyqtSlot()
+    def calibrate_axis_start(self, func):
         try:
             if not self.store['running'] and var.status['calibration'] == "None":
                 self.store['axis'] = func
@@ -1141,7 +1154,7 @@ class MainWindow(QMainWindow):
                     self.store['pct'] = var.status[func]['primary']
                 elif var.status[func]['switched']:
                     self.store['pct'] = var.status[func]['secondary']
-                self.store['thread_pool'].start(self.calibrate)
+                self.store['thread_pool'].start(self.calibrate_axis)
             elif func + "Done" == var.status['calibration']:
                 var.status['calibration'] = "None"
                 self.store['running'] = False
@@ -1155,7 +1168,7 @@ class MainWindow(QMainWindow):
                         func_pass = function
                 self.start_flash_tab(func_pass)
         except Exception as e:
-            fn.error_handling(e, "interface.calibrate_start()")
+            fn.error_handling(e, "interface.calibrate_axis_start()")
 
     @pyqtSlot()
     def increment(self, func):
@@ -1177,7 +1190,7 @@ class MainWindow(QMainWindow):
             else:
                 var.status[func]['secondary'] = (value * var.step[func]) - var.step[func]
             if var.status[func]['switched']:
-                vjoy.set(func, var.status[func]['secondary'])
+                vjoy.set_axis(func, var.status[func]['secondary'])
             var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.switch()")
@@ -1200,7 +1213,7 @@ class MainWindow(QMainWindow):
                 var.settings[func]['toggle'] = True
             elif self.store['content'][func]['switch_mode'].currentText() == "Hold":
                 var.status[func]['switched'] = False
-                vjoy.set(func, var.status[func]['primary'])
+                vjoy.set_axis(func, var.status[func]['primary'])
                 var.settings[func]['toggle'] = False
             var.status['rewrite_profile'] = True
         except Exception as e:

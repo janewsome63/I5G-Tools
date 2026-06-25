@@ -147,8 +147,8 @@ car_settings = {
         "fuel_map": [1, 8],
         "hybrid": True,
         # "limiter": 11950,
-        # "regen": [0.5, 1.0],
-        # "deploy": [0.1, 1.0],
+        # "regen_rate": [0.5, 1.0],
+        # "deploy_rate": [0.1, 1.0],
         # "brake_bias": "?"
     },
     # int(105): {              # Formula Renault 3.5

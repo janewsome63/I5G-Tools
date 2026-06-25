@@ -13,8 +13,8 @@ axis_ref = {
     "fuel_map": vjoy.HID_USAGE_RX,
     "clutch": vjoy.HID_USAGE_RY,
     "throttle": vjoy.HID_USAGE_RZ,
-    "regen": vjoy.HID_USAGE_SL0,
-    "deploy": vjoy.HID_USAGE_SL1,
+    "regen_rate": vjoy.HID_USAGE_SL0,
+    "deploy_rate": vjoy.HID_USAGE_SL1,
 }
 
 axis_values = {
@@ -24,8 +24,8 @@ axis_values = {
     "fuel_map": 0.0,
     "clutch": 0.0,
     "throttle": 0.0,
-    "regen": 0.0,
-    "deploy": 0.0,
+    "regen_rate": 1.0,
+    "deploy_rate": 1.0,
 }
 
 axis_busy = {
@@ -35,8 +35,13 @@ axis_busy = {
     "fuel_map": False,
     "clutch": False,
     "throttle": False,
-    "regen": False,
-    "deploy": False,
+    "regen_rate": False,
+    "deploy_rate": False,
+}
+
+button_ref = {
+    "regen": 1,
+    "deploy": 2,
 }
 
 try:
@@ -47,7 +52,7 @@ except:
 queue = []
 number = 0
 
-def set(axis, pct):
+def set_axis(axis, pct):
     try:
         global number
         print("vjoy set check1")
@@ -92,9 +97,16 @@ def set(axis, pct):
             print("new primary: ", var.status[axis]['primary'])
         axis_busy[axis] = False
     except Exception as e:
-        fn.error_handling(e, "vjoy.set()")
+        fn.error_handling(e, "vjoy.set_axis()")
 
-def calibrate(axis):
+def set_button(button, state):
+    try:
+        print("try set using: ", button, button_ref[button], state)
+        j.set_button(button_ref[button], state)
+    except Exception as e:
+        fn.error_handling(e, "vjoy.set_button()")
+
+def calibrate_axis(axis):
     try:
         #var.status['calibration'] = True
         while var.status[axis]['thread']['waiting']: #wait for any hold loops to finish
@@ -102,35 +114,45 @@ def calibrate(axis):
         step = 0.01
         pct = 0.0
         while pct < 1.0:
-            set(axis, pct)
+            set_axis(axis, pct)
             pct = pct + step
             sleep(0.005)
-        set(axis,pct)
+        set_axis(axis, pct)
         sleep(0.05) # make sure iRacing reads the max value
-        set(axis,pct)
+        set_axis(axis, pct)
         sleep(0.125)
         while pct > 0:
-            set(axis, pct)
+            set_axis(axis, pct)
             pct = pct - step
             sleep(0.005)
-        set(axis,0.0)
+        set_axis(axis, 0.0)
         sleep(0.25)
 
         #var.status['calibration'] = False
     except Exception as e:
-        fn.error_handling(e, "vjoy.calibrate()")
+        fn.error_handling(e, "vjoy.calibrate()_axis")
+
+def calibrate_button(button):
+    try:
+        set_button(button, True)
+        sleep(0.25)
+        set_button(button, False)
+    except Exception as e:
+        fn.error_handling(e, "vjoy.calibrate()_axis")
 
 def intialize():
     try:
         j.update()
-        set("weight_jacker", 0.5)
-        set("front_roll_bar", 1.0)
-        set("rear_roll_bar", 0.0)
-        set("fuel_map", 0.0)
-        set("clutch", 0.0)
-        set("throttle", 0.0)
-        # set("regen", 4/9) # 0.5 in sim
-        # set("deploy", 4/9) # 0.5 in sim
+        set_axis("weight_jacker", 0.5)
+        set_axis("front_roll_bar", 1.0)
+        set_axis("rear_roll_bar", 0.0)
+        set_axis("fuel_map", 0.0)
+        set_axis("clutch", 0.0)
+        set_axis("throttle", 0.0)
+        # set("regen_rate", 1.0)
+        # set("deploy_rate", 1.0)
+        set_button("regen", False)
+        set_button("deploy", False)
     except Exception as e:
         fn.error_handling(e, "vjoy.initialize()")
 
