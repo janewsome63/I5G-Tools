@@ -9,7 +9,7 @@ import history
 from time import sleep
 import keyboard
 
-devices = []
+# devices = []
 device_info = {
     "keyboard": {
         "guid": None,
@@ -22,7 +22,6 @@ device_info = {
         },
     },
 }
-id_table = [[-2,-2]] # index is the instance id, first value is the joystick index, second value is the guid; -1 is keyboard, so using -2 to avoid confusion
 
 def add_device(startup):
     try:
@@ -34,7 +33,7 @@ def add_device(startup):
             if "vJoy" not in device.get_name():
                 guid = device.get_guid()
                 index = i
-                devices.append(device)
+                # devices.append(device)
                 device_info[guid] = {
                     "guid": guid,
                     "name": device.get_name(),
@@ -42,10 +41,12 @@ def add_device(startup):
                     "instance": device.get_instance_id(),
                     "initialized": device.get_init(),
                 }
-                while len(id_table) <= device.get_instance_id():
-                    id_table.append([-2,-2])
-                id_table[device.get_instance_id()] = [index, guid]
-                print("id_table is now ", id_table)
+                while len(var.id_table) <= device.get_instance_id():
+                    var.id_table.append([-2,-2])
+                var.id_table[device.get_instance_id()] = [index, guid]
+                if guid not in var.settings['device_axis_thresh']:
+                    var.settings['device_axis_thresh'][guid] = {'name': device_info[guid]['name'], 'high_threshold': 0.90, 'low_threshold': 0.10}
+                print("id_table is now ", var.id_table)
                 if device.get_numbuttons():
                     device_info[guid]['buttons'] = {}
                     for b in range(device.get_numbuttons()):
@@ -66,13 +67,15 @@ def add_device(startup):
 
 def remove_device(instance):
     try:
-        for i, device in enumerate(devices):
-            if device.get_instance_id() == instance:
-                devices.pop(i)
-                break
+        # for i, device in enumerate(devices):
+        #     if device.get_instance_id() == instance:
+        #         devices.pop(i)
+        #         break
         for i, guid in enumerate(device_info):
             if device_info[guid]['instance'] == instance:
                 del device_info[guid]
+                var.id_table[instance] = [-2, -2]
+                print("id_table is now ", var.id_table)
                 break
         fn.read_profile(var.settings['profile']['current'])
     except Exception as e:
@@ -84,7 +87,7 @@ def log_event(instance_id, type, num, value):
         # print(instance_id, type, num, value)
         # print(id_table)
         if instance_id != -1:
-            [index, guid] = id_table[instance_id]
+            [index, guid] = var.id_table[instance_id]
         else:
             [index, guid] = [-1, "keyboard"]
         # print(index, guid)
@@ -218,7 +221,7 @@ def format_device(function, control):
                 num = str(var.bindings[function][control]['num'])
                 dev_pretty = name + " - " + type + " " + num
                 if control != 'pedal':
-                    axis_dir = var.bindings[function][control]['value'] >= var.settings['local']['high_threshold']
+                    axis_dir = var.bindings[function][control]['value'] >= var.settings['device_axis_thresh'][var.bindings[function][control]['guid']]['high_threshold']
                     if axis_dir:
                         dev_pretty += "+"
                     else:

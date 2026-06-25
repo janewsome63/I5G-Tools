@@ -1650,12 +1650,13 @@ class MainWindow(QMainWindow):
                     else:
                         self.store['content']['sounds']['sound'].setCurrentText('No')
                 elif setting == 'low_threshold' or setting == 'high_threshold':
-                    print("apply_settings before ", setting)
-                    self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1,51), 99)
-                    self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1,49))
-                    self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
-                    self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
-                    print("apply_settings after, ", setting)
+                    continue
+                #     print("apply_settings before ", setting)
+                #     self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1,51), 99)
+                #     self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1,49))
+                #     self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
+                #     self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
+                #     print("apply_settings after ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
                     if setting == "axis_rollover":
                         tab = 'settings'
@@ -1673,6 +1674,7 @@ class MainWindow(QMainWindow):
                 else:
                     if not setting == 'version':
                         print("isinstance check failed", setting, var.settings['local'][setting])
+            self.replace_axis_thresh()
             print ("end apply_settings")
         except Exception as e:
             fn.error_handling(e, "interface.apply_settings()")
