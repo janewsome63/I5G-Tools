@@ -7,7 +7,6 @@ import sound_fx as sfx
 import sys
 import variables as var
 import vjoy
-import pygame as p
 from car_settings_list import car_settings
 from PyQt6.QtCore import (pyqtSlot, QSize, Qt, QThreadPool, QTimer)
 from PyQt6.QtGui import (QIcon, QColor, QWheelEvent)
@@ -1651,12 +1650,12 @@ class MainWindow(QMainWindow):
                         self.store['content']['sounds']['sound'].setCurrentText('No')
                 elif setting == 'low_threshold' or setting == 'high_threshold':
                     continue
-                #     print("apply_settings before ", setting)
-                #     self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1,51), 99)
-                #     self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1,49))
-                #     self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
-                #     self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
-                #     print("apply_settings after ", setting)
+                    # print("apply_settings before ", setting)
+                    # self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1,51), 99)
+                    # self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1,49))
+                    # self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
+                    # self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
+                    # print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
                     if setting == "axis_rollover":
                         tab = 'settings'

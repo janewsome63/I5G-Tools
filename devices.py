@@ -9,7 +9,7 @@ import history
 from time import sleep
 import keyboard
 
-# devices = []
+devices = []
 device_info = {
     "keyboard": {
         "guid": None,
@@ -22,6 +22,7 @@ device_info = {
         },
     },
 }
+# id_table = [[-2,-2]] # index is the instance id, first value is the joystick index, second value is the guid; -1 is keyboard, so using -2 to avoid confusion
 
 def add_device(startup):
     try:
@@ -33,7 +34,7 @@ def add_device(startup):
             if "vJoy" not in device.get_name():
                 guid = device.get_guid()
                 index = i
-                # devices.append(device)
+                devices.append(device)
                 device_info[guid] = {
                     "guid": guid,
                     "name": device.get_name(),
@@ -44,8 +45,6 @@ def add_device(startup):
                 while len(var.id_table) <= device.get_instance_id():
                     var.id_table.append([-2,-2])
                 var.id_table[device.get_instance_id()] = [index, guid]
-                if guid not in var.settings['device_axis_thresh']:
-                    var.settings['device_axis_thresh'][guid] = {'name': device_info[guid]['name'], 'high_threshold': 0.90, 'low_threshold': 0.10}
                 print("id_table is now ", var.id_table)
                 if device.get_numbuttons():
                     device_info[guid]['buttons'] = {}
@@ -67,15 +66,13 @@ def add_device(startup):
 
 def remove_device(instance):
     try:
-        # for i, device in enumerate(devices):
-        #     if device.get_instance_id() == instance:
-        #         devices.pop(i)
-        #         break
+        for i, device in enumerate(devices):
+            if device.get_instance_id() == instance:
+                devices.pop(i)
+                break
         for i, guid in enumerate(device_info):
             if device_info[guid]['instance'] == instance:
                 del device_info[guid]
-                var.id_table[instance] = [-2, -2]
-                print("id_table is now ", var.id_table)
                 break
         fn.read_profile(var.settings['profile']['current'])
     except Exception as e:

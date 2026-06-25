@@ -304,11 +304,10 @@ def is_bind():
                 "num": var.event['num'],
                 "value": var.event['value']
             }
-            # print(var.settings['device_axis_thresh'])
-            if event['value'] > var.settings['device_axis_thresh'][event['guid']]['high_threshold']:
-                event['value'] = var.settings['device_axis_thresh'][event['guid']]['high_threshold']
-            elif event['value'] < var.settings['device_axis_thresh'][event['guid']]['low_threshold']:
-                event['value'] = var.settings['device_axis_thresh'][event['guid']]['low_threshold']
+            if event['value'] > var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold']:
+                event['value'] = var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold']
+            elif event['value'] < var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold']:
+                event['value'] = var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold']
         elif var.event['type'] == "hat":
             event = {
                 "guid": var.event['guid'],
