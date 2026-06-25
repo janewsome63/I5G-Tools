@@ -2,11 +2,12 @@ import copy
 import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', '0.7.3b', 'v0.7.4b']
+                       'v0.7.1b', 'v0.7.1.1b', 'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b', 'v0.7.3.3b', 'v0.7.3.4b',
+                       'v0.7.3.5b', 'v0.7.3.6b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.4b",
+    "version": "v0.7.3.6b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -19,7 +20,7 @@ lang = {
     "increment_mode": "Increment Mode:",
     "continuous": "Continuous",
     "single": "Single",
-    "axis_threshold": "Axis Threshold:",
+    "axis_threshold": "Axis Threshold Setting for Device:",
     "rollover_mode": "Rollover Mode:",
     "locked": "Locked",
     "unlocked": "Unlocked",
@@ -27,6 +28,9 @@ lang = {
     "binding": "<-Binding->",
     "calibrate": "Calibrate",
     "calibrating": "<-Calibrating->",
+    "high_threshold": "High Axis Threshold:",
+    "low_threshold": "Low Axis Threshold:",
+    "axis_rollover": "Axis Rollover:",
     # "axis_samples": "Number of Axis Samples:",
     "scale": "Scale Factor (Requires Restart):",
     "timer_loop": "Continuous Mode Loop Timer (in ms):",
@@ -117,17 +121,18 @@ lang = {
     "github": "Github",
     "github_link": "https://www.github.com",
 }
-lang['settings_version'] = lang['version'] # identical to version now, compatibility list stored above
+lang['settings_version'] = lang['version']
 
 step = {
-    "weight_jacker": 1 / 40,
-    "front_roll_bar": 1 / 5,
-    "rear_roll_bar": 1 / 5,
-    "fuel_map": 1 / 7,
-    "clutch": 1 / 1000,
-    "throttle": 1 / 1000,
-    "deploy": 1 / 9,
-    "regen": 1 / 5,
+    "weight_jacker": 1 / (41 - 1),
+    "front_roll_bar": 1 / (6 - 1),
+    "rear_roll_bar": 1 / (6 - 1),
+    "fuel_map": 1 / (8 - 1),
+    "clutch": 1 / (201 - 1),
+    "throttle": 1 / (201 - 1),
+    "brake": 1 / (201 - 1),
+    "regen": 1 / (1.0 - 0.5),
+    "deploy": 1 / (1.0 - 0.1),
 }
 
 bindings = {
@@ -274,7 +279,6 @@ bindings_cache = copy.deepcopy(bindings)
 
 settings = {
     "frequency": 0.1,
-    "global_threshold": 0.9,
     "scale": 1.25,
     "axis_samples": 2, # constant, not really a setting anymore
     "timer_loop": 150,
@@ -298,6 +302,8 @@ settings = {
     },
 
     "local": {
+        # "high_threshold": 0.90,
+        # "low_threshold": 0.10,
         "audio": False,
         "volume": 0.5,
         "hybrid_low_audio": True,
@@ -325,7 +331,6 @@ settings = {
         "toggle": False,
         "increment": 1,
         "switch_value": -20,
-        "axis_threshold": 0.90,
         "rollover_mode": False,
     },
     "front_roll_bar": {
@@ -333,7 +338,6 @@ settings = {
         "toggle": False,
         "increment": 1,
         "switch_value": 1,
-        "axis_threshold": 0.90,
         "rollover_mode": False,
     },
     "rear_roll_bar": {
@@ -341,7 +345,6 @@ settings = {
         "toggle": False,
         "increment": 1,
         "switch_value": 6,
-        "axis_threshold": 0.90,
         "rollover_mode": False,
     },
     "fuel_map": {
@@ -349,7 +352,6 @@ settings = {
         "toggle": True,
         "increment": 1,
         "switch_value": 8,
-        "axis_threshold": 0.90,
         "rollover_mode": False,
     },
     "clutch": {
@@ -357,7 +359,6 @@ settings = {
         "toggle": False,
         "increment": 0.1,
         "switch_value": 50,
-        "axis_threshold": 0.90,
         "rollover_mode": False,
     },
     "throttle": {
@@ -365,26 +366,18 @@ settings = {
         "toggle": False,
         "increment": 0.1,
         "switch_value": 50,
-        "axis_threshold": 0.90,
         "rollover_mode": False,
     },
-    "deploy": {
-        "continuous": False,
-        "toggle": False,
-        "increment": 0.1,
-        "switch_value": 50,
-        "axis_threshold": 0.90,
-        "rollover_mode": False,
-    },
-    "regen": {
-        "continuous": False,
-        "toggle": False,
-        "increment": 0.1,
-        "switch_value": 50,
-        "axis_threshold": 0.90,
-        "rollover_mode": False,
-    },
+    "device_axis_thresh": {
+        "-2": {
+            "name": "None",
+            "high_threshold": 0.90,
+            "low_threshold": 0.10,
+        },
+                           },
 }
+
+id_table = [[-2,-2]] # index is the instance id, first value is the joystick index, second value is the guid; -1 is keyboard, so using -2 to avoid confusion
 
 status = {
     "calibration": "None",
@@ -394,6 +387,8 @@ status = {
     "profile_list": [],
     "first": False,
     "refresh_labels": False,
+    "refresh_guid_list": False,
+    "rewrite_profile": False,
     "rewrite":{
         "config": False,
         "profile": False,
@@ -485,22 +480,9 @@ status = {
             "waiting": False,
         },
     },
-    "deploy": {
-        "primary": 1.0,
-        "secondary": 0.0,
-        "switched": False,
-        "thread": {
-            "current": 0,
-            "running": {
-                "up": False,
-                "down": False
-            },
-            "waiting": False,
-        },
-    },
-    "regen": {
-        "primary": 1.0,
-        "secondary": 0.0,
+    "brake": {
+        "primary": 0.0,
+        "secondary": 0.2,
         "switched": False,
         "thread": {
             "current": 0,
@@ -524,10 +506,6 @@ backend = {
     "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985,
                   693475, 778565, 292374, 909283, 1177562),
 }
-
-obsolete = ("previous", "axis_rollover", "high_threshold", "low_threshold")
-
-profile_list = []
 
 potential_bind = {}
 
