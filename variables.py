@@ -273,9 +273,27 @@ bindings = {
             "num": 0,
         },
     },
+    "hybrid": {
+        "regen": {
+            "label": "None",
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+        "deploy": {
+            "label": "None",
+            "guid": 0,
+            "type": "none",
+            "num": 0,
+        },
+    },
 }
 
 bindings_cache = copy.deepcopy(bindings)
+
+bindings_info = {
+    "types": ("up", "down", "switch", "pedal", "label", "regen", "deploy")
+}
 
 settings = {
     "frequency": 0.1,
@@ -367,6 +385,9 @@ settings = {
         "increment": 0.1,
         "switch_value": 50,
         "rollover_mode": False,
+    },
+    "hybrid": {
+        "toggle": False,
     },
     "device_axis_thresh": {
         "-2": {
@@ -480,17 +501,18 @@ status = {
             "waiting": False,
         },
     },
-    "brake": {
-        "primary": 0.0,
-        "secondary": 0.2,
-        "switched": False,
-        "thread": {
-            "current": 0,
-            "running": {
-                "up": False,
-                "down": False
+    "hybrid": {
+        "regen": {
+            "state": False,
+            "thread": {
+                "waiting": False,
             },
-            "waiting": False,
+        },
+        "deploy": {
+            "state": False,
+            "thread": {
+                "waiting": False,
+            },
         },
     },
 }

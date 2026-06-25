@@ -1,3 +1,5 @@
+import ast
+
 import devices as dev
 import functions as fn
 import history
@@ -304,6 +306,10 @@ class MainWindow(QMainWindow):
 
     def hybrid_tab(self):
         try:
+            local_store = {
+                "binds": ["regen", "deploy"],
+            }
+
             self.tabs['hybrid'].layout = QGridLayout()
 
             self.store['content']['hybrid']['soc_label'] = QLabel()
@@ -335,8 +341,48 @@ class MainWindow(QMainWindow):
             self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
             self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
             self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 2)
+            
+            self.store['content']['hybrid']['regen_label'] = QLabel()
+            self.store['content']['hybrid']['regen_label'].setText(var.lang['regen'])
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_label'], 2, 0)
+
+            self.store['content']['hybrid']['regen_device'] = QLineEdit()
+            self.store['content']['hybrid']['regen_device'].setFixedHeight(25)
+            self.store['content']['hybrid']['regen_device'].setReadOnly(True)
+            self.store['content']['hybrid']['regen_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_device'], 2, 1)
+
+            self.store['content']['hybrid']['regen_bind'] = QPushButton()
+            self.store['content']['hybrid']['regen_bind'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_bind'].setText(var.lang['bind'])
+            self.store['content']['hybrid']['regen_bind'].clicked.connect(lambda: self.bind_start("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_bind'], 2, 2)
+
+            self.store['content']['hybrid']['deploy_label'] = QLabel()
+            self.store['content']['hybrid']['deploy_label'].setText(var.lang['deploy'])
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_label'], 3, 0)
+
+            self.store['content']['hybrid']['deploy_device'] = QLineEdit()
+            self.store['content']['hybrid']['deploy_device'].setFixedHeight(25)
+            self.store['content']['hybrid']['deploy_device'].setReadOnly(True)
+            self.store['content']['hybrid']['deploy_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_device'], 3, 1)
+
+            self.store['content']['hybrid']['deploy_bind'] = QPushButton()
+            self.store['content']['hybrid']['deploy_bind'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_bind'].setText(var.lang['bind'])
+            self.store['content']['hybrid']['deploy_bind'].clicked.connect(lambda: self.bind_start("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_bind'], 3, 2)
 
             self.tabs['hybrid'].setLayout(self.tabs['hybrid'].layout)
+
+            self.store['index']['hybrid'] = {}
+            for control in local_store['binds']:
+                self.store['index']['hybrid'][control] = {
+                    "bind": self.store['content']['hybrid'][control + '_bind'],
+                    "device": self.store['content']['hybrid'][control + '_device'],
+                    "label": self.store['content']['hybrid'][control + '_label'],
+                }
         except Exception as e:
             fn.error_handling(e, "interface.hybrid_tab()")
 
@@ -942,7 +988,7 @@ class MainWindow(QMainWindow):
     def updater(self):
         try:
             for function in var.status:
-                if function in self.store['content']:
+                if function in self.store['content'] and function != "hybrid":
                     value = var.status[function]['secondary']
                     if function == "weight_jacker":
                         # var.status[function]['secondary'] = (value * var.step[function]) + 0.5
@@ -959,6 +1005,8 @@ class MainWindow(QMainWindow):
                         value = int(round((value / var.step[function]) + 1))
 
                     self.store['content'][function]['switch'].setValue(value)
+                elif function == "hybrid":
+                    pass
 
             self.display()
 
@@ -1613,6 +1661,7 @@ class MainWindow(QMainWindow):
                 if function != "status":
                     for control in var.bindings[function]:
                         self.update_label(function, control)
+
         except Exception as e:
             fn.error_handling(e, "interface.update_label_all()")
     

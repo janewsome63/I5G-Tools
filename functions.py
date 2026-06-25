@@ -2,6 +2,7 @@ import configparser as parse
 import copy
 import os.path
 import threading
+import traceback
 from ast import literal_eval as eval
 import ctypes
 import sys
@@ -125,7 +126,7 @@ def read_profile(profile=None):
                     if response == 1:
                         sys.exit(0)
 
-            if var.status['rewrite']['profile'] == True:
+            if var.status['rewrite']['profile']:
                 translate(config, 'profile', profile, ver)
                 var.status['rewrite']['profile'] = False
                 read_profile()
@@ -148,7 +149,7 @@ def read_profile(profile=None):
                         if item != 'high_threshold' and item != 'low_threshold':
                             var.settings['local'][item] = setting
                     elif section.lower() in var.bindings:
-                        if item == "up" or item == "down" or item == "switch" or item == "pedal" or item == "label":
+                        if item in var.bindings_info['types']:
                             var.bindings[section.lower()][item] = setting
                         else:
                             var.settings[section.lower()][item] = setting
@@ -505,11 +506,14 @@ def open_browser(link):
         error_handling(e, "functions.open_browser()")
 
 def error_handling(e, loc):
+    error = traceback.format_exc()
     print("!!! An error has occured !!! :(")
+    print(error)
     now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
     now_pretty = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
     with open("I5G_Tools_err_" + now + ".log", "a") as f:
         f.write(now_pretty + "\n")
-        f.write(f"{type(e)}: {str(e.args)}, {str(e)}\n" + loc + "\n\n")
+        f.write(error)
+        #f.write(f"{type(e)}: {str(e.args)}, {str(e)}\n" + loc + "\n\n")
     # sys.exit(0) # exit program to make it obvious an error occured. Otherwise, the app could continue partially functioning with only part of it in a broken state

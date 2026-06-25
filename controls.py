@@ -8,6 +8,7 @@ from time import sleep
 def controls():
     try:
         check = fn.is_bind()
+        print(check)
         if check:
             for entry in check:
                 function = entry['function']
@@ -29,10 +30,10 @@ def controls():
                         if not var.status[function]['thread']['waiting']:
                             var.status[function]['thread']['waiting'] = True
                             fn.start_thread(lambda: switch(bind, function))
-                    elif control == "button":
-                        if not var.status[function]['thread']['waiting']:
-                            var.status[function]['thread']['waiting'] = True
-                            fn.start_thread(lambda: button(bind, function))
+                    elif control in ("regen", "deploy"):
+                        if not var.status[function][control]['thread']['waiting']:
+                            var.status[function][control]['thread']['waiting'] = True
+                            fn.start_thread(lambda: button(bind, function, control))
     except Exception as e:
         fn.error_handling(e, "controls.controls()")
 
@@ -160,24 +161,24 @@ def pedal(function, value):
     except Exception as e:
         fn.error_handling(e, "controls.pedal()")
 
-def button(bind, function):
+def button(bind, function, control):
     try:
         if check_pressed(bind):
-            if var.status[function]['state']:
-                var.status[function]['state'] = False
-            elif not var.status[function]['state']:
-                var.status[function]['state'] = True
-            vjoy.set_button(function, var.status[function]['state'])
+            if var.status[function][control]['state']:
+                var.status[function][control]['state'] = False
+            elif not var.status[function][control]['state']:
+                var.status[function][control]['state'] = True
+            vjoy.set_button(control, var.status[function][control]['state'])
 
             while check_pressed(bind) and not var.bindings['status']['active']:
                 sleep(0.05)
 
             if not var.settings[function]['toggle']:
-                if var.status[function]['state']:
-                    var.status[function]['state'] = False
-                elif not var.status[function]['state']:
-                    var.status[function]['state'] = True
-                vjoy.set_button(function, var.status[function]['state'])
-        var.status[function]['thread']['waiting'] = False
+                if var.status[function][control]['state']:
+                    var.status[function][control]['state'] = False
+                elif not var.status[function][control]['state']:
+                    var.status[function][control]['state'] = True
+                vjoy.set_button(control, var.status[function][control]['state'])
+        var.status[function][control]['thread']['waiting'] = False
     except Exception as e:
         fn.error_handling(e, "controls.button()")
