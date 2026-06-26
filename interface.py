@@ -446,7 +446,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['hybrid_low_led'] = CustomLEDLabel()
             self.store['content']['display']['hybrid_low_led'].setFixedSize(16, 16)
-            self.store['content']['display']['hybrid_low_led'].state(False)
+            self.store['content']['display']['hybrid_low_led'].state('off')
             self.store['content']['display']['hybrid_low_led'].sound = 'low'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_low_led'], 1, 6)
 
@@ -456,7 +456,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['hybrid_high_led'] = CustomLEDLabel()
             self.store['content']['display']['hybrid_high_led'].setFixedSize(16, 16)
-            self.store['content']['display']['hybrid_high_led'].state(False)
+            self.store['content']['display']['hybrid_high_led'].state('off')
             self.store['content']['display']['hybrid_high_led'].sound = 'high'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_high_led'], 2, 6)
 
@@ -466,7 +466,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['hybrid_limit_led'] = CustomLEDLabel()
             self.store['content']['display']['hybrid_limit_led'].setFixedSize(16, 16)
-            self.store['content']['display']['hybrid_limit_led'].state(False)
+            self.store['content']['display']['hybrid_limit_led'].state('off')
             self.store['content']['display']['hybrid_limit_led'].sound = 'limit'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_limit_led'], 3, 6)
 
@@ -476,7 +476,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['upshift_beep_led'] = CustomLEDLabel()
             self.store['content']['display']['upshift_beep_led'].setFixedSize(16, 16)
-            self.store['content']['display']['upshift_beep_led'].state(False)
+            self.store['content']['display']['upshift_beep_led'].state('off')
             self.store['content']['display']['upshift_beep_led'].sound = 'upshift_beep'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift_beep_led'], 4, 6)
 
@@ -486,7 +486,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['downshift_beep_led'] = CustomLEDLabel()
             self.store['content']['display']['downshift_beep_led'].setFixedSize(16, 16)
-            self.store['content']['display']['downshift_beep_led'].state(False)
+            self.store['content']['display']['downshift_beep_led'].state('off')
             self.store['content']['display']['downshift_beep_led'].sound = 'downshift_beep'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift_beep_led'], 5, 6)
 
@@ -496,7 +496,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['p2p_active_led'] = CustomLEDLabel()
             self.store['content']['display']['p2p_active_led'].setFixedSize(16, 16)
-            self.store['content']['display']['p2p_active_led'].state(False)
+            self.store['content']['display']['p2p_active_led'].state('off')
             self.store['content']['display']['p2p_active_led'].sound = 'p2p_active'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active_led'], 6, 6)
 
@@ -1229,13 +1229,19 @@ class MainWindow(QMainWindow):
                     sound = item[:-4]
                     if sound == 'p2p_active':
                         if sfx.audio['p2p_active'].get_num_channels() != 0:
-                            self.store['content']['display'][item].state(True)
+                            self.store['content']['display'][item].state('active')
                         else:
-                            self.store['content']['display'][item].state(False)
+                            if fn.check_audio_setting(sound):
+                                self.store['content']['display'][item].state('standby')
+                            else:
+                                self.store['content']['display'][item].state('off')
                     elif sfx.audio[sound].get_num_channels() != 0:
-                        self.store['content']['display'][item].state(True)
+                        self.store['content']['display'][item].state('active')
                     else:
-                        self.store['content']['display'][item].state(False)
+                        if fn.check_audio_setting(sound):
+                            self.store['content']['display'][item].state('standby')
+                        else:
+                            self.store['content']['display'][item].state('off')
             if self.check_profile_list():
                 self.refresh_profile_list()
         except Exception as e:
@@ -2102,34 +2108,43 @@ class CustomDoubleSpinBox(QDoubleSpinBox):
             fn.error_handling(e, "interface.wheelEvent() QDoubleSpinBox")
 
 class CustomLEDLabel(QLabel):
-    greenLED = """
+    color = {
+        'greenLED': """
                 background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
                                   stop:0 #33ff33, stop:1 #008800);
                 border-radius: 8px;
                 border: 1px;
-            """
-    redLED = """
+            """,
+        'redLED': """
                 background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
                                   stop:0 #ff3333, stop:1 #880000);
                 border-radius: 8px;
                 border: 1px;
-            """
-    active = False
+            """,
+        'offLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #808080, stop:1 #202020);
+                border-radius: 8px;
+                border: 1px;
+            """,
+    }
+    code = { # color per signal defined here
+        'off': 'offLED',
+        'standby': 'redLED',
+        'active': 'greenLED',
+    }
+    active = "None"
     sound = "None"
     def __init__(self):
         super().__init__()
         self.layout = QVBoxLayout()
         self.label = QLabel()
-        self.setStyleSheet(self.redLED)
-    def state(self, signal): # True = on (green), False = off (red)
-        if signal and not self.active:
-            print(self.sound, "LED turning on")
-            self.setStyleSheet(self.greenLED)
-            self.active = True
-        elif not signal and self.active:
-            print(self.sound, "LED turning off")
-            self.setStyleSheet(self.redLED)
-            self.active = False
+        self.setStyleSheet(self.color[self.code['off']])
+    def state(self, signal): # 'off' = sound disabled in settings, 'standby' = sound , 'active' = sound playing
+        if signal != self.active:
+            print(self.sound, "LED turning to", signal)
+            self.setStyleSheet(self.color[self.code[signal]])
+            self.active = signal
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])

@@ -505,6 +505,24 @@ def open_browser(link):
     except Exception as e:
         error_handling(e, "functions.open_browser()")
 
+def check_audio_setting(sound): # returns true if the settings for this sound are on, returns false if settings for this sound are off
+    if not var.settings['local']['audio']:
+        return False
+    elif sound == 'hybrid_low':
+        return var.settings['local']['hybrid_low_audio']
+    elif sound == 'hybrid_high':
+        return var.settings['local']['hybrid_high_audio']
+    elif sound == 'hybrid_limit':
+        return var.settings['local']['hybrid_limit_audio']
+    elif sound == 'upshift_beep':
+        return var.settings['local']['upshift_beep']
+    elif sound == 'downshift_beep':
+        return var.settings['local']['downshift_beep']
+    elif sound == 'p2p_active':
+        return var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']
+    else:
+        print("something went wrong in fn.check_aduio_setting", sound)
+
 def error_handling(e, loc):
     error = traceback.format_exc()
     print("!!! An error has occured !!! :(")
