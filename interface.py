@@ -424,6 +424,7 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['weight_jacker_lcd'] = QLCDNumber()
             self.store['content']['display']['weight_jacker_lcd'].display(0)
             self.store['content']['display']['weight_jacker_lcd'].setSegmentStyle(self.store['content']['weight_jacker']['lcd'].segmentStyle())
+            self.store['content']['display']['weight_jacker_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_lcd'], 1, 2)
 
             self.store['content']['display']['weight_jacker_axis'] = QProgressBar()
@@ -510,6 +511,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['front_roll_bar_lcd'] = QLCDNumber()
             self.store['content']['display']['front_roll_bar_lcd'].display(0)
+            self.store['content']['display']['front_roll_bar_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_lcd'], 2, 2)
 
             self.store['content']['display']['front_roll_bar_axis'] = QProgressBar()
@@ -528,6 +530,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['rear_roll_bar_lcd'] = QLCDNumber()
             self.store['content']['display']['rear_roll_bar_lcd'].display(0)
+            self.store['content']['display']['rear_roll_bar_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_lcd'], 3, 2)
 
             self.store['content']['display']['rear_roll_bar_axis'] = QProgressBar()
@@ -546,6 +549,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['fuel_map_lcd'] = QLCDNumber()
             self.store['content']['display']['fuel_map_lcd'].display(0)
+            self.store['content']['display']['fuel_map_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_lcd'], 4, 2)
 
             self.store['content']['display']['fuel_map_axis'] = QProgressBar()
@@ -564,6 +568,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['clutch_lcd'] = QLCDNumber()
             self.store['content']['display']['clutch_lcd'].display(0)
+            self.store['content']['display']['clutch_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_lcd'], 5, 2)
 
             self.store['content']['display']['clutch_axis'] = QProgressBar()
@@ -582,6 +587,7 @@ class MainWindow(QMainWindow):
 
             self.store['content']['display']['throttle_lcd'] = QLCDNumber()
             self.store['content']['display']['throttle_lcd'].display(0)
+            self.store['content']['display']['throttle_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_lcd'], 6, 2)
 
             self.store['content']['display']['throttle_axis'] = QProgressBar()
@@ -589,6 +595,38 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['throttle_axis'].setMinimum(0)
             self.store['content']['display']['throttle_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 3)
+
+            self.store['content']['display']['soc_label'] = QLabel()
+            self.store['content']['display']['soc_label'].setText(var.lang['soc'])
+            self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_label'], 7, 0)
+
+            self.store['content']['display']['soc_lcd'] = QLCDNumber()
+            self.store['content']['display']['soc_lcd'].display(str(0.00))
+            self.store['content']['display']['soc_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_lcd'], 7, 2)
+
+            self.store['content']['display']['soc_axis'] = QProgressBar()
+            self.store['content']['display']['soc_axis'].setTextVisible(False)
+            self.store['content']['display']['soc_axis'].setMinimum(0)
+            self.store['content']['display']['soc_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_axis'], 7, 3)
+
+            self.store['content']['display']['deploy_lim_label'] = QLabel()
+            self.store['content']['display']['deploy_lim_label'].setText(var.lang['deploy_lim'])
+            self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_label'], 8, 0)
+
+            self.store['content']['display']['deploy_lim_lcd'] = QLCDNumber()
+            self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
+            self.store['content']['display']['deploy_lim_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_lcd'], 8, 2)
+
+            self.store['content']['display']['deploy_lim_axis'] = QProgressBar()
+            self.store['content']['display']['deploy_lim_axis'].setTextVisible(False)
+            self.store['content']['display']['deploy_lim_axis'].setMinimum(0)
+            self.store['content']['display']['deploy_lim_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_axis'], 8, 3)
 
             self.tabs['display'].setLayout(self.tabs['display'].layout)
         except Exception as e:
@@ -1133,10 +1171,14 @@ class MainWindow(QMainWindow):
                 self.store['content']['hybrid']['deploy_lim_axis'].update()
                 self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
                 self.store['content']['hybrid']['soc_lcd'].update()
+                self.store['content']['display']['soc_lcd'].display(str(0.00))
+                self.store['content']['display']['soc_lcd'].update()
                 self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
                 self.store['content']['hybrid']['deploy_lim_lcd'].update()
                 self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
                 self.update_limits()
                 var.gearing = []
             if var.status['refresh_labels']:
@@ -1185,30 +1227,50 @@ class MainWindow(QMainWindow):
                     self.store['content']['display'][func + '_lcd'].update()
             if (self.store['content']['display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['display']['car_id']]:
                 self.store['content']['hybrid']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
                     soc_pct = self.ir['EnergyERSBatteryPct']
                     self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
                     self.store['content']['hybrid']['soc_axis'].update()
                     self.store['content']['hybrid']['soc_lcd'].display(str(round(soc_pct*100,1)))
                     self.store['content']['hybrid']['soc_lcd'].update()
+                    self.store['content']['display']['soc_axis'].setValue(int(soc_pct*100))
+                    self.store['content']['display']['soc_axis'].update()
+                    self.store['content']['display']['soc_lcd'].display(str(round(soc_pct*100,1)))
+                    self.store['content']['display']['soc_lcd'].update()
                     deploy_lim_pct = self.ir['EnergyMGU_KLapDeployPct']
                     self.store['content']['hybrid']['deploy_lim_axis'].setValue(int(deploy_lim_pct*100))
                     self.store['content']['hybrid']['deploy_lim_axis'].update()
                     self.store['content']['hybrid']['deploy_lim_lcd'].display(str(round(deploy_lim_pct*100,1)))
                     self.store['content']['hybrid']['deploy_lim_lcd'].update()
+                    self.store['content']['display']['deploy_lim_axis'].setValue(int(deploy_lim_pct*100))
+                    self.store['content']['display']['deploy_lim_axis'].update()
+                    self.store['content']['display']['deploy_lim_lcd'].display(str(round(deploy_lim_pct*100,1)))
+                    self.store['content']['display']['deploy_lim_lcd'].update()
                 else:
                     self.store['content']['hybrid']['soc_axis'].setValue(0)
                     self.store['content']['hybrid']['soc_axis'].update()
                     self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
                     self.store['content']['hybrid']['soc_lcd'].update()
                     self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['soc_axis'].setValue(0)
+                    self.store['content']['display']['soc_axis'].update()
+                    self.store['content']['display']['soc_lcd'].display(str(0.00))
+                    self.store['content']['display']['soc_lcd'].update()
+                    self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
                     self.lastval['soc'] = 999.0
                     self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
                     self.store['content']['hybrid']['deploy_lim_axis'].update()
                     self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
                     self.store['content']['hybrid']['deploy_lim_lcd'].update()
                     self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['deploy_lim_axis'].setValue(0)
+                    self.store['content']['display']['deploy_lim_axis'].update()
+                    self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
+                    self.store['content']['display']['deploy_lim_lcd'].update()
+                    self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
                     self.lastval['deploy_lim'] = 999.0
                 if self.store['content']['sounds']['sound'].currentText() == "Yes":
                     if self.lastval['soc'] != 999.0:
