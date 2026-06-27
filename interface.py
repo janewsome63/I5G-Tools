@@ -2190,10 +2190,15 @@ class CustomLEDLabel(QLabel):
                 border: 1px;
             """,
     }
-    code = { # color per signal defined here
+    color_code = { # color per signal defined here
         'off': 'offLED',
         'standby': 'redLED',
         'active': 'greenLED',
+    }
+    symbol_code = { # symbol per signal defined here
+        'off': "🔇", # U+1F507
+        'standby': "🔈", # U+1F508
+        'active': "🔊", # U+1F509
     }
     active = "None"
     sound = "None"
@@ -2201,11 +2206,12 @@ class CustomLEDLabel(QLabel):
         super().__init__()
         self.layout = QVBoxLayout()
         self.label = QLabel()
-        self.setStyleSheet(self.color[self.code['off']])
+        self.setStyleSheet(self.color[self.color_code['off']])
     def state(self, signal): # 'off' = sound disabled in settings, 'standby' = sound , 'active' = sound playing
         if signal != self.active:
             print(self.sound, "LED turning to", signal)
-            self.setStyleSheet(self.color[self.code[signal]])
+            self.setStyleSheet(self.color[self.color_code[signal]])
+            self.setText(self.symbol_code[signal])
             self.active = signal
 
 def main():
