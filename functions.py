@@ -72,7 +72,7 @@ def read_config():
                 write_config()
                 var.status['rewrite']['config'] = False
         else:
-            if var.status['first'] == False:
+            if not var.status['first']:
                 response = ctypes.windll.user32.MessageBoxW(0, var.lang['not_found']['config']['body'], var.lang['not_found']['config']['title'], 1)
                 if response == 1:
                     pass
@@ -190,7 +190,7 @@ def read_profile(profile=None):
                                 bind_errors.append([str(function), str(control)])
 
         else:
-            if var.status['first'] == False:
+            if not var.status['first']:
                 text = var.lang['not_found']['profile']['intro'] + profile + var.lang['not_found']['profile']['outro']
                 response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['not_found']['profile']['title'], 1)
                 if response == 1:
@@ -284,7 +284,7 @@ def delete_profile(profile):
             if os.path.exists(path):
                 os.remove(path)
     except Exception as e:
-        error_handling(e)
+        error_handling(e, "functions.delete_profile()")
 
 def get_profiles():
     try:
@@ -526,14 +526,15 @@ def check_audio_setting(sound): # returns true if the settings for this sound ar
 def error_handling(e, loc):
     error = traceback.format_exc()
     print("!!! An error has occured !!! :(")
+    print(str(type(e)) + " " + loc)
     print(error)
     now_pretty = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
-    with open("I5G_Tools_err_" + var.startup_time + ".log", "a") as f:
+    with open("I5G_Tools_err_" + var.backend['startup_time'] + ".log", "a") as f:
         f.write(now_pretty + "\n")
         f.write(error)
         #f.write(f"{type(e)}: {str(e.args)}, {str(e)}\n" + loc + "\n\n")
     # sys.exit(0) # exit program to make it obvious an error occured. Otherwise, the app could continue partially functioning with only part of it in a broken state
 
 def startup_time():
-    var.startup_time = str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))
+    var.backend['startup_time'] = str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))

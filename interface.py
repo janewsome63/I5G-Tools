@@ -1,5 +1,3 @@
-import ast
-
 import devices as dev
 import functions as fn
 import history
@@ -18,7 +16,8 @@ from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayou
 from time import sleep
 import math
 
-# noinspection PyUnresolvedReferences,PyProtectedMember
+
+# noinspection PyUnresolvedReferences,PyNoneFunctionAssignment,PyProtectedMember,PyTypeChecker
 class MainWindow(QMainWindow):
     def __init__(self):
         try:
@@ -1192,9 +1191,9 @@ class MainWindow(QMainWindow):
                     try:
                         var.status['upshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['upshift_offset']
                         var.status['downshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['downshift_offset']
-                    except:
+                    except KeyError or NameError:
                         print("upshift and downshift values failed in updater()")
-                if (var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont'])):
+                if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']):
                     self.irsdk_audio()
                 # if driver just got in car, self.store['running'] = False; var.status['calibration'] = "None"; var.bindings['status'] = { "active": False, "function": None, "control": None, "input": None, }; self.stop_flash_tab_all()
             elif self.ir.is_initialized and not self.ir.is_connected and self.store['content']['display']['car_id'] != "None":
@@ -1927,7 +1926,6 @@ class MainWindow(QMainWindow):
                 guid = var.id_table[i][1]
                 self.store['content']['settings']['axis_threshold_device_guid'] = str(guid)
                 old_high = self.store['content']['settings']['high_threshold'].value()
-                old_low = self.store['content']['settings']['low_threshold'].value()
                 new_high = int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)
                 new_low = int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)
 
@@ -2115,13 +2113,13 @@ class MainWindow(QMainWindow):
                 self.lastval['CarIdxList'] = [-1] * length
                 while index >= 0:
                     self.lastval['CarIdxList'][index] = self.ir['DriverInfo']['Drivers'][index]['CarIdx']
-                    if (var.settings['local']['p2p_behind_thresh'] == -1 or (self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] > 0 and self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh']/1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                    if (var.settings['local']['p2p_behind_thresh'] == -1 or (0 < self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh'] / 1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                         if not var.settings['local']['p2p_behind_closest_car']:
                             self.lastval['CarIdx_Within_p2p_Range'].append(index)
                         else:
                             if (self.lastval['CarIdx_Within_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] > self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_p2p_Range'][0]]) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                                 self.lastval['CarIdx_Within_p2p_Range'] = [index]
-                    if (var.settings['local']['p2p_behind_thresh_cont'] == -1 or (self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] > 0 and self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh_cont']/1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                    if (var.settings['local']['p2p_behind_thresh_cont'] == -1 or (0 < self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh_cont'] / 1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                         if not var.settings['local']['p2p_behind_closest_car']:
                             self.lastval['CarIdx_Within_Cont_p2p_Range'].append(index)
                         else:
@@ -2136,28 +2134,28 @@ class MainWindow(QMainWindow):
                         sfx.audio['p2p_active'].stop()
                     else:
                         if var.settings['local']['p2p_behind_audio_cont']:
-                            if self.lastval['CarIdx_Within_Cont_p2p_Range'] == []:
+                            if not self.lastval['CarIdx_Within_Cont_p2p_Range']:
                                 var.status['p2p_sound_active']['loop'] = False
                             # elif var.status['p2p_sound_active']['loop'] == False:
                             else:
                                 var.status['p2p_sound_active']['loop'] = False
                                 for CarIdx in self.lastval['CarIdx_Within_Cont_p2p_Range']:
-                                    if self.lastval['CarIdxp2p'][CarIdx] == True:
+                                    if self.lastval['CarIdxp2p'][CarIdx]:
                                         var.status['p2p_sound_active']['loop'] = True
-                                if var.status['p2p_sound_active']['loop'] == True:
+                                if var.status['p2p_sound_active']['loop']:
                                     fn.start_thread(sfx.play_loop('p2p_active'))
                         else:
                             var.status['p2p_sound_active']['loop'] = False
                         if var.settings['local']['p2p_behind_audio']:
-                            if self.lastval['CarIdx_Within_p2p_Range'] == []:
+                            if not self.lastval['CarIdx_Within_p2p_Range']:
                                 var.status['p2p_sound_active']['single'] = False
-                            elif var.status['p2p_sound_active']['single'] == False:
+                            elif not var.status['p2p_sound_active']['single']:
                             # else:
                                 var.status['p2p_sound_active']['single'] = False
                                 for CarIdx in self.lastval['CarIdx_Within_p2p_Range']:
-                                    if self.lastval['CarIdxp2p'][CarIdx] == True:
+                                    if self.lastval['CarIdxp2p'][CarIdx]:
                                         var.status['p2p_sound_active']['single'] = True
-                                if var.status['p2p_sound_active']['single'] == True:
+                                if var.status['p2p_sound_active']['single']:
                                     fn.start_thread(sfx.play('p2p_active'))
                                 elif sfx.p2p_active.get_num_channels() == 0:
                                     sfx.status['p2p_active_single'] = False
@@ -2216,7 +2214,7 @@ class MainWindow(QMainWindow):
                 
                 if self.lastval['IsOnTrack_beep'] and self.lastval['Gear'] > 0: # determine if a beep is required now
                     if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
-                        if var.settings['local']['beep_mode'] == True: # True -> fixed beep setting
+                        if var.settings['local']['beep_mode']: # True -> fixed beep setting
                             if var.settings['local']['upshift_beep'] and len(var.gearing) >= self.lastval['Gear'] and var.gearing[self.lastval['Gear']-1] != [] and var.gearing[self.lastval['Gear']-1][1] != 0 and var.status['upshift_val'] > 0:
                                 if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val'] + (self.lastval['p2p'] == True)*300: # p2p pushes upshift beep up by 300RPM
                                     # print("call play upshift_beep ", var.status['upshift_val'], self.lastval['Speed'], self.lastval['Gear'], var.gearing)

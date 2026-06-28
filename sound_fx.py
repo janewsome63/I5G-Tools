@@ -4,7 +4,6 @@ import functions as fn
 import pygame as p
 import sys
 import shutil
-from time import sleep
 
 p.mixer.init()
 
@@ -21,7 +20,9 @@ status = {
     "p2p_active_loop": False,
 }
 
+# noinspection PyBroadException
 try:
+    # noinspection PyProtectedMember
     resources = sys._MEIPASS
 except:
     resources = os.path.abspath(".")
@@ -47,7 +48,7 @@ audio = {
 
 def play(notif):
     try:
-        if status[notif] == False:
+        if not status[notif]:
             if not notif == "p2p_active":
                 print("playing notif: ", notif)
             if notif == "low":
@@ -96,7 +97,7 @@ def play(notif):
 def play_loop(notif):
     try:
         if notif == "p2p_active":
-            if status["p2p_active_loop"] == False:
+            if not status["p2p_active_loop"]:
                 print("playing notif on loop: ", notif)
                 audio['p2p_active'].stop() # if currently playing single
                 status['p2p_active_single'] = False
@@ -133,7 +134,7 @@ def play_num_loop(notif, num):
 
 def stop_loop(notif):
     try:
-        if status[notif] == True:
+        if status[notif]:
             print("stopping notif on loop: ", notif)
             if notif == "p2p_active":
                 audio['p2p_active'].stop()

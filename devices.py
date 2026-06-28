@@ -84,18 +84,17 @@ def remove_device(instance):
 
 def log_event(instance_id, type, num, value):
     try:
-        # print(instance_id, type, num, value)
-        # print(id_table)
         if instance_id != -1:
             [index, guid] = var.id_table[instance_id]
         else:
             [index, guid] = [-1, "keyboard"]
-        # print(index, guid)
-        # print(device_info)
-        # if index != -1:
-        #     guid = p.joystick.Joystick(index).get_guid()
-        # else:
-        #     guid = "-1"
+
+        if index != -1:
+            #guid = p.joystick.Joystick(index).get_guid()
+            pass
+        else:
+            #guid = "-1"
+            pass
         if guid in device_info:
             if type == "button":
                 if "buttons" in device_info[guid] and num in device_info[guid]['buttons']:

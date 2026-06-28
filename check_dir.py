@@ -48,6 +48,6 @@ def run():
                     try:
                         shutil.move(source_path, target_path)
                     except Exception as e:
-                        print("Error moving file {file}: {e}")
+                        print("Error moving file {file}: " + str(e))
     except Exception as e:
         fn.error_handling(e, "check_dir.run()")
