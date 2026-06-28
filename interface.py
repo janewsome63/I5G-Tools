@@ -43,7 +43,9 @@ class MainWindow(QMainWindow):
                 "timer": QTimer(),
                 "thread_pool": QThreadPool(),
                 "axis": None,
+                "button": None,
                 "pct": None,
+                "state": None,
             }
 
             self.layout = QVBoxLayout()
@@ -314,67 +316,114 @@ class MainWindow(QMainWindow):
 
             self.tabs['hybrid'].layout = QGridLayout()
 
-            self.store['content']['hybrid']['soc_label'] = QLabel()
-            self.store['content']['hybrid']['soc_label'].setText(var.lang['soc'])
-            self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_label'], 0, 0)
+            # self.store['content']['hybrid']['soc_label'] = QLabel()
+            # self.store['content']['hybrid']['soc_label'].setText(var.lang['soc_label'])
+            # self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_label'], 0, 0)
+            #
+            # self.store['content']['hybrid']['soc_lcd'] = QLCDNumber()
+            # self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
+            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_lcd'], 0, 1)
+            #
+            # self.store['content']['hybrid']['soc_axis'] = QProgressBar()
+            # self.store['content']['hybrid']['soc_axis'].setTextVisible(False)
+            # self.store['content']['hybrid']['soc_axis'].setMinimum(0)
+            # self.store['content']['hybrid']['soc_axis'].setMaximum(100)
+            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 2)
+            #
+            # self.store['content']['hybrid']['deploy_lim_label'] = QLabel()
+            # self.store['content']['hybrid']['deploy_lim_label'].setText(var.lang['deploy_lim_label'])
+            # self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_label'], 1, 0)
+            #
+            # self.store['content']['hybrid']['deploy_lim_lcd'] = QLCDNumber()
+            # self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
+            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_lcd'], 1, 1)
+            #
+            # self.store['content']['hybrid']['deploy_lim_axis'] = QProgressBar()
+            # self.store['content']['hybrid']['deploy_lim_axis'].setTextVisible(False)
+            # self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
+            # self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
+            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 2)
 
-            self.store['content']['hybrid']['soc_lcd'] = QLCDNumber()
-            self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_lcd'], 0, 1)
+            self.store['content']['hybrid']['regen_led'] = CustomButtonLEDLabel()
+            self.store['content']['hybrid']['regen_led'].setFixedSize(92, 21)
+            self.store['content']['hybrid']['regen_led'].label_text = var.lang['regen']
+            self.store['content']['hybrid']['regen_led'].state('standby')
+            self.store['content']['hybrid']['regen_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_led'], 0, 0)
 
-            self.store['content']['hybrid']['soc_axis'] = QProgressBar()
-            self.store['content']['hybrid']['soc_axis'].setTextVisible(False)
-            self.store['content']['hybrid']['soc_axis'].setMinimum(0)
-            self.store['content']['hybrid']['soc_axis'].setMaximum(100)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 2)
+            self.store['content']['hybrid']['deploy_led'] = CustomButtonLEDLabel()
+            self.store['content']['hybrid']['deploy_led'].setFixedSize(92, 21)
+            self.store['content']['hybrid']['deploy_led'].label_text = var.lang['deploy']
+            self.store['content']['hybrid']['deploy_led'].state('standby')
+            self.store['content']['hybrid']['deploy_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_led'], 0, 2)
 
-            self.store['content']['hybrid']['deploy_lim_label'] = QLabel()
-            self.store['content']['hybrid']['deploy_lim_label'].setText(var.lang['deploy_lim'])
-            self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_label'], 1, 0)
+            self.store['content']['hybrid']['regen_calibrate'] = QPushButton()
+            self.store['content']['hybrid']['regen_calibrate'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_calibrate'].setText(var.lang['calibrate'])
+            self.store['content']['hybrid']['regen_calibrate'].clicked.connect(lambda: self.calibrate_button_start("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_calibrate'], 1, 0)
 
-            self.store['content']['hybrid']['deploy_lim_lcd'] = QLCDNumber()
-            self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_lcd'], 1, 1)
+            self.store['content']['hybrid']['deploy_calibrate'] = QPushButton()
+            self.store['content']['hybrid']['deploy_calibrate'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_calibrate'].setText(var.lang['calibrate'])
+            self.store['content']['hybrid']['deploy_calibrate'].clicked.connect(lambda: self.calibrate_button_start("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_calibrate'], 1, 2)
 
-            self.store['content']['hybrid']['deploy_lim_axis'] = QProgressBar()
-            self.store['content']['hybrid']['deploy_lim_axis'].setTextVisible(False)
-            self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
-            self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 2)
-            
+            self.store['content']['hybrid']['regen_toggle_label'] = QLabel()
+            self.store['content']['hybrid']['regen_toggle_label'].setText(var.lang['regen'] + " " + var.lang['toggle'] + ":")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_toggle_label'], 2, 0)
+
+            self.store['content']['hybrid']['deploy_toggle_label'] = QLabel()
+            self.store['content']['hybrid']['deploy_toggle_label'].setText(var.lang['deploy'] + " " + var.lang['toggle'] + ":")
+            self.store['content']['hybrid']['deploy_toggle_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_toggle_label'], 2, 1)
+
+            self.store['content']['hybrid']['regen_toggle'] = CustomComboBox()
+            self.store['content']['hybrid']['regen_toggle'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_toggle'].addItems((var.lang['hold'], var.lang['toggle']))
+            self.store['content']['hybrid']['regen_toggle'].currentIndexChanged.connect(lambda: self.toggle_mode("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_toggle'], 2, 1)
+
+            self.store['content']['hybrid']['deploy_toggle'] = CustomComboBox()
+            self.store['content']['hybrid']['deploy_toggle'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_toggle'].addItems((var.lang['hold'], var.lang['toggle']))
+            self.store['content']['hybrid']['deploy_toggle'].currentIndexChanged.connect(lambda: self.toggle_mode("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_toggle'], 2, 2)
+
             self.store['content']['hybrid']['regen_label'] = QLabel()
-            self.store['content']['hybrid']['regen_label'].setText(var.lang['regen'])
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_label'], 2, 0)
-
-            self.store['content']['hybrid']['regen_bind'] = QPushButton()
-            self.store['content']['hybrid']['regen_bind'].setFixedSize(95, 25)
-            self.store['content']['hybrid']['regen_bind'].setText(var.lang['bind'])
-            self.store['content']['hybrid']['regen_bind'].clicked.connect(lambda: self.bind_start("hybrid", "regen"))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_bind'], 2, 1)
+            self.store['content']['hybrid']['regen_label'].setText(var.lang['regen'] + ":")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_label'], 3, 0)
 
             self.store['content']['hybrid']['regen_device'] = QLineEdit()
             self.store['content']['hybrid']['regen_device'].setFixedHeight(25)
             self.store['content']['hybrid']['regen_device'].setReadOnly(True)
             self.store['content']['hybrid']['regen_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_device'], 2, 2)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_device'], 3, 1)
+
+            self.store['content']['hybrid']['regen_bind'] = QPushButton()
+            self.store['content']['hybrid']['regen_bind'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_bind'].setText(var.lang['bind'])
+            self.store['content']['hybrid']['regen_bind'].clicked.connect(lambda: self.bind_start("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_bind'], 3, 2)
 
             self.store['content']['hybrid']['deploy_label'] = QLabel()
-            self.store['content']['hybrid']['deploy_label'].setText(var.lang['deploy'])
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_label'], 3, 0)
-
-            self.store['content']['hybrid']['deploy_bind'] = QPushButton()
-            self.store['content']['hybrid']['deploy_bind'].setFixedSize(95, 25)
-            self.store['content']['hybrid']['deploy_bind'].setText(var.lang['bind'])
-            self.store['content']['hybrid']['deploy_bind'].clicked.connect(lambda: self.bind_start("hybrid", "deploy"))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_bind'], 3, 1)
+            self.store['content']['hybrid']['deploy_label'].setText(var.lang['deploy'] + ":")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_label'], 4, 0)
 
             self.store['content']['hybrid']['deploy_device'] = QLineEdit()
             self.store['content']['hybrid']['deploy_device'].setFixedHeight(25)
             self.store['content']['hybrid']['deploy_device'].setReadOnly(True)
             self.store['content']['hybrid']['deploy_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_device'], 3, 2)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_device'], 4, 1)
+
+            self.store['content']['hybrid']['deploy_bind'] = QPushButton()
+            self.store['content']['hybrid']['deploy_bind'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_bind'].setText(var.lang['bind'])
+            self.store['content']['hybrid']['deploy_bind'].clicked.connect(lambda: self.bind_start("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_bind'], 4, 2)
 
             self.tabs['hybrid'].setLayout(self.tabs['hybrid'].layout)
 
@@ -413,8 +462,12 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['car_id'].setWordWrap(True)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id'], 0, 3)
 
+            self.store['content']['display']['sounds'] = QLabel()
+            self.store['content']['display']['sounds'].setText("Audio")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['sounds'], 0, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
             self.store['content']['display']['weight_jacker_label'] = QLabel()
-            self.store['content']['display']['weight_jacker_label'].setText(var.lang['weight_jacker'])
+            self.store['content']['display']['weight_jacker_label'].setText(var.lang['weight_jacker'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_label'], 1, 0)
 
             self.store['content']['display']['weight_jacker_limits'] = QLabel()
@@ -433,10 +486,6 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['weight_jacker_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 3)
 
-            self.store['content']['display']['sounds'] = QLabel()
-            self.store['content']['display']['sounds'].setText("Audio")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['sounds'], 0, 5, alignment=Qt.AlignmentFlag.AlignRight)
-
             self.store['content']['display']['soc_low_spacer'] = QLabel()
             self.store['content']['display']['soc_low_spacer'].setText(" " * 5)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_low_spacer'], 1, 4)
@@ -451,58 +500,8 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['hybrid_low_led'].sound = 'low'
             self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_low_led'], 1, 6)
 
-            self.store['content']['display']['soc_high'] = QLabel()
-            self.store['content']['display']['soc_high'].setText("SoC High")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_high'], 2, 5, alignment=Qt.AlignmentFlag.AlignRight)
-
-            self.store['content']['display']['hybrid_high_led'] = CustomLEDLabel()
-            self.store['content']['display']['hybrid_high_led'].setFixedSize(16, 16)
-            self.store['content']['display']['hybrid_high_led'].state('off')
-            self.store['content']['display']['hybrid_high_led'].sound = 'high'
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_high_led'], 2, 6)
-
-            self.store['content']['display']['deploy_limit'] = QLabel()
-            self.store['content']['display']['deploy_limit'].setText("Deploy Lim")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_limit'], 3, 5, alignment=Qt.AlignmentFlag.AlignRight)
-
-            self.store['content']['display']['hybrid_limit_led'] = CustomLEDLabel()
-            self.store['content']['display']['hybrid_limit_led'].setFixedSize(16, 16)
-            self.store['content']['display']['hybrid_limit_led'].state('off')
-            self.store['content']['display']['hybrid_limit_led'].sound = 'limit'
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_limit_led'], 3, 6)
-
-            self.store['content']['display']['upshift'] = QLabel()
-            self.store['content']['display']['upshift'].setText("Upshift")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift'], 4, 5, alignment=Qt.AlignmentFlag.AlignRight)
-
-            self.store['content']['display']['upshift_beep_led'] = CustomLEDLabel()
-            self.store['content']['display']['upshift_beep_led'].setFixedSize(16, 16)
-            self.store['content']['display']['upshift_beep_led'].state('off')
-            self.store['content']['display']['upshift_beep_led'].sound = 'upshift_beep'
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift_beep_led'], 4, 6)
-
-            self.store['content']['display']['downshift'] = QLabel()
-            self.store['content']['display']['downshift'].setText("Downshift")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift'], 5, 5, alignment=Qt.AlignmentFlag.AlignRight)
-
-            self.store['content']['display']['downshift_beep_led'] = CustomLEDLabel()
-            self.store['content']['display']['downshift_beep_led'].setFixedSize(16, 16)
-            self.store['content']['display']['downshift_beep_led'].state('off')
-            self.store['content']['display']['downshift_beep_led'].sound = 'downshift_beep'
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift_beep_led'], 5, 6)
-
-            self.store['content']['display']['p2p_active'] = QLabel()
-            self.store['content']['display']['p2p_active'].setText("P2P Warn")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active'], 6, 5, alignment=Qt.AlignmentFlag.AlignRight)
-
-            self.store['content']['display']['p2p_active_led'] = CustomLEDLabel()
-            self.store['content']['display']['p2p_active_led'].setFixedSize(16, 16)
-            self.store['content']['display']['p2p_active_led'].state('off')
-            self.store['content']['display']['p2p_active_led'].sound = 'p2p_active'
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active_led'], 6, 6)
-
             self.store['content']['display']['front_roll_bar_label'] = QLabel()
-            self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'])
+            self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_label'], 2, 0)
 
             self.store['content']['display']['front_roll_bar_limits'] = QLabel()
@@ -520,8 +519,18 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['front_roll_bar_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_axis'], 2, 3)
 
+            self.store['content']['display']['soc_high'] = QLabel()
+            self.store['content']['display']['soc_high'].setText("SoC High")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_high'], 2, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_high_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_high_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_high_led'].state('off')
+            self.store['content']['display']['hybrid_high_led'].sound = 'high'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_high_led'], 2, 6)
+
             self.store['content']['display']['rear_roll_bar_label'] = QLabel()
-            self.store['content']['display']['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'])
+            self.store['content']['display']['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_label'], 3, 0)
 
             self.store['content']['display']['rear_roll_bar_limits'] = QLabel()
@@ -539,8 +548,18 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['rear_roll_bar_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_axis'], 3, 3)
 
+            self.store['content']['display']['deploy_limit'] = QLabel()
+            self.store['content']['display']['deploy_limit'].setText("Deploy Lim")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_limit'], 3, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_limit_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_limit_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_limit_led'].state('off')
+            self.store['content']['display']['hybrid_limit_led'].sound = 'limit'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_limit_led'], 3, 6)
+
             self.store['content']['display']['fuel_map_label'] = QLabel()
-            self.store['content']['display']['fuel_map_label'].setText(var.lang['fuel_map'])
+            self.store['content']['display']['fuel_map_label'].setText(var.lang['fuel_map'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_label'], 4, 0)
 
             self.store['content']['display']['fuel_map_limits'] = QLabel()
@@ -558,8 +577,18 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['fuel_map_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_axis'], 4, 3)
 
+            self.store['content']['display']['upshift'] = QLabel()
+            self.store['content']['display']['upshift'].setText("Upshift")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift'], 4, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['upshift_beep_led'] = CustomLEDLabel()
+            self.store['content']['display']['upshift_beep_led'].setFixedSize(16, 16)
+            self.store['content']['display']['upshift_beep_led'].state('off')
+            self.store['content']['display']['upshift_beep_led'].sound = 'upshift_beep'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift_beep_led'], 4, 6)
+
             self.store['content']['display']['clutch_label'] = QLabel()
-            self.store['content']['display']['clutch_label'].setText(var.lang['clutch'])
+            self.store['content']['display']['clutch_label'].setText(var.lang['clutch'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_label'], 5, 0)
 
             # self.store['content']['display']['clutch_limits'] = QLabel()
@@ -577,8 +606,18 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['clutch_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_axis'], 5, 3)
 
+            self.store['content']['display']['downshift'] = QLabel()
+            self.store['content']['display']['downshift'].setText("Downshift")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift'], 5, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['downshift_beep_led'] = CustomLEDLabel()
+            self.store['content']['display']['downshift_beep_led'].setFixedSize(16, 16)
+            self.store['content']['display']['downshift_beep_led'].state('off')
+            self.store['content']['display']['downshift_beep_led'].sound = 'downshift_beep'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift_beep_led'], 5, 6)
+
             self.store['content']['display']['throttle_label'] = QLabel()
-            self.store['content']['display']['throttle_label'].setText(var.lang['throttle'])
+            self.store['content']['display']['throttle_label'].setText(var.lang['throttle'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_label'], 6, 0)
 
             # self.store['content']['display']['throttle_limits'] = QLabel()
@@ -596,8 +635,18 @@ class MainWindow(QMainWindow):
             self.store['content']['display']['throttle_axis'].setMaximum(100)
             self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 3)
 
+            self.store['content']['display']['p2p_active'] = QLabel()
+            self.store['content']['display']['p2p_active'].setText("P2P Warn")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active'], 6, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['p2p_active_led'] = CustomLEDLabel()
+            self.store['content']['display']['p2p_active_led'].setFixedSize(16, 16)
+            self.store['content']['display']['p2p_active_led'].state('off')
+            self.store['content']['display']['p2p_active_led'].sound = 'p2p_active'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active_led'], 6, 6)
+
             self.store['content']['display']['soc_label'] = QLabel()
-            self.store['content']['display']['soc_label'].setText(var.lang['soc'])
+            self.store['content']['display']['soc_label'].setText(var.lang['soc'] + ":")
             self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_label'], 7, 0)
 
@@ -613,7 +662,7 @@ class MainWindow(QMainWindow):
             self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_axis'], 7, 3)
 
             self.store['content']['display']['deploy_lim_label'] = QLabel()
-            self.store['content']['display']['deploy_lim_label'].setText(var.lang['deploy_lim'])
+            self.store['content']['display']['deploy_lim_label'].setText(var.lang['deploy_limit'] + ":")
             self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_label'], 8, 0)
 
@@ -1113,8 +1162,12 @@ class MainWindow(QMainWindow):
                         value = int(round((value / var.step[function]) + 1))
 
                     self.store['content'][function]['switch'].setValue(value)
-                elif function == "hybrid":
-                    pass
+                elif function in self.store['content'] and function == "hybrid":
+                    for control in var.status[function]:
+                        if var.status[function][control]['state']:
+                            self.store['content'][function][control + '_led'].state('active')
+                        elif not var.status[function][control]['state']:
+                            self.store['content'][function][control + '_led'].state('standby')
 
             self.display()
 
@@ -1330,13 +1383,22 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def calibrate_button(self):
         try:
-            if self.store['button'] in self.store['content']:
-                self.store['content'][self.store['button']]['calibrate'].setText(var.lang['calibrating'])
+            if self.store['button'][0] in self.store['content']:
+                self.store['content'][self.store['button'][0]][self.store['button'][1] + '_calibrate'].setText(var.lang['calibrating'])
             else:
                 print("Warning: calibrate_button()")
 
-            vjoy.calibrate_button(self.store['button'])
-            self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
+            vjoy.set_button(self.store['button'][1], True)
+            var.status[self.store['button'][0]][self.store['button'][1]]['state'] = True
+            var.status['calibration'] += "Done"
+            sleep(1)
+            vjoy.set_button(self.store['button'][1], False)
+            var.status[self.store['button'][0]][self.store['button'][1]]['state'] = False
+            sleep(1)
+            self.calibrate_button_start(self.store['button'][0], self.store['button'][1])
+            self.store['content'][self.store['button'][0]][self.store['button'][1] + '_calibrate'].setText(var.lang['calibrate'])
+            vjoy.set_button(self.store['button'][1], self.store['state'])
+            var.status[self.store['button'][0]][self.store['button'][1]]['state'] = self.store['state']
         except Exception as e:
             fn.error_handling(e, "interface.calibrate_button()")
 
@@ -1367,6 +1429,31 @@ class MainWindow(QMainWindow):
                 self.start_flash_tab(func_pass)
         except Exception as e:
             fn.error_handling(e, "interface.calibrate_axis_start()")
+
+    @pyqtSlot()
+    def calibrate_button_start(self, func, con):
+        try:
+            if not self.store['running'] and var.status['calibration'] == "None":
+                self.store['button'] = (func, con)
+                self.store['running'] = True
+                var.status['calibration'] = func
+                sleep(0.1) #wait for loops to stop
+                self.store['state'] = var.status[func][con]['state']
+                self.store['thread_pool'].start(self.calibrate_button)
+            elif func + "Done" == var.status['calibration']:
+                var.status['calibration'] = "None"
+                self.store['running'] = False
+                if func in var.status['flash_tab']:
+                    var.status['flash_tab'].remove(func)
+                    self.stop_flash_tab(func)
+            elif var.status['calibration'] != "None":
+                func_pass = var.status['calibration']
+                for function in var.bindings:
+                    if function + "Done" == func_pass:
+                        func_pass = function
+                self.start_flash_tab(func_pass)
+        except Exception as e:
+            fn.error_handling(e, "interface.calibrate_button_start()")
 
     @pyqtSlot()
     def increment(self, func):
@@ -1407,9 +1494,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def switch_mode(self, func):
         try:
-            if self.store['content'][func]['switch_mode'].currentText() == "Toggle":
+            if self.store['content'][func]['switch_mode'].currentText() == var.lang['toggle']:
                 var.settings[func]['toggle'] = True
-            elif self.store['content'][func]['switch_mode'].currentText() == "Hold":
+            elif self.store['content'][func]['switch_mode'].currentText() == var.lang['hold']:
                 var.status[func]['switched'] = False
                 vjoy.set_axis(func, var.status[func]['primary'])
                 var.settings[func]['toggle'] = False
@@ -1427,6 +1514,17 @@ class MainWindow(QMainWindow):
             var.status['rewrite_profile'] = True
         except Exception as e:
             fn.error_handling(e, "interface.rollover_mode()")
+
+    @pyqtSlot()
+    def toggle_mode(self, func, con):
+        try:
+            if self.store['content'][func][con + '_toggle'].currentText() == var.lang['toggle']:
+                var.settings[func][con + '_toggle'] = True
+            elif self.store['content'][func][con + '_toggle'].currentText() == var.lang['hold']:
+                var.settings[func][con + '_toggle'] = False
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.press_mode()")
 
     @pyqtSlot()
     def axis_threshold(self, func):
@@ -2212,6 +2310,55 @@ class CustomLEDLabel(QLabel):
             print(self.sound, "LED turning to", signal)
             self.setStyleSheet(self.color[self.color_code[signal]])
             self.setText(self.symbol_code[signal])
+            self.active = signal
+
+class CustomButtonLEDLabel(QLabel):
+    color = {
+        'greenLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #33ff33, stop:1 #008800);
+                border-width: 1px;
+                border-radius: 4px;
+                border-style: solid;
+                border-color: #808080;
+                color: black;
+            """,
+        'redLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #ff3333, stop:1 #880000);
+                border-width: 1px;
+                border-radius: 4px;
+                border-style: solid;
+                border-color: #808080;
+                color: white;
+            """,
+        'offLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #808080, stop:1 #202020);
+                border-width: 1px;
+                border-radius: 4px;
+                border-style: solid;
+                border-color: #808080;
+                color: white;
+            """,
+    }
+    color_code = { # color per signal defined here
+        'off': 'offLED',
+        'standby': 'redLED',
+        'active': 'greenLED',
+    }
+    active = "None"
+    label_text = "None"
+    def __init__(self):
+        super().__init__()
+        self.layout = QVBoxLayout()
+        self.label = QLabel()
+        self.setStyleSheet(self.color[self.color_code['off']])
+    def state(self, signal): # 'off' = disabled, 'standby' = inactive, 'active' = active
+        if signal != self.active:
+            self.setStyleSheet(self.color[self.color_code[signal]])
+            if self.label_text != "None":
+                self.setText(self.label_text)
             self.active = signal
 
 def main():

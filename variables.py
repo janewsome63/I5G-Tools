@@ -4,11 +4,11 @@ import os
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
                        'v0.7.1b', 'v0.7.1.1b',
                        'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b', 'v0.7.3.3b', 'v0.7.3.4b', 'v0.7.3.5b', 'v0.7.3.6b',
-                       'v0.7.3.7b', 'v0.7.3.8b', 'v0.7.3.9b', 'v0.7.3.10b']
+                       'v0.7.3.7b', 'v0.7.3.8b', 'v0.7.3.9b', 'v0.7.3.10b', 'v0.7.3.11b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.3.10b",
+    "version": "v0.7.3.11b",
     "pedal": "Pedal Axis:",
     "up": "Increase:",
     "down": "Decrease:",
@@ -16,6 +16,7 @@ lang = {
     "increment": "Increment:",
     "switch_value": "Switch Value:",
     "switch_mode": "Switch Mode:",
+    "press_mode": "Press Mode:",
     "hold": "Hold",
     "toggle": "Toggle",
     "increment_mode": "Increment Mode:",
@@ -44,8 +45,9 @@ lang = {
     "clutch": "Clutch",
     "throttle": "Throttle",
     "regen": "Regen",
+    "regen_label": "Regen:",
     "deploy": "Deploy",
-    "deploy_lim": "Deploy Limit:",
+    "deploy_limit": "Deploy Limit",
     "fuel": "Fuel",
     "sounds": "Sounds",
     "settings": "Settings",
@@ -56,7 +58,7 @@ lang = {
     "profile_select": "Select Profile:",
     "display": "Display",
     "car_id": "Car ID:",
-    "soc": "SoC",
+    "soc": "Battery",
     "hybrid": "Hybrid",
     "play_sound": "Play Sound",
     "playing_sound": "Playing",
@@ -388,7 +390,8 @@ settings = {
         "rollover_mode": False,
     },
     "hybrid": {
-        "toggle": False,
+        "regen_toggle": False,
+        "deploy_toggle": False,
     },
     "device_axis_thresh": {
         "-2": {

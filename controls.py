@@ -173,7 +173,7 @@ def button(bind, function, control):
             while check_pressed(bind) and not var.bindings['status']['active']:
                 sleep(0.05)
 
-            if not var.settings[function]['toggle']:
+            if not var.settings[function][control + '_toggle']:
                 if var.status[function][control]['state']:
                     var.status[function][control]['state'] = False
                 elif not var.status[function][control]['state']:

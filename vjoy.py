@@ -132,14 +132,6 @@ def calibrate_axis(axis):
     except Exception as e:
         fn.error_handling(e, "vjoy.calibrate()_axis")
 
-def calibrate_button(button):
-    try:
-        set_button(button, True)
-        sleep(0.25)
-        set_button(button, False)
-    except Exception as e:
-        fn.error_handling(e, "vjoy.calibrate()_axis")
-
 def intialize():
     try:
         j.update()
