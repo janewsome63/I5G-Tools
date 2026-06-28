@@ -223,11 +223,21 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['rollover_mode_label'] = QLabel()
             self.store['content'][function]['rollover_mode_label'].setText(var.lang['rollover_mode'] + ":")
 
+            self.store['content'][function]['switch_led_label'] = QLabel()
+            self.store['content'][function]['switch_led_label'].setText(var.lang['switch_status'] + ":")
+            self.store['content'][function]['switch_led_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
             self.store['content'][function]['rollover_mode'] = CustomComboBox()
             self.store['content'][function]['rollover_mode'].setFixedSize(95, 25)
             self.store['content'][function]['rollover_mode'].addItems((var.lang['locked'], var.lang['unlocked']))
             self.store['content'][function]['rollover_mode'].currentIndexChanged.connect(lambda: self.rollover_mode(function))
-            
+
+            self.store['content'][function]['switch_led'] = CustomButtonLEDLabel()
+            self.store['content'][function]['switch_led'].setFixedSize(95, 22)
+            self.store['content'][function]['switch_led'].label_text = var.lang['primary']
+            self.store['content'][function]['switch_led'].state('standby')
+            self.store['content'][function]['switch_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+
             if type == "input":
                 self.store['content'][function]['pedal_label'] = QLabel()
                 self.store['content'][function]['pedal_label'].setText(var.lang['pedal'] + ":")
@@ -284,10 +294,7 @@ class MainWindow(QMainWindow):
             row, column = 0, 0
             for element in self.store['content'][function]:
                 self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
-                if element == "rollover_mode":
-                    column = 0
-                    row += 1
-                elif element != "switch_value_label" and element != "switch_mode_label":
+                if element != "switch_value_label" and element != "switch_mode_label" and element != "switch_led_label":
                     column += 1
                     if column > 2:
                         column = 0
@@ -1141,8 +1148,15 @@ class MainWindow(QMainWindow):
                     else:
                         # var.status[function]['secondary'] = (value * var.step[function]) - var.step[function]
                         value = int(round((value / var.step[function]) + 1))
-
                     self.store['content'][function]['switch'].setValue(value)
+
+                    if function in self.tabs['types']['adjustment'] or function in self.tabs['types']['input']:
+                        if var.status[function]['switched']:
+                            self.store['content'][function]['switch_led'].label_text = var.lang['secondary']
+                            self.store['content'][function]['switch_led'].state('active')
+                        elif not var.status[function]['switched']:
+                            self.store['content'][function]['switch_led'].label_text = var.lang['primary']
+                            self.store['content'][function]['switch_led'].state('standby')
                 elif function in self.store['content'] and function == "hybrid":
                     for control in var.status[function]:
                         if var.status[function][control]['state']:
