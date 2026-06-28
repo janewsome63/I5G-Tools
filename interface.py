@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
             self.store = {
                 "width": 675,
-                "height": 250,
+                "height": 260,
                 "running": False,
                 "profile_busy": False,
                 "content": {},
@@ -184,10 +184,10 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['calibrate'].clicked.connect(lambda: self.calibrate_axis_start(function))
 
             self.store['content'][function]['increment_label'] = QLabel()
-            self.store['content'][function]['increment_label'].setText(var.lang['increment'])
+            self.store['content'][function]['increment_label'].setText(var.lang['increment'] + ":")
 
             self.store['content'][function]['switch_value_label'] = QLabel()
-            self.store['content'][function]['switch_value_label'].setText(var.lang['switch_value'])
+            self.store['content'][function]['switch_value_label'].setText(var.lang['switch_value'] + ":")
             self.store['content'][function]['switch_value_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['increment'] = CustomDoubleSpinBox()
@@ -205,10 +205,10 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch'].valueChanged.connect(lambda: self.switch(function))
 
             self.store['content'][function]['increment_mode_label'] = QLabel()
-            self.store['content'][function]['increment_mode_label'].setText(var.lang['increment_mode'])
+            self.store['content'][function]['increment_mode_label'].setText(var.lang['increment_mode'] + ":")
 
             self.store['content'][function]['switch_mode_label'] = QLabel()
-            self.store['content'][function]['switch_mode_label'].setText(var.lang['switch_mode'])
+            self.store['content'][function]['switch_mode_label'].setText(var.lang['switch_mode'] + ":")
             self.store['content'][function]['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['increment_mode'] = CustomComboBox()
@@ -222,7 +222,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode(function))
 
             self.store['content'][function]['rollover_mode_label'] = QLabel()
-            self.store['content'][function]['rollover_mode_label'].setText(var.lang['rollover_mode'])
+            self.store['content'][function]['rollover_mode_label'].setText(var.lang['rollover_mode'] + ":")
 
             self.store['content'][function]['rollover_mode'] = CustomComboBox()
             self.store['content'][function]['rollover_mode'].setFixedSize(95, 25)
@@ -231,7 +231,7 @@ class MainWindow(QMainWindow):
             
             if type == "input":
                 self.store['content'][function]['pedal_label'] = QLabel()
-                self.store['content'][function]['pedal_label'].setText(var.lang['pedal'])
+                self.store['content'][function]['pedal_label'].setText(var.lang['pedal'] + ":")
 
                 self.store['content'][function]['pedal_device'] = QLineEdit()
                 self.store['content'][function]['pedal_device'].setFixedHeight(25)
@@ -244,7 +244,7 @@ class MainWindow(QMainWindow):
                 self.store['content'][function]['pedal_bind'].clicked.connect(lambda: self.bind_start(function, "pedal", True))
 
             self.store['content'][function]['up_label'] = QLabel()
-            self.store['content'][function]['up_label'].setText(var.lang['up'])
+            self.store['content'][function]['up_label'].setText(var.lang['up'] + ":")
 
             self.store['content'][function]['up_device'] = QLineEdit()
             self.store['content'][function]['up_device'].setFixedHeight(25)
@@ -257,7 +257,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['up_bind'].clicked.connect(lambda: self.bind_start(function, "up"))
 
             self.store['content'][function]['down_label'] = QLabel()
-            self.store['content'][function]['down_label'].setText(var.lang['down'])
+            self.store['content'][function]['down_label'].setText(var.lang['down'] + ":")
 
             self.store['content'][function]['down_device'] = QLineEdit()
             self.store['content'][function]['down_device'].setFixedHeight(25)
@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['down_bind'].clicked.connect(lambda: self.bind_start(function, "down"))
 
             self.store['content'][function]['switch_label'] = QLabel()
-            self.store['content'][function]['switch_label'].setText(var.lang['switch'])
+            self.store['content'][function]['switch_label'].setText(var.lang['switch'] + ":")
 
             self.store['content'][function]['switch_device'] = QLineEdit()
             self.store['content'][function]['switch_device'].setFixedHeight(25)
@@ -316,42 +316,18 @@ class MainWindow(QMainWindow):
 
             self.tabs['hybrid'].layout = QGridLayout()
 
-            # self.store['content']['hybrid']['soc_label'] = QLabel()
-            # self.store['content']['hybrid']['soc_label'].setText(var.lang['soc_label'])
-            # self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
-            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_label'], 0, 0)
-            #
-            # self.store['content']['hybrid']['soc_lcd'] = QLCDNumber()
-            # self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_lcd'], 0, 1)
-            #
-            # self.store['content']['hybrid']['soc_axis'] = QProgressBar()
-            # self.store['content']['hybrid']['soc_axis'].setTextVisible(False)
-            # self.store['content']['hybrid']['soc_axis'].setMinimum(0)
-            # self.store['content']['hybrid']['soc_axis'].setMaximum(100)
-            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 2)
-            #
-            # self.store['content']['hybrid']['deploy_lim_label'] = QLabel()
-            # self.store['content']['hybrid']['deploy_lim_label'].setText(var.lang['deploy_lim_label'])
-            # self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
-            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_label'], 1, 0)
-            #
-            # self.store['content']['hybrid']['deploy_lim_lcd'] = QLCDNumber()
-            # self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_lcd'], 1, 1)
-            #
-            # self.store['content']['hybrid']['deploy_lim_axis'] = QProgressBar()
-            # self.store['content']['hybrid']['deploy_lim_axis'].setTextVisible(False)
-            # self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
-            # self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
-            # self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 2)
-
             self.store['content']['hybrid']['regen_led'] = CustomButtonLEDLabel()
             self.store['content']['hybrid']['regen_led'].setFixedSize(92, 21)
             self.store['content']['hybrid']['regen_led'].label_text = var.lang['regen']
             self.store['content']['hybrid']['regen_led'].state('standby')
             self.store['content']['hybrid']['regen_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_led'], 0, 0)
+
+            self.store['content']['hybrid']['soc_axis'] = QProgressBar()
+            self.store['content']['hybrid']['soc_axis'].setTextVisible(False)
+            self.store['content']['hybrid']['soc_axis'].setMinimum(0)
+            self.store['content']['hybrid']['soc_axis'].setMaximum(100)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 1)
 
             self.store['content']['hybrid']['deploy_led'] = CustomButtonLEDLabel()
             self.store['content']['hybrid']['deploy_led'].setFixedSize(92, 21)
@@ -365,6 +341,12 @@ class MainWindow(QMainWindow):
             self.store['content']['hybrid']['regen_calibrate'].setText(var.lang['calibrate'])
             self.store['content']['hybrid']['regen_calibrate'].clicked.connect(lambda: self.calibrate_button_start("hybrid", "regen"))
             self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_calibrate'], 1, 0)
+
+            self.store['content']['hybrid']['deploy_lim_axis'] = QProgressBar()
+            self.store['content']['hybrid']['deploy_lim_axis'].setTextVisible(False)
+            self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
+            self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 1)
 
             self.store['content']['hybrid']['deploy_calibrate'] = QPushButton()
             self.store['content']['hybrid']['deploy_calibrate'].setFixedSize(95, 25)
@@ -454,7 +436,7 @@ class MainWindow(QMainWindow):
             self.tabs['display'].layout = QGridLayout()
 
             self.store['content']['display']['car_id_label'] = QLabel()
-            self.store['content']['display']['car_id_label'].setText(var.lang['car_id'])
+            self.store['content']['display']['car_id_label'].setText(var.lang['car_id'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_label'], 0, 2)
 
             self.store['content']['display']['car_id'] = QLabel()
@@ -686,7 +668,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout = QGridLayout()
             
             self.store['content']['sounds']['sound_label'] = QLabel()
-            self.store['content']['sounds']['sound_label'].setText(var.lang['sound_label'])
+            self.store['content']['sounds']['sound_label'].setText(var.lang['sound_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['sound_label'], 0, 0)
 
             self.store['content']['sounds']['sound'] = CustomComboBox()
@@ -698,7 +680,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['sound'], 0, 1)
 
             self.store['content']['sounds']['volume_label'] = QLabel()
-            self.store['content']['sounds']['volume_label'].setText(var.lang['volume_label'])
+            self.store['content']['sounds']['volume_label'].setText(var.lang['volume_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['volume_label'], 1, 0)
 
             self.store['content']['sounds']['volume'] = CustomSpinBox()
@@ -708,7 +690,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['volume'], 1, 1)
 
             self.store['content']['sounds']['hybrid_low_audio_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'])
+            self.store['content']['sounds']['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_audio_label'], 2, 0)
 
             self.store['content']['sounds']['hybrid_low_audio'] = CustomComboBox()
@@ -726,7 +708,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_test'], 2, 2)
 
             self.store['content']['sounds']['hybrid_high_audio_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'])
+            self.store['content']['sounds']['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_audio_label'], 3, 0)
 
             self.store['content']['sounds']['hybrid_high_audio'] = CustomComboBox()
@@ -744,7 +726,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_test'], 3, 2)
 
             self.store['content']['sounds']['hybrid_limit_audio_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'])
+            self.store['content']['sounds']['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_audio_label'], 4, 0)
 
             self.store['content']['sounds']['hybrid_limit_audio'] = CustomComboBox()
@@ -762,7 +744,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_test'], 4, 2)
 
             self.store['content']['sounds']['hybrid_low_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
+            self.store['content']['sounds']['hybrid_low_label'].setText(var.lang['hybrid_low_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_label'], 5, 0)
 
             self.store['content']['sounds']['hybrid_low_val'] = CustomSpinBox()
@@ -773,7 +755,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_val'], 5, 1)
 
             self.store['content']['sounds']['hybrid_high_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_high_label'].setText(var.lang['hybrid_high_label'])
+            self.store['content']['sounds']['hybrid_high_label'].setText(var.lang['hybrid_high_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_label'], 6, 0)
 
             self.store['content']['sounds']['hybrid_high_val'] = CustomSpinBox()
@@ -784,7 +766,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_val'], 6, 1)
 
             self.store['content']['sounds']['hybrid_limit_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'])
+            self.store['content']['sounds']['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_label'], 7, 0)
 
             self.store['content']['sounds']['hybrid_limit_val'] = CustomSpinBox()
@@ -795,7 +777,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_val'], 7, 1)
 
             self.store['content']['sounds']['upshift_beep_label'] = QLabel()
-            self.store['content']['sounds']['upshift_beep_label'].setText(var.lang['upshift_beep_label'])
+            self.store['content']['sounds']['upshift_beep_label'].setText(var.lang['upshift_beep_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_label'], 8, 0)
 
             self.store['content']['sounds']['upshift_beep'] = CustomComboBox()
@@ -813,7 +795,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_test'], 8, 2)
 
             self.store['content']['sounds']['downshift_beep_label'] = QLabel()
-            self.store['content']['sounds']['downshift_beep_label'].setText(var.lang['downshift_beep_label'])
+            self.store['content']['sounds']['downshift_beep_label'].setText(var.lang['downshift_beep_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_label'], 9, 0)
 
             self.store['content']['sounds']['downshift_beep'] = CustomComboBox()
@@ -831,7 +813,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_test'], 9, 2)
 
             self.store['content']['sounds']['beep_mode_label'] = QLabel()
-            self.store['content']['sounds']['beep_mode_label'].setText(var.lang['beep_mode_label'])
+            self.store['content']['sounds']['beep_mode_label'].setText(var.lang['beep_mode_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['beep_mode_label'], 10, 0)
 
             self.store['content']['sounds']['beep_mode'] = CustomComboBox()
@@ -844,7 +826,7 @@ class MainWindow(QMainWindow):
 
             # dynamic mode offset
             self.store['content']['sounds']['dynamic_mode_offset_label'] = QLabel()
-            self.store['content']['sounds']['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'])
+            self.store['content']['sounds']['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['dynamic_mode_offset_label'], 11, 0)
 
             self.store['content']['sounds']['dynamic_mode_offset'] = CustomSpinBox()
@@ -856,7 +838,7 @@ class MainWindow(QMainWindow):
 
             # upshift offset
             self.store['content']['sounds']['upshift_offset_label'] = QLabel()
-            self.store['content']['sounds']['upshift_offset_label'].setText(var.lang['upshift_offset_label'])
+            self.store['content']['sounds']['upshift_offset_label'].setText(var.lang['upshift_offset_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_offset_label'], 12, 0)
 
             self.store['content']['sounds']['upshift_offset'] = CustomSpinBox()
@@ -868,7 +850,7 @@ class MainWindow(QMainWindow):
 
             # downshift offset
             self.store['content']['sounds']['downshift_offset_label'] = QLabel()
-            self.store['content']['sounds']['downshift_offset_label'].setText(var.lang['downshift_offset_label'])
+            self.store['content']['sounds']['downshift_offset_label'].setText(var.lang['downshift_offset_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_offset_label'], 13, 0)
 
             self.store['content']['sounds']['downshift_offset'] = CustomSpinBox()
@@ -880,7 +862,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind audio enabled
             self.store['content']['sounds']['p2p_behind_audio_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'])
+            self.store['content']['sounds']['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_label'], 14, 0)
 
             self.store['content']['sounds']['p2p_behind_audio'] = CustomComboBox()
@@ -899,7 +881,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind audio continuous enabled
             self.store['content']['sounds']['p2p_behind_audio_cont_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'])
+            self.store['content']['sounds']['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_cont_label'], 15, 0)
 
             self.store['content']['sounds']['p2p_behind_audio_cont'] = CustomComboBox()
@@ -918,7 +900,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind stop audio under braking
             self.store['content']['sounds']['p2p_behind_nobrake_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'])
+            self.store['content']['sounds']['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_nobrake_label'], 16, 0)
 
             self.store['content']['sounds']['p2p_behind_nobrake'] = CustomComboBox()
@@ -931,7 +913,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind single warning threshold
             self.store['content']['sounds']['p2p_behind_thresh_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'])
+            self.store['content']['sounds']['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_label'], 17, 0)
 
             self.store['content']['sounds']['p2p_behind_thresh'] = CustomSpinBox()
@@ -943,7 +925,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind continuous warning threshold
             self.store['content']['sounds']['p2p_behind_thresh_cont_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'])
+            self.store['content']['sounds']['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_cont_label'], 18, 0)
 
             self.store['content']['sounds']['p2p_behind_thresh_cont'] = CustomSpinBox()
@@ -955,7 +937,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind audio for any car within range vs closest car only
             self.store['content']['sounds']['p2p_behind_closest_car_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'])
+            self.store['content']['sounds']['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_closest_car_label'], 19, 0)
 
             self.store['content']['sounds']['p2p_behind_closest_car'] = CustomComboBox()
@@ -981,7 +963,7 @@ class MainWindow(QMainWindow):
             column = 0
 
             self.store['content']['settings']['scale_label'] = QLabel()
-            self.store['content']['settings']['scale_label'].setText(var.lang['scale'])
+            self.store['content']['settings']['scale_label'].setText(var.lang['scale'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], row, column)
             column += 2
 
@@ -998,7 +980,7 @@ class MainWindow(QMainWindow):
             column = 0
 
             self.store['content']['settings']['timer_first_label'] = QLabel()
-            self.store['content']['settings']['timer_first_label'].setText(var.lang['timer_first'])
+            self.store['content']['settings']['timer_first_label'].setText(var.lang['timer_first'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first_label'], row, column)
             column += 2
 
@@ -1011,7 +993,7 @@ class MainWindow(QMainWindow):
             column = 0
 
             self.store['content']['settings']['timer_loop_label'] = QLabel()
-            self.store['content']['settings']['timer_loop_label'].setText(var.lang['timer_loop'])
+            self.store['content']['settings']['timer_loop_label'].setText(var.lang['timer_loop'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop_label'], row, column)
             column += 2
 
@@ -1024,7 +1006,7 @@ class MainWindow(QMainWindow):
             column = 0
 
             self.store['content']['settings']['profile_create_label'] = QLabel()
-            self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'])
+            self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], row, column)
             column += 2
 
@@ -1042,7 +1024,7 @@ class MainWindow(QMainWindow):
             column = 0
 
             self.store['content']['settings']['profile_select_label'] = QLabel()
-            self.store['content']['settings']['profile_select_label'].setText(var.lang['profile_select'])
+            self.store['content']['settings']['profile_select_label'].setText(var.lang['profile_select'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select_label'], row, column)
             column += 2
 
@@ -1067,17 +1049,17 @@ class MainWindow(QMainWindow):
             row += 1
 
             self.store['content']['settings']['axis_threshold_device_label'] = QLabel()
-            self.store['content']['settings']['axis_threshold_device_label'].setText(var.lang['axis_threshold'])
+            self.store['content']['settings']['axis_threshold_device_label'].setText(var.lang['axis_threshold'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['axis_threshold_device_label'], row, column)
             column += 2
 
             self.store['content']['settings']['high_threshold_label'] = QLabel()
-            self.store['content']['settings']['high_threshold_label'].setText(var.lang['high_threshold'])
+            self.store['content']['settings']['high_threshold_label'].setText(var.lang['high_threshold'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold_label'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             column += 1
 
             self.store['content']['settings']['low_threshold_label'] = QLabel()
-            self.store['content']['settings']['low_threshold_label'].setText(var.lang['low_threshold'])
+            self.store['content']['settings']['low_threshold_label'].setText(var.lang['low_threshold'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold_label'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
             row += 1
             column = 0
