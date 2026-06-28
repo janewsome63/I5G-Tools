@@ -1506,7 +1506,7 @@ class MainWindow(QMainWindow):
                 var.settings[func][con + '_toggle'] = False
             var.status['rewrite_profile'] = True
         except Exception as e:
-            fn.error_handling(e, "interface.press_mode()")
+            fn.error_handling(e, "interface.toggle_mode()")
 
     @pyqtSlot()
     def axis_threshold(self, func):
@@ -1975,6 +1975,16 @@ class MainWindow(QMainWindow):
                             self.store['content'][function]['switch_mode'].setCurrentText(var.lang['toggle'])
                         else:
                             self.store['content'][function]['switch_mode'].setCurrentText(var.lang['hold'])
+                    if type == "other":
+                        if function == "hybrid":
+                            if var.settings[function]['regen_toggle']:
+                                self.store['content'][function]['regen_toggle'].setCurrentText(var.lang['toggle'])
+                            else:
+                                self.store['content'][function]['regen_toggle'].setCurrentText(var.lang['hold'])
+                            if var.settings[function]['deploy_toggle']:
+                                self.store['content'][function]['deploy_toggle'].setCurrentText(var.lang['toggle'])
+                            else:
+                                self.store['content'][function]['deploy_toggle'].setCurrentText(var.lang['hold'])
 
             # self.store['content']['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
             self.store['content']['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
