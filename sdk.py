@@ -4,10 +4,7 @@ import variables as var
 import irsdk
 import keyboard
 import math
-import statistics
 
-from string import capwords
-from time import perf_counter
 from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
 
@@ -62,6 +59,7 @@ def main():
             var.telemetry['car']['name'] = ir['DriverInfo']['Drivers'][var.telemetry['driver']['idx']]['CarPath']
             var.telemetry['fuel']['full'] = ir['DriverInfo']['DriverCarFuelMaxLtr'] #check this for less than 100% values
             var.telemetry['fuel']['limit'] = ir['DriverInfo']['DriverCarMaxFuelPct']
+            var.telemetry['track']['length'] = float(ir['WeekendInfo']['TrackLength'].split()[0])
         elif check_connection() is False:
             print("<-------- iRacing Disconnected -------->") #temporary, make indicator
             
@@ -81,12 +79,31 @@ def main():
             var.telemetry['driver']['lap']['dist'] = ir['LapDist']
             var.telemetry['driver']['lap']['pct'] = ir['LapDistPct']
 
+            # Engine
+            var.telemetry['engine']['oil'] = ir['OilTemp']
+            var.telemetry['engine']['water'] = ir['WaterTemp']
+            var.telemetry['engine']['temp_total'] = ir['OilTemp'] + ir['WaterTemp']
+
             # Flags
             var.telemetry['flags']['hex'] = ir['SessionFlags']
 
             # Fuel
             var.telemetry['fuel']['level'] = ir['FuelLevel']
             var.telemetry['fuel']['pct'] = ir['FuelLevelPct']
+
+            # Tires
+            var.telemetry['tires']['temp_total'] = 0.0
+            var.telemetry['tires']['wear_total'] = 0.0
+            for tire in var.telemetry['tires']:
+                if tire != "temp_total" and tire != "wear_total":
+                    for info in var.telemetry['tires'][tire]:
+                        for section in var.telemetry['tires'][tire][info]:
+                            if info == "temp":
+                                unit = "C"
+                            else:
+                                unit = ""
+                            var.telemetry['tires'][tire][info][section] = ir[tire.upper() + info + unit + section.upper()]
+                            var.telemetry['tires'][info + '_total'] += ir[tire.upper() + info + unit + section.upper()]
 
             # Session
             var.telemetry['session']['lap']['remaining'] = ir['SessionLapsRemainEx']
@@ -117,8 +134,8 @@ def main():
                 var.cache['distances'].pop(0)
 
             # Set cache values
-            var.cache['lap']['pct']['diff'] = var.telemetry['driver']['lap']['pct'] - var.cache['lap']['pct']['prev']
-            var.cache['lap']['pct']['prev'] = var.telemetry['driver']['lap']['pct']
+            var.cache['lap']['pct_diff'] = var.telemetry['driver']['lap']['pct'] - var.cache['lap']['pct']
+            var.cache['lap']['pct'] = var.telemetry['driver']['lap']['pct']
 
             if init_loop:
                 init_loop = False
@@ -142,6 +159,7 @@ def triggers():
     pct_prev = pct
     sessiontime_prev = var.telemetry['session']['time']['current']
     ticks_prev = 0.1167
+    fuel_prev = 0.0
 
     # Starting vars
     init_loop = True
@@ -167,29 +185,21 @@ def triggers():
             var.cache['driving'] = False
 
         # Check for car reset
-        combo_tires, sections, tires = 0.0, ["CL", "CM", "CR"], ["LF", "RF", "LR", "RR"]
-        for tire in tires:
-            for section in sections:
-                combo_tires += ir[tire + "temp" + section]
-        combo_eng = var.telemetry['engine']['oil'] + var.telemetry['engine']['water']
-        if combo_eng == 154.0 and var.cache['engine']['oil'] + var.cache['engine']['water'] != 154.0:
-            if combo_tires != var.cache['tire_temp']:
-                if not init_loop:
-                    var.cache['fuel']['pct_prev'] = var.telemetry['fuel']['pct']
-                    for section in var.triggers['reset']:
-                        var.triggers['reset'][section] = True
-                    print("Car Reset")
-                var.cache['tire_temp'] = combo_tires
+        if var.cache['engine']['temp_total'] != 154.0 == var.telemetry['engine']['temp_total'] and var.cache['tires']['temp_total'] != var.telemetry['tires']['temp_total']:
+            if not init_loop:
+                for section in var.triggers['reset']:
+                    var.triggers['reset'][section] = True
+                print("Car Reset")
 
         # Check for active reset
-        if "Offline Testing" in var.telemetry['session']['type'] and var.cache['lap']['pct']['diff'] != diff_prev:
+        if "Offline Testing" in var.telemetry['session']['type'] and var.cache['lap']['pct_diff'] != diff_prev:
             if var.triggers['lap']['active_reset']:
-                pct += 1.0 - math.fabs(var.cache['lap']['pct']['diff'])
+                pct += 1.0 - math.fabs(var.cache['lap']['pct_diff'])
                 var.triggers['lap']['active_reset'] = False
-            elif not var.triggers['lap']['active_reset'] and 1.0 > var.cache['lap']['pct']['diff'] > 0.5:
-                pct += 1.0 - var.cache['lap']['pct']['diff']
+            elif not var.triggers['lap']['active_reset'] and 1.0 > var.cache['lap']['pct_diff'] > 0.5:
+                pct += 1.0 - var.cache['lap']['pct_diff']
             else:
-                pct += var.cache['lap']['pct']['diff']
+                pct += var.cache['lap']['pct_diff']
             pct_diff = pct - pct_prev
             pct_prev = pct
             sessiontime = var.telemetry['session']['time']['current']
@@ -201,13 +211,20 @@ def triggers():
             ticks_prev = ticks
             speed = math.fabs(dist / ticks)
             if not var.triggers['reset']['active_reset']:
-                if speed > 135.0:
+                if speed > 117.0 or not var.telemetry['car']['pitting'] and var.cache['fuel']['level_prev'] < var.telemetry['fuel']['level']:
                     for section in var.triggers['active_reset']:
                         var.triggers['active_reset'][section] = True
                     print("Active Reset")
             else:
                 var.triggers['reset']['active_reset'] = False
-        diff_prev = var.cache['lap']['pct']['diff']
+        diff_prev = var.cache['lap']['pct_diff']
+
+        # Set every-time cache values
+        var.cache['engine']['oil'] = var.telemetry['engine']['oil']
+        var.cache['engine']['water'] = var.telemetry['engine']['water']
+        var.cache['engine']['temp_total'] = var.telemetry['engine']['temp_total']
+        var.cache['fuel']['level_prev'] = var.telemetry['fuel']['level']
+        var.cache['tires']['temp_total'] = var.telemetry['tires']['temp_total']
 
         if init_loop:
             init_loop = False

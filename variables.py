@@ -582,6 +582,58 @@ telemetry = {
         },
         "type": "None",
     },
+    "tires": {
+        "lf": {
+            "temp": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+            "wear": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+        },
+        "lr": {
+            "temp": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+            "wear": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+        },
+        "rf": {
+            "temp": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+            "wear": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+        },
+        "rr": {
+            "temp": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+            "wear": {
+                "l": 0.0,
+                "m": 0.0,
+                "r": 0.0,
+            },
+        },
+        "temp_total": 0.0,
+        "wear_total": 0.0,
+    },
     "track": {
         "name": "",
         "length": 0.0,
@@ -612,32 +664,22 @@ cache = {
     "engine": {
         "oil": 77.0,
         "water": 77.0,
+        "temp_total": 154.0,
     },
     "fuel": {
         "pct_prev": 0.0,
+        "level_prev": 0.0,
         "level_prev_lap": 0.0,
     },
+    "tires": {
+        "temp_total": 0.0,
+    },
     "lap": {
-        "dist": {
-            "diff": 0.0,
-            "prev": 0.0,
-            "sum": 0.0,
-        },
-        "pct": {
-            "diff": 0.0,
-            "prev": 0.0,
-            "sum": 0.0,
-        },
+        "pct": 0.0,
+        "pct_diff": 0.0,
     },
-    "lap_trigger": False,
     "pitted": False,
-    "incidents": 0,
     "session_type": "None",
-    "temperature": {
-        "air": 0.0,
-        "track": 0.0,
-    },
-    "tire_temp": 414.0,
 }
 
 triggers = {
