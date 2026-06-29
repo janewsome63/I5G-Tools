@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.7.3.8b - Finish infrastructure for vjoy buttons, add bindings to hybrid tab (toggle and calibrate UI elements still TODO)">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.7.3.11b - Add switch status to tool tabs">
+      <change afterPath="$PROJECT_DIR$/sdk.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.pyw" beforeDir="false" afterPath="$PROJECT_DIR$/main.pyw" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -126,7 +129,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
+        <option value="bundled-python-sdk-af26db0dccfe-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.26775.22" />
       </set>
     </attachedChunks>
   </component>
@@ -138,22 +141,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1757535539683</updated>
-    </task>
-    <task id="LOCAL-00001" summary="Initial Commit">
-      <option name="closed" value="true" />
-      <created>1757535605230</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1757535605230</updated>
-    </task>
-    <task id="LOCAL-00002" summary="Adding basics">
-      <option name="closed" value="true" />
-      <created>1757536286407</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1757536286407</updated>
     </task>
     <task id="LOCAL-00003" summary="Initial UI design">
       <option name="closed" value="true" />
@@ -507,7 +494,47 @@
       <option name="project" value="LOCAL" />
       <updated>1782413160716</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="v0.7.3.11b - Finish hybrid tab functionality and basic UI">
+      <option name="closed" value="true" />
+      <created>1782617717733</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1782617717733</updated>
+    </task>
+    <task id="LOCAL-00048" summary="v0.7.3.11b - Finish hybrid tab functionality and basic UI">
+      <option name="closed" value="true" />
+      <created>1782618350927</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1782618350927</updated>
+    </task>
+    <task id="LOCAL-00049" summary="v0.7.3.11b - Finish hybrid tab functionality and basic UI">
+      <option name="closed" value="true" />
+      <created>1782619369567</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1782619369567</updated>
+    </task>
+    <task id="LOCAL-00050" summary="v0.7.3.11b - Cleanup">
+      <option name="closed" value="true" />
+      <created>1782621840286</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1782621840286</updated>
+    </task>
+    <task id="LOCAL-00051" summary="v0.7.3.11b - Add switch status to tool tabs">
+      <option name="closed" value="true" />
+      <created>1782623831386</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1782623831386</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -522,9 +549,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add config file system, miscellaneous tweaks, increase calibration step" />
-    <MESSAGE value="Fix crash on creating AppData directory" />
-    <MESSAGE value="Fix crash on launch if a bound controller was not detected on startup" />
     <MESSAGE value="Fix memory leak caused by creating new vjoy device objects" />
     <MESSAGE value="Fix bindings being cleared due to checking for GUIDs before all devices had been loaded" />
     <MESSAGE value="Fix TypeError on unbinding, fix KeyError on undetected device binding" />
@@ -547,6 +571,9 @@
     <MESSAGE value="v0.7.3.7b - Make error log a bit more detailed" />
     <MESSAGE value="v0.7.3.8b - Start infrastructure for vjoy buttons" />
     <MESSAGE value="v0.7.3.8b - Finish infrastructure for vjoy buttons, add bindings to hybrid tab (toggle and calibrate UI elements still TODO)" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.7.3.8b - Finish infrastructure for vjoy buttons, add bindings to hybrid tab (toggle and calibrate UI elements still TODO)" />
+    <MESSAGE value="v0.7.3.11b - Finish hybrid tab functionality and basic UI" />
+    <MESSAGE value="v0.7.3.11b - Cleanup" />
+    <MESSAGE value="v0.7.3.11b - Add switch status to tool tabs" />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.7.3.11b - Add switch status to tool tabs" />
   </component>
 </project>

@@ -4,11 +4,11 @@ import os
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
                        'v0.7.1b', 'v0.7.1.1b',
                        'v0.7.2b', 'v0.7.3.1b', 'v0.7.3.2b', 'v0.7.3.3b', 'v0.7.3.4b', 'v0.7.3.5b', 'v0.7.3.6b',
-                       'v0.7.3.7b', 'v0.7.3.8b', 'v0.7.3.9b', 'v0.7.3.10b', 'v0.7.3.11b']
+                       'v0.7.3.7b', 'v0.7.3.8b', 'v0.7.3.9b', 'v0.7.3.10b', 'v0.7.3.11b', 'v0.7.4.1b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.7.3.11b",
+    "version": "v0.7.4.1b",
     "pedal": "Pedal Axis:",
     "up": "Increase",
     "down": "Decrease",
@@ -394,6 +394,9 @@ settings = {
         "regen_toggle": False,
         "deploy_toggle": False,
     },
+    "fuel": {
+        "": None,
+    },
     "device_axis_thresh": {
         "-2": {
             "name": "None",
@@ -426,6 +429,12 @@ status = {
     "p2p_sound_active": {
         "single": False,
         "loop": False,
+    },
+    "ir": {
+        "connected": False,
+        "pitting": False,
+        "spectator": False,
+        "spotter": False,
     },
     "weight_jacker": {
         "primary": 0.5,
@@ -519,6 +528,160 @@ status = {
                 "waiting": False,
             },
         },
+    },
+}
+
+telemetry = {
+    "units": "imperial",
+    "car": {
+        "garage": False,
+        "name": "",
+        "pitting": False,
+        "position": 0.0,
+        "surface": -1,
+    },
+    "driver": {
+        "driving": False,
+        "idx": -1,
+        "incidents": 0,
+        "lap": {
+            "completed": 0,
+            "dist": 0.0,
+            "next": 0,
+            "pct": 0.0,
+        },
+        # "reset": "",
+    },
+    "engine": {
+        "hex": 0x0,
+        "list": [],
+        "oil": 0.0,
+        "water": 0.0,
+    },
+    "flags": {
+        "hex": 0x0,
+        "list": [],
+    },
+    "fuel": {
+        "full": 999.0,
+        "level": 0.0,
+        "limit": 1.0,
+        "pct": 1.0,
+    },
+    "session": {
+        "lap": {
+            "remaining": 0,
+            "time": 0.0,
+            "total": 0,
+        },
+        "state": 0x0,
+        "time": {
+            "current": 0.0,
+            "remaining": 0.0,
+            "total": 0.0,
+        },
+        "type": "None",
+    },
+    "track": {
+        "name": "",
+        "length": 0.0,
+        "rubber": "",
+        "temperature": 0.0,
+        "wetness": "",
+    },
+    "weather": {
+        "clouds": "N/A",
+        "date": "2000-01-01",
+        "density": 0.0,
+        "fog": 0.0,
+        "humidity": 0.0,
+        "precipitation": 0.0,
+        "pressure": 0.0,
+        "temperature": 0.0,
+        "time": "12:00am",
+        "wind": {
+            "direction": "N/A",
+            "velocity": 0.0,
+        }
+    },
+}
+
+cache = {
+    "distances": [0],
+    "driving": False,
+    "engine": {
+        "oil": 77.0,
+        "water": 77.0,
+    },
+    "fuel": {
+        "pct_prev": 0.0,
+        "level_prev_lap": 0.0,
+    },
+    "lap": {
+        "dist": {
+            "diff": 0.0,
+            "prev": 0.0,
+            "sum": 0.0,
+        },
+        "pct": {
+            "diff": 0.0,
+            "prev": 0.0,
+            "sum": 0.0,
+        },
+    },
+    "lap_trigger": False,
+    "pitted": False,
+    "incidents": 0,
+    "session_type": "None",
+    "temperature": {
+        "air": 0.0,
+        "track": 0.0,
+    },
+    "tire_temp": 414.0,
+}
+
+triggers = {
+    "active_reset": {
+        "generic": False,
+    },
+    "driving": {
+        "generic": False,
+    },
+    "lap": {
+        "active_reset": False,
+    },
+    "reset": {
+        "active_reset": False,
+    },
+}
+
+codes = {
+    "flags": {
+        "checkered": 0x00000001,
+        "white": 0x00000002,
+        "green": 0x00000004,
+        "yellow": 0x00000008,
+        "red": 0x00000010,
+        "blue": 0x00000020,
+        "debris": 0x00000040,
+        "crossed": 0x00000080,
+        "yellow_waving": 0x00000100,
+        "one_lap_to_green": 0x00000200,
+        "green_held": 0x00000400,
+        "ten_to_go": 0x00000800,
+        "five_to_go": 0x00001000,
+        "random_waving": 0x00002000,
+        "caution": 0x00004000,
+        "caution_waving": 0x00008000,
+        "black": 0x00010000,
+        "disqualify": 0x00020000,
+        "serviceable": 0x00040000,
+        "furled": 0x00080000,
+        "repair": 0x00100000,
+        "start_hidden": 0x10000000,
+        "start_ready": 0x20000000,
+        "start_set": 0x40000000,
+        "start_go": 0x80000000,
     },
 }
 

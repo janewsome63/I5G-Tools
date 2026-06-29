@@ -4,12 +4,12 @@ check_dir.run() # checks to make sure all the folders are already set up and cre
 import devices as dev
 import functions as fn
 import interface as ui
-import threading
+import sdk
 import vjoy
 
 if __name__ == '__main__':
-    detect = threading.Thread(target=dev.device_detection, daemon=True)
-    detect.start()
+    fn.start_thread(dev.device_detection)
+    fn.start_thread(sdk.main)
 
     vjoy.intialize()
     fn.read_config()
