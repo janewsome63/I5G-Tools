@@ -173,6 +173,7 @@ class MainWindow(QMainWindow):
             self.tabs[function].layout = QGridLayout()
 
             self.store['content'][function]['lcd'] = QLCDNumber()
+            self.store['content'][function]['lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
             self.store['content'][function]['axis'] = QProgressBar()
             self.store['content'][function]['axis'].setTextVisible(False)
@@ -1215,14 +1216,18 @@ class MainWindow(QMainWindow):
                 self.store['content']['display']['car_id'] = "None"
                 self.store['content']['hybrid']['soc_axis'].setValue(0)
                 self.store['content']['hybrid']['soc_axis'].update()
+                self.store['content']['display']['soc_axis'].setValue(0)
+                self.store['content']['display']['soc_axis'].update()
                 self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
                 self.store['content']['hybrid']['deploy_lim_axis'].update()
-                self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-                self.store['content']['hybrid']['soc_lcd'].update()
+                self.store['content']['display']['deploy_lim_axis'].setValue(0)
+                self.store['content']['display']['deploy_lim_axis'].update()
                 self.store['content']['display']['soc_lcd'].display(str(0.00))
                 self.store['content']['display']['soc_lcd'].update()
-                self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-                self.store['content']['hybrid']['deploy_lim_lcd'].update()
+                self.store['content']['display']['soc_lcd'].display(str(0.00))
+                self.store['content']['display']['soc_lcd'].update()
+                self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
+                self.store['content']['display']['deploy_lim_lcd'].update()
                 self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
                 self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
@@ -1274,16 +1279,20 @@ class MainWindow(QMainWindow):
                     self.store['content'][func]['lcd'].update()
                     self.store['content']['display'][func + '_lcd'].update()
             if (self.store['content']['display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['display']['car_id']]:
-                self.store['content']['hybrid']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 self.store['content']['display']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 self.store['content']['display']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
                     soc_pct = self.ir['EnergyERSBatteryPct']
                     self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
                     self.store['content']['hybrid']['soc_axis'].update()
-                    self.store['content']['hybrid']['soc_lcd'].display(str(round(soc_pct*100,1)))
-                    self.store['content']['hybrid']['soc_lcd'].update()
+                    self.store['content']['display']['soc_axis'].setValue(int(soc_pct*100))
+                    self.store['content']['display']['soc_axis'].update()
+                    self.store['content']['display']['soc_lcd'].display(str(round(soc_pct*100,1)))
+                    self.store['content']['display']['soc_lcd'].update()
+                    self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
+                    self.store['content']['hybrid']['soc_axis'].update()
                     self.store['content']['display']['soc_axis'].setValue(int(soc_pct*100))
                     self.store['content']['display']['soc_axis'].update()
                     self.store['content']['display']['soc_lcd'].display(str(round(soc_pct*100,1)))
@@ -1291,8 +1300,6 @@ class MainWindow(QMainWindow):
                     deploy_lim_pct = self.ir['EnergyMGU_KLapDeployPct']
                     self.store['content']['hybrid']['deploy_lim_axis'].setValue(int(deploy_lim_pct*100))
                     self.store['content']['hybrid']['deploy_lim_axis'].update()
-                    self.store['content']['hybrid']['deploy_lim_lcd'].display(str(round(deploy_lim_pct*100,1)))
-                    self.store['content']['hybrid']['deploy_lim_lcd'].update()
                     self.store['content']['display']['deploy_lim_axis'].setValue(int(deploy_lim_pct*100))
                     self.store['content']['display']['deploy_lim_axis'].update()
                     self.store['content']['display']['deploy_lim_lcd'].display(str(round(deploy_lim_pct*100,1)))
@@ -1300,9 +1307,9 @@ class MainWindow(QMainWindow):
                 else:
                     self.store['content']['hybrid']['soc_axis'].setValue(0)
                     self.store['content']['hybrid']['soc_axis'].update()
-                    self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-                    self.store['content']['hybrid']['soc_lcd'].update()
-                    self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['soc_lcd'].display(str(0.00))
+                    self.store['content']['display']['soc_lcd'].update()
+                    self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
                     self.store['content']['display']['soc_axis'].setValue(0)
                     self.store['content']['display']['soc_axis'].update()
                     self.store['content']['display']['soc_lcd'].display(str(0.00))
@@ -1311,9 +1318,7 @@ class MainWindow(QMainWindow):
                     self.lastval['soc'] = 999.0
                     self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
                     self.store['content']['hybrid']['deploy_lim_axis'].update()
-                    self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-                    self.store['content']['hybrid']['deploy_lim_lcd'].update()
-                    self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
                     self.store['content']['display']['deploy_lim_axis'].setValue(0)
                     self.store['content']['display']['deploy_lim_axis'].update()
                     self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
@@ -2142,40 +2147,41 @@ class MainWindow(QMainWindow):
                     index -= 1
                 # print(self.lastval['CarIdx_Within_p2p_Range'], self.lastval['CarIdx_Within_Cont_p2p_Range'])
                 if var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']:
-                    if var.settings['local']['p2p_behind_nobrake'] and self.lastval['Brake'] > 0.05:
-                        var.status['p2p_sound_active']['single'] = False
-                        var.status['p2p_sound_active']['loop'] = False
-                        sfx.audio['p2p_active'].stop()
-                    else:
-                        if var.settings['local']['p2p_behind_audio_cont']:
-                            if not self.lastval['CarIdx_Within_Cont_p2p_Range']:
-                                var.status['p2p_sound_active']['loop'] = False
-                            # elif var.status['p2p_sound_active']['loop'] == False:
+                    if self.lastval['IsOnTrack_beep']:
+                        if var.settings['local']['p2p_behind_nobrake'] and self.lastval['Brake'] > 0.05:
+                            var.status['p2p_sound_active']['single'] = False
+                            var.status['p2p_sound_active']['loop'] = False
+                            sfx.audio['p2p_active'].stop()
+                        else:
+                            if var.settings['local']['p2p_behind_audio_cont']:
+                                if not self.lastval['CarIdx_Within_Cont_p2p_Range']:
+                                    var.status['p2p_sound_active']['loop'] = False
+                                # elif var.status['p2p_sound_active']['loop'] == False:
+                                else:
+                                    var.status['p2p_sound_active']['loop'] = False
+                                    for CarIdx in self.lastval['CarIdx_Within_Cont_p2p_Range']:
+                                        if self.lastval['CarIdxp2p'][CarIdx]:
+                                            var.status['p2p_sound_active']['loop'] = True
+                                    if var.status['p2p_sound_active']['loop']:
+                                        fn.start_thread(sfx.play_loop('p2p_active'))
                             else:
                                 var.status['p2p_sound_active']['loop'] = False
-                                for CarIdx in self.lastval['CarIdx_Within_Cont_p2p_Range']:
-                                    if self.lastval['CarIdxp2p'][CarIdx]:
-                                        var.status['p2p_sound_active']['loop'] = True
-                                if var.status['p2p_sound_active']['loop']:
-                                    fn.start_thread(sfx.play_loop('p2p_active'))
-                        else:
-                            var.status['p2p_sound_active']['loop'] = False
-                        if var.settings['local']['p2p_behind_audio']:
-                            if not self.lastval['CarIdx_Within_p2p_Range']:
+                            if var.settings['local']['p2p_behind_audio']:
+                                if not self.lastval['CarIdx_Within_p2p_Range']:
+                                    var.status['p2p_sound_active']['single'] = False
+                                elif not var.status['p2p_sound_active']['single']:
+                                # else:
+                                    var.status['p2p_sound_active']['single'] = False
+                                    for CarIdx in self.lastval['CarIdx_Within_p2p_Range']:
+                                        if self.lastval['CarIdxp2p'][CarIdx]:
+                                            var.status['p2p_sound_active']['single'] = True
+                                    if var.status['p2p_sound_active']['single']:
+                                        fn.start_thread(sfx.play('p2p_active'))
+                                    elif sfx.p2p_active.get_num_channels() == 0:
+                                        sfx.status['p2p_active_single'] = False
+                                    var.status['p2p_sound_active']['single'] = False
+                            else:
                                 var.status['p2p_sound_active']['single'] = False
-                            elif not var.status['p2p_sound_active']['single']:
-                            # else:
-                                var.status['p2p_sound_active']['single'] = False
-                                for CarIdx in self.lastval['CarIdx_Within_p2p_Range']:
-                                    if self.lastval['CarIdxp2p'][CarIdx]:
-                                        var.status['p2p_sound_active']['single'] = True
-                                if var.status['p2p_sound_active']['single']:
-                                    fn.start_thread(sfx.play('p2p_active'))
-                                elif sfx.p2p_active.get_num_channels() == 0:
-                                    sfx.status['p2p_active_single'] = False
-                                var.status['p2p_sound_active']['single'] = False
-                        else:
-                            var.status['p2p_sound_active']['single'] = False
                 else:
                     var.status['p2p_sound_active']['single'] = False
                     var.status['p2p_sound_active']['loop'] = False
