@@ -1226,9 +1226,7 @@ class MainWindow(QMainWindow):
                 self.store['content']['display']['soc_lcd'].update()
                 self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
                 self.store['content']['display']['deploy_lim_lcd'].update()
-                self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
                 self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
-                self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
                 self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
                 self.update_limits()
                 var.gearing = []
@@ -1783,6 +1781,7 @@ class MainWindow(QMainWindow):
                 fn.write_profile(name)
             self.refresh_profile_list()
             self.store['content']['settings']['profile_select'].setCurrentText(name)
+            self.store['content']['settings']['profile_create_name'].clear()
         except Exception as e:
             fn.error_handling(e, "interface.create_profile()")
 
