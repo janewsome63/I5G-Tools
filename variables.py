@@ -299,6 +299,7 @@ bindings_info = {
 
 settings = {
     "frequency": 0.1,
+    "global_threshold": 0.9,
     "scale": 1.25,
     "axis_samples": 2, # constant, not really a setting anymore
     "timer_loop": 150,
