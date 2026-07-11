@@ -16,11 +16,14 @@ from PyQt6.QtWidgets import (QApplication, QComboBox, QDoubleSpinBox, QGridLayou
 from time import sleep
 import math
 
-# noinspection PyUnresolvedReferences,PyProtectedMember
+
+# noinspection PyUnresolvedReferences,PyNoneFunctionAssignment,PyProtectedMember,PyTypeChecker
 class MainWindow(QMainWindow):
-    try:
-        def __init__(self):
+    def __init__(self):
+        try:
             super().__init__()
+
+            fn.startup_time()
 
             if getattr(sys, 'frozen', False):
                 applicationPath = sys._MEIPASS
@@ -31,7 +34,7 @@ class MainWindow(QMainWindow):
 
             self.store = {
                 "width": 675,
-                "height": 250,
+                "height": 260,
                 "running": False,
                 "profile_busy": False,
                 "content": {},
@@ -39,7 +42,9 @@ class MainWindow(QMainWindow):
                 "timer": QTimer(),
                 "thread_pool": QThreadPool(),
                 "axis": None,
+                "button": None,
                 "pct": None,
+                "state": None,
             }
 
             self.layout = QVBoxLayout()
@@ -140,8 +145,11 @@ class MainWindow(QMainWindow):
             # if var.status['rewrite']['profile']:
             #     fn.write_profile()
             #     var.status['rewrite']['profile'] = False
+        except Exception as e:
+            fn.error_handling(e, "interface.__init__()")
 
-        def tool_tabs(self, type, function):
+    def tool_tabs(self, type, function):
+        try:
             local_store = {
                 "binds": ["up", "down", "switch"],
                 "decimals": 0,
@@ -166,6 +174,7 @@ class MainWindow(QMainWindow):
             self.tabs[function].layout = QGridLayout()
 
             self.store['content'][function]['lcd'] = QLCDNumber()
+            self.store['content'][function]['lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
 
             self.store['content'][function]['axis'] = QProgressBar()
             self.store['content'][function]['axis'].setTextVisible(False)
@@ -173,13 +182,13 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['calibrate'] = QPushButton()
             self.store['content'][function]['calibrate'].setFixedSize(95, 25)
             self.store['content'][function]['calibrate'].setText(var.lang['calibrate'])
-            self.store['content'][function]['calibrate'].clicked.connect(lambda: self.calibrate_start(function))
+            self.store['content'][function]['calibrate'].clicked.connect(lambda: self.calibrate_axis_start(function))
 
             self.store['content'][function]['increment_label'] = QLabel()
-            self.store['content'][function]['increment_label'].setText(var.lang['increment'])
+            self.store['content'][function]['increment_label'].setText(var.lang['increment'] + ":")
 
             self.store['content'][function]['switch_value_label'] = QLabel()
-            self.store['content'][function]['switch_value_label'].setText(var.lang['switch_value'])
+            self.store['content'][function]['switch_value_label'].setText(var.lang['switch_value'] + ":")
             self.store['content'][function]['switch_value_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['increment'] = CustomDoubleSpinBox()
@@ -197,10 +206,10 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch'].valueChanged.connect(lambda: self.switch(function))
 
             self.store['content'][function]['increment_mode_label'] = QLabel()
-            self.store['content'][function]['increment_mode_label'].setText(var.lang['increment_mode'])
+            self.store['content'][function]['increment_mode_label'].setText(var.lang['increment_mode'] + ":")
 
             self.store['content'][function]['switch_mode_label'] = QLabel()
-            self.store['content'][function]['switch_mode_label'].setText(var.lang['switch_mode'])
+            self.store['content'][function]['switch_mode_label'].setText(var.lang['switch_mode'] + ":")
             self.store['content'][function]['switch_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['increment_mode'] = CustomComboBox()
@@ -213,27 +222,27 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['switch_mode'].addItems((var.lang['hold'], var.lang['toggle']))
             self.store['content'][function]['switch_mode'].currentIndexChanged.connect(lambda: self.switch_mode(function))
 
-            self.store['content'][function]['axis_threshold_label'] = QLabel()
-            self.store['content'][function]['axis_threshold_label'].setText(var.lang['axis_threshold'])
-
             self.store['content'][function]['rollover_mode_label'] = QLabel()
-            self.store['content'][function]['rollover_mode_label'].setText(var.lang['rollover_mode'])
-            self.store['content'][function]['rollover_mode_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.store['content'][function]['rollover_mode_label'].setText(var.lang['rollover_mode'] + ":")
 
-            self.store['content'][function]['axis_threshold'] = CustomSpinBox()
-            self.store['content'][function]['axis_threshold'].setFixedSize(95, 25)
-            self.store['content'][function]['axis_threshold'].setRange(1, 99)
-            self.store['content'][function]['axis_threshold'].setValue(int(var.settings[function]['axis_threshold'] * 100))
-            self.store['content'][function]['axis_threshold'].valueChanged.connect(lambda: self.axis_threshold(function))
+            self.store['content'][function]['switch_led_label'] = QLabel()
+            self.store['content'][function]['switch_led_label'].setText(var.lang['switch_status'] + ":")
+            self.store['content'][function]['switch_led_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
             self.store['content'][function]['rollover_mode'] = CustomComboBox()
             self.store['content'][function]['rollover_mode'].setFixedSize(95, 25)
             self.store['content'][function]['rollover_mode'].addItems((var.lang['locked'], var.lang['unlocked']))
             self.store['content'][function]['rollover_mode'].currentIndexChanged.connect(lambda: self.rollover_mode(function))
-            
+
+            self.store['content'][function]['switch_led'] = CustomButtonLEDLabel()
+            self.store['content'][function]['switch_led'].setFixedSize(95, 22)
+            self.store['content'][function]['switch_led'].label_text = var.lang['primary']
+            self.store['content'][function]['switch_led'].state('standby')
+            self.store['content'][function]['switch_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+
             if type == "input":
                 self.store['content'][function]['pedal_label'] = QLabel()
-                self.store['content'][function]['pedal_label'].setText(var.lang['pedal'])
+                self.store['content'][function]['pedal_label'].setText(var.lang['pedal'] + ":")
 
                 self.store['content'][function]['pedal_device'] = QLineEdit()
                 self.store['content'][function]['pedal_device'].setFixedHeight(25)
@@ -246,7 +255,7 @@ class MainWindow(QMainWindow):
                 self.store['content'][function]['pedal_bind'].clicked.connect(lambda: self.bind_start(function, "pedal", True))
 
             self.store['content'][function]['up_label'] = QLabel()
-            self.store['content'][function]['up_label'].setText(var.lang['up'])
+            self.store['content'][function]['up_label'].setText(var.lang['up'] + ":")
 
             self.store['content'][function]['up_device'] = QLineEdit()
             self.store['content'][function]['up_device'].setFixedHeight(25)
@@ -259,7 +268,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['up_bind'].clicked.connect(lambda: self.bind_start(function, "up"))
 
             self.store['content'][function]['down_label'] = QLabel()
-            self.store['content'][function]['down_label'].setText(var.lang['down'])
+            self.store['content'][function]['down_label'].setText(var.lang['down'] + ":")
 
             self.store['content'][function]['down_device'] = QLineEdit()
             self.store['content'][function]['down_device'].setFixedHeight(25)
@@ -272,7 +281,7 @@ class MainWindow(QMainWindow):
             self.store['content'][function]['down_bind'].clicked.connect(lambda: self.bind_start(function, "down"))
 
             self.store['content'][function]['switch_label'] = QLabel()
-            self.store['content'][function]['switch_label'].setText(var.lang['switch'])
+            self.store['content'][function]['switch_label'].setText(var.lang['switch'] + ":")
 
             self.store['content'][function]['switch_device'] = QLineEdit()
             self.store['content'][function]['switch_device'].setFixedHeight(25)
@@ -287,11 +296,12 @@ class MainWindow(QMainWindow):
             row, column = 0, 0
             for element in self.store['content'][function]:
                 self.tabs[function].layout.addWidget(self.store['content'][function][element], row, column)
-                if element != "switch_value_label" and element != "switch_mode_label" and element != "rollover_mode_label":
+                if element != "switch_value_label" and element != "switch_mode_label" and element != "switch_led_label":
                     column += 1
                     if column > 2:
                         column = 0
                         row += 1
+
             del row, column
             self.tabs[function].setLayout(self.tabs[function].layout)
 
@@ -302,43 +312,123 @@ class MainWindow(QMainWindow):
                     "device": self.store['content'][function][control + '_device'],
                     "label": self.store['content'][function][control + '_label'],
                 }
+        except Exception as e:
+            print("exception in tool_tabs() with " + type + " " + function + " " + repr(e))
+            fn.error_handling(e, "interface.tool_tabs()")
 
-        def hybrid_tab(self):
+    def hybrid_tab(self):
+        try:
+            local_store = {
+                "binds": ["regen", "deploy"],
+            }
+
             self.tabs['hybrid'].layout = QGridLayout()
 
-            self.store['content']['hybrid']['soc_label'] = QLabel()
-            self.store['content']['hybrid']['soc_label'].setText(var.lang['soc'])
-            self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_label'], 0, 0)
-
-            self.store['content']['hybrid']['soc_lcd'] = QLCDNumber()
-            self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_lcd'], 0, 1)
+            self.store['content']['hybrid']['regen_led'] = CustomButtonLEDLabel()
+            self.store['content']['hybrid']['regen_led'].setFixedSize(92, 21)
+            self.store['content']['hybrid']['regen_led'].label_text = var.lang['regen']
+            self.store['content']['hybrid']['regen_led'].state('standby')
+            self.store['content']['hybrid']['regen_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_led'], 0, 0)
 
             self.store['content']['hybrid']['soc_axis'] = QProgressBar()
             self.store['content']['hybrid']['soc_axis'].setTextVisible(False)
             self.store['content']['hybrid']['soc_axis'].setMinimum(0)
             self.store['content']['hybrid']['soc_axis'].setMaximum(100)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 2)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['soc_axis'], 0, 1)
 
-            self.store['content']['hybrid']['deploy_lim_label'] = QLabel()
-            self.store['content']['hybrid']['deploy_lim_label'].setText(var.lang['deploy_lim'])
-            self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_label'], 1, 0)
+            self.store['content']['hybrid']['deploy_led'] = CustomButtonLEDLabel()
+            self.store['content']['hybrid']['deploy_led'].setFixedSize(92, 21)
+            self.store['content']['hybrid']['deploy_led'].label_text = var.lang['deploy']
+            self.store['content']['hybrid']['deploy_led'].state('standby')
+            self.store['content']['hybrid']['deploy_led'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_led'], 0, 2)
 
-            self.store['content']['hybrid']['deploy_lim_lcd'] = QLCDNumber()
-            self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_lcd'], 1, 1)
+            self.store['content']['hybrid']['regen_calibrate'] = QPushButton()
+            self.store['content']['hybrid']['regen_calibrate'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_calibrate'].setText(var.lang['calibrate'])
+            self.store['content']['hybrid']['regen_calibrate'].clicked.connect(lambda: self.calibrate_button_start("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_calibrate'], 1, 0)
 
             self.store['content']['hybrid']['deploy_lim_axis'] = QProgressBar()
             self.store['content']['hybrid']['deploy_lim_axis'].setTextVisible(False)
             self.store['content']['hybrid']['deploy_lim_axis'].setMinimum(0)
             self.store['content']['hybrid']['deploy_lim_axis'].setMaximum(100)
-            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 2)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_lim_axis'], 1, 1)
+
+            self.store['content']['hybrid']['deploy_calibrate'] = QPushButton()
+            self.store['content']['hybrid']['deploy_calibrate'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_calibrate'].setText(var.lang['calibrate'])
+            self.store['content']['hybrid']['deploy_calibrate'].clicked.connect(lambda: self.calibrate_button_start("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_calibrate'], 1, 2)
+
+            self.store['content']['hybrid']['regen_toggle_label'] = QLabel()
+            self.store['content']['hybrid']['regen_toggle_label'].setText(var.lang['regen'] + " " + var.lang['toggle'] + ":")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_toggle_label'], 2, 0)
+
+            self.store['content']['hybrid']['deploy_toggle_label'] = QLabel()
+            self.store['content']['hybrid']['deploy_toggle_label'].setText(var.lang['deploy'] + " " + var.lang['toggle'] + ":")
+            self.store['content']['hybrid']['deploy_toggle_label'].setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_toggle_label'], 2, 1)
+
+            self.store['content']['hybrid']['regen_toggle'] = CustomComboBox()
+            self.store['content']['hybrid']['regen_toggle'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_toggle'].addItems((var.lang['hold'], var.lang['toggle']))
+            self.store['content']['hybrid']['regen_toggle'].currentIndexChanged.connect(lambda: self.toggle_mode("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_toggle'], 2, 1)
+
+            self.store['content']['hybrid']['deploy_toggle'] = CustomComboBox()
+            self.store['content']['hybrid']['deploy_toggle'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_toggle'].addItems((var.lang['hold'], var.lang['toggle']))
+            self.store['content']['hybrid']['deploy_toggle'].currentIndexChanged.connect(lambda: self.toggle_mode("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_toggle'], 2, 2)
+
+            self.store['content']['hybrid']['regen_label'] = QLabel()
+            self.store['content']['hybrid']['regen_label'].setText(var.lang['regen'] + ":")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_label'], 3, 0)
+
+            self.store['content']['hybrid']['regen_device'] = QLineEdit()
+            self.store['content']['hybrid']['regen_device'].setFixedHeight(25)
+            self.store['content']['hybrid']['regen_device'].setReadOnly(True)
+            self.store['content']['hybrid']['regen_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_device'], 3, 1)
+
+            self.store['content']['hybrid']['regen_bind'] = QPushButton()
+            self.store['content']['hybrid']['regen_bind'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['regen_bind'].setText(var.lang['bind'])
+            self.store['content']['hybrid']['regen_bind'].clicked.connect(lambda: self.bind_start("hybrid", "regen"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['regen_bind'], 3, 2)
+
+            self.store['content']['hybrid']['deploy_label'] = QLabel()
+            self.store['content']['hybrid']['deploy_label'].setText(var.lang['deploy'] + ":")
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_label'], 4, 0)
+
+            self.store['content']['hybrid']['deploy_device'] = QLineEdit()
+            self.store['content']['hybrid']['deploy_device'].setFixedHeight(25)
+            self.store['content']['hybrid']['deploy_device'].setReadOnly(True)
+            self.store['content']['hybrid']['deploy_device'].setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_device'], 4, 1)
+
+            self.store['content']['hybrid']['deploy_bind'] = QPushButton()
+            self.store['content']['hybrid']['deploy_bind'].setFixedSize(95, 25)
+            self.store['content']['hybrid']['deploy_bind'].setText(var.lang['bind'])
+            self.store['content']['hybrid']['deploy_bind'].clicked.connect(lambda: self.bind_start("hybrid", "deploy"))
+            self.tabs['hybrid'].layout.addWidget(self.store['content']['hybrid']['deploy_bind'], 4, 2)
 
             self.tabs['hybrid'].setLayout(self.tabs['hybrid'].layout)
 
-        def fuel_tab(self):
+            self.store['index']['hybrid'] = {}
+            for control in local_store['binds']:
+                self.store['index']['hybrid'][control] = {
+                    "bind": self.store['content']['hybrid'][control + '_bind'],
+                    "device": self.store['content']['hybrid'][control + '_device'],
+                    "label": self.store['content']['hybrid'][control + '_label'],
+                }
+        except Exception as e:
+            fn.error_handling(e, "interface.hybrid_tab()")
+
+    def fuel_tab(self):
+        try:
             self.tabs['fuel'].layout = QGridLayout()
 
             self.store['content']['fuel']['wip'] = QLabel()
@@ -346,115 +436,247 @@ class MainWindow(QMainWindow):
             self.tabs['fuel'].layout.addWidget(self.store['content']['fuel']['wip'], 0, 0)
 
             self.tabs['fuel'].setLayout(self.tabs['fuel'].layout)
+        except Exception as e:
+            fn.error_handling(e, "interface.fuel_tab()")
 
-        def display_tab(self):
+    def display_tab(self):
+        try:
             self.tabs['display'].layout = QGridLayout()
 
             self.store['content']['display']['car_id_label'] = QLabel()
-            self.store['content']['display']['car_id_label'].setText(var.lang['car_id'])
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_label'], 0, 0)
+            self.store['content']['display']['car_id_label'].setText(var.lang['car_id'] + ":")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_label'], 0, 2)
 
             self.store['content']['display']['car_id'] = QLabel()
             self.store['content']['display']['car_id'].setText("None")
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id'], 0, 1)
+            self.store['content']['display']['car_id'].setWordWrap(True)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id'], 0, 3)
 
-            self.store['content']['display']['car_id_limits'] = QLabel()
-            self.store['content']['display']['car_id_limits'].setText("Placeholder")
-            self.store['content']['display']['car_id_limits'].setWordWrap(True)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['car_id_limits'], 0, 2)
+            self.store['content']['display']['sounds'] = QLabel()
+            self.store['content']['display']['sounds'].setText("Audio")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['sounds'], 0, 5, alignment=Qt.AlignmentFlag.AlignRight)
 
             self.store['content']['display']['weight_jacker_label'] = QLabel()
-            self.store['content']['display']['weight_jacker_label'].setText(var.lang['weight_jacker'])
+            self.store['content']['display']['weight_jacker_label'].setText(var.lang['weight_jacker'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_label'], 1, 0)
+
+            self.store['content']['display']['weight_jacker_limits'] = QLabel()
+            self.store['content']['display']['weight_jacker_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_limits'], 1, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             self.store['content']['display']['weight_jacker_lcd'] = QLCDNumber()
             self.store['content']['display']['weight_jacker_lcd'].display(0)
             self.store['content']['display']['weight_jacker_lcd'].setSegmentStyle(self.store['content']['weight_jacker']['lcd'].segmentStyle())
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_lcd'], 1, 1)
+            self.store['content']['display']['weight_jacker_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_lcd'], 1, 2)
 
             self.store['content']['display']['weight_jacker_axis'] = QProgressBar()
             self.store['content']['display']['weight_jacker_axis'].setTextVisible(False)
             self.store['content']['display']['weight_jacker_axis'].setMinimum(0)
             self.store['content']['display']['weight_jacker_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['weight_jacker_axis'], 1, 3)
+
+            self.store['content']['display']['soc_low_spacer'] = QLabel()
+            self.store['content']['display']['soc_low_spacer'].setText(" " * 5)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_low_spacer'], 1, 4)
+
+            self.store['content']['display']['soc_low'] = QLabel()
+            self.store['content']['display']['soc_low'].setText("SoC Low")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_low'], 1, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_low_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_low_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_low_led'].state('off')
+            self.store['content']['display']['hybrid_low_led'].sound = 'low'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_low_led'], 1, 6)
 
             self.store['content']['display']['front_roll_bar_label'] = QLabel()
-            self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'])
+            self.store['content']['display']['front_roll_bar_label'].setText(var.lang['front_roll_bar'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_label'], 2, 0)
+
+            self.store['content']['display']['front_roll_bar_limits'] = QLabel()
+            self.store['content']['display']['front_roll_bar_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_limits'], 2, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             self.store['content']['display']['front_roll_bar_lcd'] = QLCDNumber()
             self.store['content']['display']['front_roll_bar_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_lcd'], 2, 1)
+            self.store['content']['display']['front_roll_bar_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_lcd'], 2, 2)
 
             self.store['content']['display']['front_roll_bar_axis'] = QProgressBar()
             self.store['content']['display']['front_roll_bar_axis'].setTextVisible(False)
             self.store['content']['display']['front_roll_bar_axis'].setMinimum(0)
             self.store['content']['display']['front_roll_bar_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_axis'], 2, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['front_roll_bar_axis'], 2, 3)
+
+            self.store['content']['display']['soc_high'] = QLabel()
+            self.store['content']['display']['soc_high'].setText("SoC High")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_high'], 2, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_high_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_high_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_high_led'].state('off')
+            self.store['content']['display']['hybrid_high_led'].sound = 'high'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_high_led'], 2, 6)
 
             self.store['content']['display']['rear_roll_bar_label'] = QLabel()
-            self.store['content']['display']['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'])
+            self.store['content']['display']['rear_roll_bar_label'].setText(var.lang['rear_roll_bar'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_label'], 3, 0)
+
+            self.store['content']['display']['rear_roll_bar_limits'] = QLabel()
+            self.store['content']['display']['rear_roll_bar_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_limits'], 3, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             self.store['content']['display']['rear_roll_bar_lcd'] = QLCDNumber()
             self.store['content']['display']['rear_roll_bar_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_lcd'], 3, 1)
+            self.store['content']['display']['rear_roll_bar_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_lcd'], 3, 2)
 
             self.store['content']['display']['rear_roll_bar_axis'] = QProgressBar()
             self.store['content']['display']['rear_roll_bar_axis'].setTextVisible(False)
             self.store['content']['display']['rear_roll_bar_axis'].setMinimum(0)
             self.store['content']['display']['rear_roll_bar_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_axis'], 3, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['rear_roll_bar_axis'], 3, 3)
+
+            self.store['content']['display']['deploy_limit'] = QLabel()
+            self.store['content']['display']['deploy_limit'].setText("Deploy Lim")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_limit'], 3, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['hybrid_limit_led'] = CustomLEDLabel()
+            self.store['content']['display']['hybrid_limit_led'].setFixedSize(16, 16)
+            self.store['content']['display']['hybrid_limit_led'].state('off')
+            self.store['content']['display']['hybrid_limit_led'].sound = 'limit'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['hybrid_limit_led'], 3, 6)
 
             self.store['content']['display']['fuel_map_label'] = QLabel()
-            self.store['content']['display']['fuel_map_label'].setText(var.lang['fuel_map'])
+            self.store['content']['display']['fuel_map_label'].setText(var.lang['fuel_map'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_label'], 4, 0)
+
+            self.store['content']['display']['fuel_map_limits'] = QLabel()
+            self.store['content']['display']['fuel_map_limits'].setText("Placeholder")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_limits'], 4, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             self.store['content']['display']['fuel_map_lcd'] = QLCDNumber()
             self.store['content']['display']['fuel_map_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_lcd'], 4, 1)
+            self.store['content']['display']['fuel_map_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_lcd'], 4, 2)
 
             self.store['content']['display']['fuel_map_axis'] = QProgressBar()
             self.store['content']['display']['fuel_map_axis'].setTextVisible(False)
             self.store['content']['display']['fuel_map_axis'].setMinimum(0)
             self.store['content']['display']['fuel_map_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_axis'], 4, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['fuel_map_axis'], 4, 3)
+
+            self.store['content']['display']['upshift'] = QLabel()
+            self.store['content']['display']['upshift'].setText("Upshift")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift'], 4, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['upshift_beep_led'] = CustomLEDLabel()
+            self.store['content']['display']['upshift_beep_led'].setFixedSize(16, 16)
+            self.store['content']['display']['upshift_beep_led'].state('off')
+            self.store['content']['display']['upshift_beep_led'].sound = 'upshift_beep'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['upshift_beep_led'], 4, 6)
 
             self.store['content']['display']['clutch_label'] = QLabel()
-            self.store['content']['display']['clutch_label'].setText(var.lang['clutch'])
+            self.store['content']['display']['clutch_label'].setText(var.lang['clutch'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_label'], 5, 0)
+
+            # self.store['content']['display']['clutch_limits'] = QLabel()
+            # self.store['content']['display']['clutch_limits'].setText("0 to 100")
+            # self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_limits'], 5, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             self.store['content']['display']['clutch_lcd'] = QLCDNumber()
             self.store['content']['display']['clutch_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_lcd'], 5, 1)
+            self.store['content']['display']['clutch_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_lcd'], 5, 2)
 
             self.store['content']['display']['clutch_axis'] = QProgressBar()
             self.store['content']['display']['clutch_axis'].setTextVisible(False)
             self.store['content']['display']['clutch_axis'].setMinimum(0)
             self.store['content']['display']['clutch_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_axis'], 5, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['clutch_axis'], 5, 3)
+
+            self.store['content']['display']['downshift'] = QLabel()
+            self.store['content']['display']['downshift'].setText("Downshift")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift'], 5, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['downshift_beep_led'] = CustomLEDLabel()
+            self.store['content']['display']['downshift_beep_led'].setFixedSize(16, 16)
+            self.store['content']['display']['downshift_beep_led'].state('off')
+            self.store['content']['display']['downshift_beep_led'].sound = 'downshift_beep'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['downshift_beep_led'], 5, 6)
 
             self.store['content']['display']['throttle_label'] = QLabel()
-            self.store['content']['display']['throttle_label'].setText(var.lang['throttle'])
+            self.store['content']['display']['throttle_label'].setText(var.lang['throttle'] + ":")
             self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_label'], 6, 0)
+
+            # self.store['content']['display']['throttle_limits'] = QLabel()
+            # self.store['content']['display']['throttle_limits'].setText("0 to 100")
+            # self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_limits'], 6, 1, alignment=Qt.AlignmentFlag.AlignCenter)
 
             self.store['content']['display']['throttle_lcd'] = QLCDNumber()
             self.store['content']['display']['throttle_lcd'].display(0)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_lcd'], 6, 1)
+            self.store['content']['display']['throttle_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_lcd'], 6, 2)
 
             self.store['content']['display']['throttle_axis'] = QProgressBar()
             self.store['content']['display']['throttle_axis'].setTextVisible(False)
             self.store['content']['display']['throttle_axis'].setMinimum(0)
             self.store['content']['display']['throttle_axis'].setMaximum(100)
-            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 2)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['throttle_axis'], 6, 3)
+
+            self.store['content']['display']['p2p_active'] = QLabel()
+            self.store['content']['display']['p2p_active'].setText("P2P Warn")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active'], 6, 5, alignment=Qt.AlignmentFlag.AlignRight)
+
+            self.store['content']['display']['p2p_active_led'] = CustomLEDLabel()
+            self.store['content']['display']['p2p_active_led'].setFixedSize(16, 16)
+            self.store['content']['display']['p2p_active_led'].state('off')
+            self.store['content']['display']['p2p_active_led'].sound = 'p2p_active'
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['p2p_active_led'], 6, 6)
+
+            self.store['content']['display']['soc_label'] = QLabel()
+            self.store['content']['display']['soc_label'].setText(var.lang['soc'] + ":")
+            self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_label'], 7, 0)
+
+            self.store['content']['display']['soc_lcd'] = QLCDNumber()
+            self.store['content']['display']['soc_lcd'].display(str(0.00))
+            self.store['content']['display']['soc_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_lcd'], 7, 2)
+
+            self.store['content']['display']['soc_axis'] = QProgressBar()
+            self.store['content']['display']['soc_axis'].setTextVisible(False)
+            self.store['content']['display']['soc_axis'].setMinimum(0)
+            self.store['content']['display']['soc_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['soc_axis'], 7, 3)
+
+            self.store['content']['display']['deploy_lim_label'] = QLabel()
+            self.store['content']['display']['deploy_lim_label'].setText(var.lang['deploy_limit'] + ":")
+            self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_label'], 8, 0)
+
+            self.store['content']['display']['deploy_lim_lcd'] = QLCDNumber()
+            self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
+            self.store['content']['display']['deploy_lim_lcd'].setSegmentStyle(QLCDNumber.SegmentStyle.Flat)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_lcd'], 8, 2)
+
+            self.store['content']['display']['deploy_lim_axis'] = QProgressBar()
+            self.store['content']['display']['deploy_lim_axis'].setTextVisible(False)
+            self.store['content']['display']['deploy_lim_axis'].setMinimum(0)
+            self.store['content']['display']['deploy_lim_axis'].setMaximum(100)
+            self.tabs['display'].layout.addWidget(self.store['content']['display']['deploy_lim_axis'], 8, 3)
 
             self.tabs['display'].setLayout(self.tabs['display'].layout)
+        except Exception as e:
+            fn.error_handling(e, "interface.display_tab()")
 
-        def sounds_tab(self):
+    def sounds_tab(self):
+        try:
             self.tabs['sounds'].layout = QGridLayout()
             
             self.store['content']['sounds']['sound_label'] = QLabel()
-            self.store['content']['sounds']['sound_label'].setText(var.lang['sound_label'])
+            self.store['content']['sounds']['sound_label'].setText(var.lang['sound_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['sound_label'], 0, 0)
 
             self.store['content']['sounds']['sound'] = CustomComboBox()
@@ -466,7 +688,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['sound'], 0, 1)
 
             self.store['content']['sounds']['volume_label'] = QLabel()
-            self.store['content']['sounds']['volume_label'].setText(var.lang['volume_label'])
+            self.store['content']['sounds']['volume_label'].setText(var.lang['volume_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['volume_label'], 1, 0)
 
             self.store['content']['sounds']['volume'] = CustomSpinBox()
@@ -476,7 +698,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['volume'], 1, 1)
 
             self.store['content']['sounds']['hybrid_low_audio_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'])
+            self.store['content']['sounds']['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_audio_label'], 2, 0)
 
             self.store['content']['sounds']['hybrid_low_audio'] = CustomComboBox()
@@ -494,7 +716,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_test'], 2, 2)
 
             self.store['content']['sounds']['hybrid_high_audio_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'])
+            self.store['content']['sounds']['hybrid_high_audio_label'].setText(var.lang['hybrid_high_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_audio_label'], 3, 0)
 
             self.store['content']['sounds']['hybrid_high_audio'] = CustomComboBox()
@@ -512,7 +734,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_test'], 3, 2)
 
             self.store['content']['sounds']['hybrid_limit_audio_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'])
+            self.store['content']['sounds']['hybrid_limit_audio_label'].setText(var.lang['hybrid_limit_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_audio_label'], 4, 0)
 
             self.store['content']['sounds']['hybrid_limit_audio'] = CustomComboBox()
@@ -530,7 +752,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_test'], 4, 2)
 
             self.store['content']['sounds']['hybrid_low_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_low_label'].setText(var.lang['hybrid_low_label'])
+            self.store['content']['sounds']['hybrid_low_label'].setText(var.lang['hybrid_low_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_label'], 5, 0)
 
             self.store['content']['sounds']['hybrid_low_val'] = CustomSpinBox()
@@ -541,7 +763,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_val'], 5, 1)
 
             self.store['content']['sounds']['hybrid_high_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_high_label'].setText(var.lang['hybrid_high_label'])
+            self.store['content']['sounds']['hybrid_high_label'].setText(var.lang['hybrid_high_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_label'], 6, 0)
 
             self.store['content']['sounds']['hybrid_high_val'] = CustomSpinBox()
@@ -552,7 +774,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_val'], 6, 1)
 
             self.store['content']['sounds']['hybrid_limit_label'] = QLabel()
-            self.store['content']['sounds']['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'])
+            self.store['content']['sounds']['hybrid_limit_label'].setText(var.lang['hybrid_limit_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_label'], 7, 0)
 
             self.store['content']['sounds']['hybrid_limit_val'] = CustomSpinBox()
@@ -563,7 +785,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_val'], 7, 1)
 
             self.store['content']['sounds']['upshift_beep_label'] = QLabel()
-            self.store['content']['sounds']['upshift_beep_label'].setText(var.lang['upshift_beep_label'])
+            self.store['content']['sounds']['upshift_beep_label'].setText(var.lang['upshift_beep_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_label'], 8, 0)
 
             self.store['content']['sounds']['upshift_beep'] = CustomComboBox()
@@ -581,7 +803,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_test'], 8, 2)
 
             self.store['content']['sounds']['downshift_beep_label'] = QLabel()
-            self.store['content']['sounds']['downshift_beep_label'].setText(var.lang['downshift_beep_label'])
+            self.store['content']['sounds']['downshift_beep_label'].setText(var.lang['downshift_beep_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_label'], 9, 0)
 
             self.store['content']['sounds']['downshift_beep'] = CustomComboBox()
@@ -599,7 +821,7 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_test'], 9, 2)
 
             self.store['content']['sounds']['beep_mode_label'] = QLabel()
-            self.store['content']['sounds']['beep_mode_label'].setText(var.lang['beep_mode_label'])
+            self.store['content']['sounds']['beep_mode_label'].setText(var.lang['beep_mode_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['beep_mode_label'], 10, 0)
 
             self.store['content']['sounds']['beep_mode'] = CustomComboBox()
@@ -612,7 +834,7 @@ class MainWindow(QMainWindow):
 
             # dynamic mode offset
             self.store['content']['sounds']['dynamic_mode_offset_label'] = QLabel()
-            self.store['content']['sounds']['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'])
+            self.store['content']['sounds']['dynamic_mode_offset_label'].setText(var.lang['dynamic_mode_offset_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['dynamic_mode_offset_label'], 11, 0)
 
             self.store['content']['sounds']['dynamic_mode_offset'] = CustomSpinBox()
@@ -624,7 +846,7 @@ class MainWindow(QMainWindow):
 
             # upshift offset
             self.store['content']['sounds']['upshift_offset_label'] = QLabel()
-            self.store['content']['sounds']['upshift_offset_label'].setText(var.lang['upshift_offset_label'])
+            self.store['content']['sounds']['upshift_offset_label'].setText(var.lang['upshift_offset_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_offset_label'], 12, 0)
 
             self.store['content']['sounds']['upshift_offset'] = CustomSpinBox()
@@ -636,7 +858,7 @@ class MainWindow(QMainWindow):
 
             # downshift offset
             self.store['content']['sounds']['downshift_offset_label'] = QLabel()
-            self.store['content']['sounds']['downshift_offset_label'].setText(var.lang['downshift_offset_label'])
+            self.store['content']['sounds']['downshift_offset_label'].setText(var.lang['downshift_offset_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_offset_label'], 13, 0)
 
             self.store['content']['sounds']['downshift_offset'] = CustomSpinBox()
@@ -648,7 +870,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind audio enabled
             self.store['content']['sounds']['p2p_behind_audio_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'])
+            self.store['content']['sounds']['p2p_behind_audio_label'].setText(var.lang['p2p_behind_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_label'], 14, 0)
 
             self.store['content']['sounds']['p2p_behind_audio'] = CustomComboBox()
@@ -667,7 +889,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind audio continuous enabled
             self.store['content']['sounds']['p2p_behind_audio_cont_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'])
+            self.store['content']['sounds']['p2p_behind_audio_cont_label'].setText(var.lang['p2p_behind_audio_cont_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_audio_cont_label'], 15, 0)
 
             self.store['content']['sounds']['p2p_behind_audio_cont'] = CustomComboBox()
@@ -686,7 +908,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind stop audio under braking
             self.store['content']['sounds']['p2p_behind_nobrake_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'])
+            self.store['content']['sounds']['p2p_behind_nobrake_label'].setText(var.lang['p2p_behind_nobrake_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_nobrake_label'], 16, 0)
 
             self.store['content']['sounds']['p2p_behind_nobrake'] = CustomComboBox()
@@ -699,7 +921,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind single warning threshold
             self.store['content']['sounds']['p2p_behind_thresh_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'])
+            self.store['content']['sounds']['p2p_behind_thresh_label'].setText(var.lang['p2p_behind_thresh_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_label'], 17, 0)
 
             self.store['content']['sounds']['p2p_behind_thresh'] = CustomSpinBox()
@@ -711,7 +933,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind continuous warning threshold
             self.store['content']['sounds']['p2p_behind_thresh_cont_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'])
+            self.store['content']['sounds']['p2p_behind_thresh_cont_label'].setText(var.lang['p2p_behind_thresh_cont_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_thresh_cont_label'], 18, 0)
 
             self.store['content']['sounds']['p2p_behind_thresh_cont'] = CustomSpinBox()
@@ -723,7 +945,7 @@ class MainWindow(QMainWindow):
 
             # p2p behind audio for any car within range vs closest car only
             self.store['content']['sounds']['p2p_behind_closest_car_label'] = QLabel()
-            self.store['content']['sounds']['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'])
+            self.store['content']['sounds']['p2p_behind_closest_car_label'].setText(var.lang['p2p_behind_closest_car_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_closest_car_label'], 19, 0)
 
             self.store['content']['sounds']['p2p_behind_closest_car'] = CustomComboBox()
@@ -735,18 +957,24 @@ class MainWindow(QMainWindow):
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_closest_car'], 19, 1)
 
             self.tabs['sounds'].setLayout(self.tabs['sounds'].layout)
+        except Exception as e:
+            fn.error_handling(e, "interface.sounds_tab()")
 
-        def settings_tab(self):
+    def settings_tab(self):
+        try:
             self.tabs['settings'].layout = QGridLayout()
 
             self.store['content']['settings']['spacer'] = QLabel()
             self.store['content']['settings']['spacer'].setText(" " * 60)
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['spacer'], 0, 1)
+
+            row = 0
+            column = 0
 
             self.store['content']['settings']['scale_label'] = QLabel()
-            self.store['content']['settings']['scale_label'].setText(var.lang['scale'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], 0, 0)
-    
+            self.store['content']['settings']['scale_label'].setText(var.lang['scale'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale_label'], row, column)
+            column += 2
+
             self.store['content']['settings']['scale'] = CustomComboBox()
             self.store['content']['settings']['scale'].setFixedSize(70, 22)
             self.store['content']['settings']['scale'].addItem("0.5" + "x")
@@ -755,63 +983,125 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['scale'].addItem("1.25" + "x")
             self.store['content']['settings']['scale'].addItem("1.5" + "x")
             self.store['content']['settings']['scale'].currentTextChanged.connect(self.scale)
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale'], 0, 2, alignment=Qt.AlignmentFlag.AlignRight)
-    
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['scale'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+
             self.store['content']['settings']['timer_first_label'] = QLabel()
-            self.store['content']['settings']['timer_first_label'].setText(var.lang['timer_first'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first_label'], 1, 0)
-    
+            self.store['content']['settings']['timer_first_label'].setText(var.lang['timer_first'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first_label'], row, column)
+            column += 2
+
             self.store['content']['settings']['timer_first'] = CustomSpinBox()
             self.store['content']['settings']['timer_first'].setFixedSize(70, 20)
             self.store['content']['settings']['timer_first'].setRange(1, 1000)
             self.store['content']['settings']['timer_first'].valueChanged.connect(lambda: self.settings_set('timer_first'))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first'], 1, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_first'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
 
             self.store['content']['settings']['timer_loop_label'] = QLabel()
-            self.store['content']['settings']['timer_loop_label'].setText(var.lang['timer_loop'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop_label'], 2, 0)
-    
+            self.store['content']['settings']['timer_loop_label'].setText(var.lang['timer_loop'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop_label'], row, column)
+            column += 2
+
             self.store['content']['settings']['timer_loop'] = CustomSpinBox()
             self.store['content']['settings']['timer_loop'].setFixedSize(70, 20)
             self.store['content']['settings']['timer_loop'].setRange(1, 1000)
             self.store['content']['settings']['timer_loop'].valueChanged.connect(lambda: self.settings_set('timer_loop'))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop'], 2, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['timer_loop'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
 
             self.store['content']['settings']['profile_create_label'] = QLabel()
-            self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], 3, 0)
-    
+            self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], row, column)
+            column += 2
+
             self.store['content']['settings']['profile_create_name'] = QLineEdit()
-            self.store['content']['settings']['profile_create_name'].setFixedSize(100, 25)
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_name'], 3, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.store['content']['settings']['profile_create_name'].setFixedSize(190, 25)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_name'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            column += 1
 
             self.store['content']['settings']['profile_create'] = QPushButton()
-            self.store['content']['settings']['profile_create'].setFixedSize(100, 25)
+            self.store['content']['settings']['profile_create'].setFixedSize(70, 25)
             self.store['content']['settings']['profile_create'].setText(var.lang['create'])
             self.store['content']['settings']['profile_create'].clicked.connect(lambda: self.create_profile(self.store['content']['settings']['profile_create_name'].text()))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create'], 3, 3, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
 
             self.store['content']['settings']['profile_select_label'] = QLabel()
-            self.store['content']['settings']['profile_select_label'].setText(var.lang['profile_select'])
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select_label'], 4, 0)
-    
+            self.store['content']['settings']['profile_select_label'].setText(var.lang['profile_select'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select_label'], row, column)
+            column += 2
+
             self.store['content']['settings']['profile_select'] = CustomComboBox()
-            self.store['content']['settings']['profile_select'].setFixedSize(100, 25)
+            self.store['content']['settings']['profile_select'].setFixedSize(190, 25)
             self.store['content']['settings']['profile_select'].addItem(var.settings['profile']['current'])
             self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
-            self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
+            # self.store['content']['settings']['profile_select'].activated.connect(lambda: self.refresh_profile_list())
             self.store['content']['settings']['profile_select'].currentTextChanged.connect(lambda: self.apply_settings(self.store['content']['settings']['profile_select'].currentText()))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select'], 4, 2, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_select'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            column += 1
 
             self.store['content']['settings']['profile_delete'] = QPushButton()
-            self.store['content']['settings']['profile_delete'].setFixedSize(100, 25)
+            self.store['content']['settings']['profile_delete'].setFixedSize(70, 25)
             self.store['content']['settings']['profile_delete'].setText(var.lang['delete'])
             self.store['content']['settings']['profile_delete'].clicked.connect(lambda: self.delete_profile(self.store['content']['settings']['profile_select'].currentText()))
-            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_delete'], 4, 3, alignment=Qt.AlignmentFlag.AlignRight)
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_delete'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['spacer'], row, column)
+            row += 1
+
+            self.store['content']['settings']['axis_threshold_device_label'] = QLabel()
+            self.store['content']['settings']['axis_threshold_device_label'].setText(var.lang['axis_threshold'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['axis_threshold_device_label'], row, column)
+            column += 2
+
+            self.store['content']['settings']['high_threshold_label'] = QLabel()
+            self.store['content']['settings']['high_threshold_label'].setText(var.lang['high_threshold'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold_label'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            column += 1
+
+            self.store['content']['settings']['low_threshold_label'] = QLabel()
+            self.store['content']['settings']['low_threshold_label'].setText(var.lang['low_threshold'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold_label'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+            self.store['content']['settings']['axis_threshold_device'] = CustomComboBox()
+            self.store['content']['settings']['axis_threshold_device_guid'] = "-2"
+            self.store['content']['settings']['axis_threshold_device'].setFixedSize(285, 25)
+            for data in var.id_table:
+                if data[0] != -2:
+                    self.store['content']['settings']['axis_threshold_device'].addItem(dev.device_info[data[1]]['name'])
+            self.store['content']['settings']['axis_threshold_device'].currentTextChanged.connect(lambda: self.replace_axis_thresh())
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['axis_threshold_device'], row, column)
+            column += 2
+
+            self.store['content']['settings']['high_threshold'] = CustomSpinBox()
+            self.store['content']['settings']['high_threshold'].setFixedSize(70, 20)
+            self.store['content']['settings']['high_threshold'].setRange(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1, 99)
+            self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
+            self.store['content']['settings']['high_threshold'].valueChanged.connect(lambda: self.settings_set('high_threshold'))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['high_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            column += 1
+
+            self.store['content']['settings']['low_threshold'] = CustomSpinBox()
+            self.store['content']['settings']['low_threshold'].setFixedSize(70, 20)
+            self.store['content']['settings']['low_threshold'].setRange(1, int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1)
+            self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
+            self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
 
             self.tabs['settings'].setLayout(self.tabs['settings'].layout)
+        except Exception as e:
+            fn.error_handling(e, "interface.settings_tab()")
 
-        def about_tab(self):
+    def about_tab(self):
+        try:
             self.tabs['about'].layout = QGridLayout()
 
             self.store['content']['about']['donate'] = QPushButton()
@@ -839,10 +1129,13 @@ class MainWindow(QMainWindow):
             self.tabs['about'].layout.addWidget(self.store['content']['about']['github'], 0, 3)
 
             self.tabs['about'].setLayout(self.tabs['about'].layout)
+        except Exception as e:
+            fn.error_handling(e, "interface.about_tab()")
 
-        def updater(self):
+    def updater(self):
+        try:
             for function in var.status:
-                if function in self.store['content']:
+                if function in self.store['content'] and function != "hybrid":
                     value = var.status[function]['secondary']
                     if function == "weight_jacker":
                         # var.status[function]['secondary'] = (value * var.step[function]) + 0.5
@@ -852,13 +1145,26 @@ class MainWindow(QMainWindow):
                         value = float(value*100)
                     #elif function == "settings":
                         #self.refresh_profile_list()
-                    elif function == "regen" or function == "deploy":
+                    elif function == "regen_rate" or function == "deploy_rate":
                         value = value * (self.store['content'][function]['switch'].maximum() - self.store['content'][function]['switch'].minimum()) + self.store['content'][function]['switch'].minimum()
                     else:
                         # var.status[function]['secondary'] = (value * var.step[function]) - var.step[function]
                         value = int(round((value / var.step[function]) + 1))
-
                     self.store['content'][function]['switch'].setValue(value)
+
+                    if function in self.tabs['types']['adjustment'] or function in self.tabs['types']['input']:
+                        if var.status[function]['switched']:
+                            self.store['content'][function]['switch_led'].label_text = var.lang['secondary']
+                            self.store['content'][function]['switch_led'].state('active')
+                        elif not var.status[function]['switched']:
+                            self.store['content'][function]['switch_led'].label_text = var.lang['primary']
+                            self.store['content'][function]['switch_led'].state('standby')
+                elif function in self.store['content'] and function == "hybrid":
+                    for control in var.status[function]:
+                        if var.status[function][control]['state']:
+                            self.store['content'][function][control + '_led'].state('active')
+                        elif not var.status[function][control]['state']:
+                            self.store['content'][function][control + '_led'].state('standby')
 
             self.display()
 
@@ -891,7 +1197,7 @@ class MainWindow(QMainWindow):
                     sleep(0.01)
                     var.bindings['status']['active'] = True
                     sleep(0.01)
-                    vjoy.set('weight_jacker', vjoy.axis_values['weight_jacker']) # bad hack to make sure vjoy is actually 'active'
+                    vjoy.set_axis('weight_jacker', vjoy.axis_values['weight_jacker']) # bad hack to make sure vjoy is actually 'active'
                     var.bindings['status']['active'] = False
                 self.lastval['IsOnTrack'] = self.ir['IsOnTrack']
                 if self.lastval['CarIdx'] in car_settings and 'limiter' in car_settings[self.lastval['CarIdx']]: # if limiter in car_settings, save limiter minus settings offset for up and down
@@ -901,7 +1207,7 @@ class MainWindow(QMainWindow):
                     try:
                         var.status['upshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['upshift_offset']
                         var.status['downshift_val'] = self.ir['PlayerCarSLBlinkRPM'] - var.settings['local']['downshift_offset']
-                    except:
+                    except KeyError or NameError:
                         print("upshift and downshift values failed in updater()")
                 if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep'] or var.settings['local']['hybrid_low_audio'] or var.settings['local']['hybrid_high_audio'] or var.settings['local']['hybrid_limit_audio'] or var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']):
                     self.irsdk_audio()
@@ -911,23 +1217,40 @@ class MainWindow(QMainWindow):
                 self.store['content']['display']['car_id'] = "None"
                 self.store['content']['hybrid']['soc_axis'].setValue(0)
                 self.store['content']['hybrid']['soc_axis'].update()
+                self.store['content']['display']['soc_axis'].setValue(0)
+                self.store['content']['display']['soc_axis'].update()
                 self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
                 self.store['content']['hybrid']['deploy_lim_axis'].update()
-                self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-                self.store['content']['hybrid']['soc_lcd'].update()
-                self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-                self.store['content']['hybrid']['deploy_lim_lcd'].update()
+                self.store['content']['display']['deploy_lim_axis'].setValue(0)
+                self.store['content']['display']['deploy_lim_axis'].update()
+                self.store['content']['display']['soc_lcd'].display(str(0.00))
+                self.store['content']['display']['soc_lcd'].update()
+                self.store['content']['display']['soc_lcd'].display(str(0.00))
+                self.store['content']['display']['soc_lcd'].update()
+                self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
+                self.store['content']['display']['deploy_lim_lcd'].update()
                 self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
                 self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
                 self.update_limits()
                 var.gearing = []
             if var.status['refresh_labels']:
                 self.update_label_all()
                 var.status['refresh_labels'] = False
+            if var.status['refresh_guid_list']:
+                self.refresh_guid_list()
+                var.status['refresh_guid_list'] = False
+            if var.status['rewrite_profile']:
+                fn.write_profile()
+                var.status['rewrite_profile'] = False
+        except Exception as e:
+            fn.error_handling(e, "interface.updater()")
 
-        def display(self):
+    def display(self):
+        try:
             for func in vjoy.axis_values:
-                if func in self.store['content']: #only because not every tab has been developed yet...
+                if func in self.store['content']:
                     pct = vjoy.axis_values[func]
                     # print("display check1: ", func, pct)
                     self.store['content'][func]['axis'].setValue(int(pct * 100))
@@ -957,31 +1280,51 @@ class MainWindow(QMainWindow):
                     self.store['content'][func]['lcd'].update()
                     self.store['content']['display'][func + '_lcd'].update()
             if (self.store['content']['display']['car_id'] in car_settings) and 'hybrid' in car_settings[self.store['content']['display']['car_id']]:
-                self.store['content']['hybrid']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['soc_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                self.store['content']['display']['deploy_lim_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 if self.ir['IsOnTrackCar'] and (car_settings[self.store['content']['display']['car_id']]['hybrid'] == True): # and hybrid in car_settings
                     soc_pct = self.ir['EnergyERSBatteryPct']
                     self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
                     self.store['content']['hybrid']['soc_axis'].update()
-                    self.store['content']['hybrid']['soc_lcd'].display(str(round(soc_pct*100,1)))
-                    self.store['content']['hybrid']['soc_lcd'].update()
+                    self.store['content']['display']['soc_axis'].setValue(int(soc_pct*100))
+                    self.store['content']['display']['soc_axis'].update()
+                    self.store['content']['display']['soc_lcd'].display(str(round(soc_pct*100,1)))
+                    self.store['content']['display']['soc_lcd'].update()
+                    self.store['content']['hybrid']['soc_axis'].setValue(int(soc_pct*100))
+                    self.store['content']['hybrid']['soc_axis'].update()
+                    self.store['content']['display']['soc_axis'].setValue(int(soc_pct*100))
+                    self.store['content']['display']['soc_axis'].update()
+                    self.store['content']['display']['soc_lcd'].display(str(round(soc_pct*100,1)))
+                    self.store['content']['display']['soc_lcd'].update()
                     deploy_lim_pct = self.ir['EnergyMGU_KLapDeployPct']
                     self.store['content']['hybrid']['deploy_lim_axis'].setValue(int(deploy_lim_pct*100))
                     self.store['content']['hybrid']['deploy_lim_axis'].update()
-                    self.store['content']['hybrid']['deploy_lim_lcd'].display(str(round(deploy_lim_pct*100,1)))
-                    self.store['content']['hybrid']['deploy_lim_lcd'].update()
+                    self.store['content']['display']['deploy_lim_axis'].setValue(int(deploy_lim_pct*100))
+                    self.store['content']['display']['deploy_lim_axis'].update()
+                    self.store['content']['display']['deploy_lim_lcd'].display(str(round(deploy_lim_pct*100,1)))
+                    self.store['content']['display']['deploy_lim_lcd'].update()
                 else:
                     self.store['content']['hybrid']['soc_axis'].setValue(0)
                     self.store['content']['hybrid']['soc_axis'].update()
-                    self.store['content']['hybrid']['soc_lcd'].display(str(0.00))
-                    self.store['content']['hybrid']['soc_lcd'].update()
-                    self.store['content']['hybrid']['soc_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['soc_lcd'].display(str(0.00))
+                    self.store['content']['display']['soc_lcd'].update()
+                    self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['soc_axis'].setValue(0)
+                    self.store['content']['display']['soc_axis'].update()
+                    self.store['content']['display']['soc_lcd'].display(str(0.00))
+                    self.store['content']['display']['soc_lcd'].update()
+                    self.store['content']['display']['soc_label'].setStyleSheet("color: red;")
                     self.lastval['soc'] = 999.0
                     self.store['content']['hybrid']['deploy_lim_axis'].setValue(0)
                     self.store['content']['hybrid']['deploy_lim_axis'].update()
-                    self.store['content']['hybrid']['deploy_lim_lcd'].display(str(0.00))
-                    self.store['content']['hybrid']['deploy_lim_lcd'].update()
-                    self.store['content']['hybrid']['deploy_lim_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['deploy_lim_axis'].setValue(0)
+                    self.store['content']['display']['deploy_lim_axis'].update()
+                    self.store['content']['display']['deploy_lim_lcd'].display(str(0.00))
+                    self.store['content']['display']['deploy_lim_lcd'].update()
+                    self.store['content']['display']['deploy_lim_label'].setStyleSheet("color: red;")
                     self.lastval['deploy_lim'] = 999.0
                 if self.store['content']['sounds']['sound'].currentText() == "Yes":
                     if self.lastval['soc'] != 999.0:
@@ -997,29 +1340,72 @@ class MainWindow(QMainWindow):
                             fn.start_thread(sfx.play('limit'))
                     self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
                     self.lastval['deploy_lim'] = self.store['content']['hybrid']['deploy_lim_axis'].value()
-            if var.status['set_list_count'] % 50 == 0:
+            for item in self.store['content']['display']: # update audio LEDs
+                if '_led' in item and item[:-4] in sfx.audio:
+                    sound = item[:-4]
+                    if sound == 'p2p_active':
+                        if sfx.audio['p2p_active'].get_num_channels() != 0:
+                            self.store['content']['display'][item].state('active')
+                        else:
+                            if fn.check_audio_setting(sound):
+                                self.store['content']['display'][item].state('standby')
+                            else:
+                                self.store['content']['display'][item].state('off')
+                    elif sfx.audio[sound].get_num_channels() != 0:
+                        self.store['content']['display'][item].state('active')
+                    else:
+                        if fn.check_audio_setting(sound):
+                            self.store['content']['display'][item].state('standby')
+                        else:
+                            self.store['content']['display'][item].state('off')
+            if self.check_profile_list():
                 self.refresh_profile_list()
-                var.status['set_list_count'] = 1
-            else:
-                var.status['set_list_count'] += 1
-            
+        except Exception as e:
+            fn.error_handling(e, "interface.display()")
+        
 
-        @pyqtSlot()
-        def calibrate(self):
+    @pyqtSlot()
+    def calibrate_axis(self):
+        try:
             if self.store['axis'] in self.store['content']:
                 self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrating'])
             else:
-                print("Warning: calibrate()")
+                print("Warning: calibrate_axis()")
 
-            vjoy.calibrate(self.store['axis'])
+            vjoy.calibrate_axis(self.store['axis'])
             var.status['calibration'] += "Done"
             while self.store['running']:
                 sleep(0.1)
             self.store['content'][self.store['axis']]['calibrate'].setText(var.lang['calibrate'])
-            vjoy.set(self.store['axis'], self.store['pct'])
+            vjoy.set_axis(self.store['axis'], self.store['pct'])
+        except Exception as e:
+            fn.error_handling(e, "interface.calibrate_axis()")
 
-        @pyqtSlot()
-        def calibrate_start(self, func):
+    @pyqtSlot()
+    def calibrate_button(self):
+        try:
+            if self.store['button'][0] in self.store['content']:
+                self.store['content'][self.store['button'][0]][self.store['button'][1] + '_calibrate'].setText(var.lang['calibrating'])
+            else:
+                print("Warning: calibrate_button()")
+
+            vjoy.set_button(self.store['button'][1], True)
+            var.status[self.store['button'][0]][self.store['button'][1]]['state'] = True
+            var.status['calibration'] += "Done"
+            sleep(1)
+            vjoy.set_button(self.store['button'][1], False)
+            var.status[self.store['button'][0]][self.store['button'][1]]['state'] = False
+            sleep(1)
+            self.calibrate_button_start(self.store['button'][0], self.store['button'][1])
+            self.store['content'][self.store['button'][0]][self.store['button'][1] + '_calibrate'].setText(var.lang['calibrate'])
+            vjoy.set_button(self.store['button'][1], self.store['state'])
+            var.status[self.store['button'][0]][self.store['button'][1]]['state'] = self.store['state']
+        except Exception as e:
+            fn.error_handling(e, "interface.calibrate_button()")
+
+    @pyqtSlot()
+    def calibrate_axis_start(self, func):
+        try:
             if not self.store['running'] and var.status['calibration'] == "None":
                 self.store['axis'] = func
                 self.store['running'] = True
@@ -1029,7 +1415,7 @@ class MainWindow(QMainWindow):
                     self.store['pct'] = var.status[func]['primary']
                 elif var.status[func]['switched']:
                     self.store['pct'] = var.status[func]['secondary']
-                self.store['thread_pool'].start(self.calibrate)
+                self.store['thread_pool'].start(self.calibrate_axis)
             elif func + "Done" == var.status['calibration']:
                 var.status['calibration'] = "None"
                 self.store['running'] = False
@@ -1042,14 +1428,45 @@ class MainWindow(QMainWindow):
                     if function + "Done" == func_pass:
                         func_pass = function
                 self.start_flash_tab(func_pass)
+        except Exception as e:
+            fn.error_handling(e, "interface.calibrate_axis_start()")
 
-        @pyqtSlot()
-        def increment(self, func):
+    @pyqtSlot()
+    def calibrate_button_start(self, func, con):
+        try:
+            if not self.store['running'] and var.status['calibration'] == "None":
+                self.store['button'] = (func, con)
+                self.store['running'] = True
+                var.status['calibration'] = func
+                sleep(0.1) #wait for loops to stop
+                self.store['state'] = var.status[func][con]['state']
+                self.store['thread_pool'].start(self.calibrate_button)
+            elif func + "Done" == var.status['calibration']:
+                var.status['calibration'] = "None"
+                self.store['running'] = False
+                if func in var.status['flash_tab']:
+                    var.status['flash_tab'].remove(func)
+                    self.stop_flash_tab(func)
+            elif var.status['calibration'] != "None":
+                func_pass = var.status['calibration']
+                for function in var.bindings:
+                    if function + "Done" == func_pass:
+                        func_pass = function
+                self.start_flash_tab(func_pass)
+        except Exception as e:
+            fn.error_handling(e, "interface.calibrate_button_start()")
+
+    @pyqtSlot()
+    def increment(self, func):
+        try:
             var.settings[func]['increment'] = self.store['content'][func]['increment'].value()
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.increment()")
 
-        @pyqtSlot()
-        def switch(self, func):
+    @pyqtSlot()
+    def switch(self, func):
+        try:
             value = self.store['content'][func]['switch'].value()
             var.settings[func]['switch_value'] = value
             if func == "weight_jacker":
@@ -1059,78 +1476,161 @@ class MainWindow(QMainWindow):
             else:
                 var.status[func]['secondary'] = (value * var.step[func]) - var.step[func]
             if var.status[func]['switched']:
-                vjoy.set(func, var.status[func]['secondary'])
-            fn.write_profile()
+                vjoy.set_axis(func, var.status[func]['secondary'])
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.switch()")
 
-        @pyqtSlot()
-        def increment_mode(self, func):
+    @pyqtSlot()
+    def increment_mode(self, func):
+        try:
             if self.store['content'][func]['increment_mode'].currentText() == "Continuous":
                 var.settings[func]['continuous'] = True
             elif self.store['content'][func]['increment_mode'].currentText() == "Single":
                 var.settings[func]['continuous'] = False
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.increment_mode()")
 
-        @pyqtSlot()
-        def switch_mode(self, func):
-            if self.store['content'][func]['switch_mode'].currentText() == "Toggle":
+    @pyqtSlot()
+    def switch_mode(self, func):
+        try:
+            if self.store['content'][func]['switch_mode'].currentText() == var.lang['toggle']:
                 var.settings[func]['toggle'] = True
-            elif self.store['content'][func]['switch_mode'].currentText() == "Hold":
+            elif self.store['content'][func]['switch_mode'].currentText() == var.lang['hold']:
                 var.status[func]['switched'] = False
-                vjoy.set(func, var.status[func]['primary'])
+                vjoy.set_axis(func, var.status[func]['primary'])
                 var.settings[func]['toggle'] = False
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.switch_mode()")
 
-        @pyqtSlot()
-        def rollover_mode(self, func):
+    @pyqtSlot()
+    def rollover_mode(self, func):
+        try:
             if self.store['content'][func]['rollover_mode'].currentText() == "Unlocked":
                 var.settings[func]['rollover_mode'] = True
             elif self.store['content'][func]['rollover_mode'].currentText() == "Locked":
                 var.settings[func]['rollover_mode'] = False
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.rollover_mode()")
 
-        @pyqtSlot()
-        def axis_threshold(self, func):
+    @pyqtSlot()
+    def toggle_mode(self, func, con):
+        try:
+            if self.store['content'][func][con + '_toggle'].currentText() == var.lang['toggle']:
+                var.settings[func][con + '_toggle'] = True
+            elif self.store['content'][func][con + '_toggle'].currentText() == var.lang['hold']:
+                var.settings[func][con + '_toggle'] = False
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.toggle_mode()")
+
+    @pyqtSlot()
+    def axis_threshold(self, func):
+        try:
             var.settings[func]["axis_threshold"] = self.store['content'][func]['axis_threshold'].value() / 100
             fn.reset_bind_thresh(func, var.settings[func]["axis_threshold"])
             print("axis_threshold, func = " + func + ", ", var.settings[func]["axis_threshold"])
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.axis_threshold()")
 
-        @pyqtSlot()
-        def settings_set(self, func):
+    @pyqtSlot()
+    def settings_set(self, func):
+        try:
+            print("settings_set ", func)
             if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
             else:
                 value = self.store['content']['settings'][func].value()
-            if func == 'sound':
-                var.settings['local']['audio'] = (value == "Yes")
-                fn.write_profile()
+            if func == 'high_threshold':
+                print("settings_set, func = high_threshold, ", value)
+                if value == var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    if value/100 > var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] and value/100 != var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']:
+                        print("changing low axis limits")
+                        self.store['content']['settings']['low_threshold'].setRange(1, value-1)
+                    else:
+                        print("not changing low axis limits")
+                    fn.reset_bind_thresh(func, value/100)
+                    var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] = value/100
+                    var.status['rewrite_profile'] = True
+            elif func == 'low_threshold':
+                if value == var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    print("settings_set, func = low_threshold, ", value)
+                    if value/100 < var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] and value/100 != var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']:
+                        print("changing high axis limits")
+                        self.store['content']['settings']['high_threshold'].setRange(value+1, 99)
+                    else:
+                        print("not changing high axis limits")
+                    fn.reset_bind_thresh(func, value/100)
+                    var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] = value/100
+                    var.status['rewrite_profile'] = True
+            elif func == 'axis_rollover':
+                if (value == "Yes") == var.settings['local']['axis_rollover']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['axis_rollover'] = (value == "Yes")
+                    var.status['rewrite_profile'] = True
+            elif func == 'sound':
+                if (value == "Yes") == var.settings['local']['audio']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['audio'] = (value == "Yes")
+                    var.status['rewrite_profile'] = True
             elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
-                var.settings['local'][func] = (value == "Yes")
-                fn.write_profile()
+                if (value == "Yes") == var.settings['local'][func]:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local'][func] = (value == "Yes")
+                    var.status['rewrite_profile'] = True
             elif func == 'beep_mode':
-                var.settings['local']['beep_mode'] = (value == "Fixed")
-                fn.write_profile()
+                if (value == "Fixed") == var.settings['local']['beep_mode']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['beep_mode'] = (value == "Fixed")
+                    var.status['rewrite_profile'] = True
             elif func == 'volume':
-                var.settings['local']['volume'] = value/100
-                fn.write_profile()
+                if value/100 == var.settings['local']['volume']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local']['volume'] = value/100
+                    var.status['rewrite_profile'] = True
             elif func == "hybrid_low_val" or func == "hybrid_high_val" or func == "hybrid_limit_val" or func == "dynamic_mode_offset" or func == "upshift_offset" or func == "downshift_offset" or func == "p2p_behind_thresh" or func == "p2p_behind_thresh_cont":
-                var.settings['local'][func] = value
-                fn.write_profile()
+                if value == var.settings['local']['volume']:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['local'][func] = value
+                    var.status['rewrite_profile'] = True
             else:
-                var.settings[func] = value
-                fn.write_config()
+                if value == var.settings[func]:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings[func] = value
+                    var.status['rewrite_profile'] = True
+        except Exception as e:
+            fn.error_handling(e, "interface.settings_set()")
 
-        @pyqtSlot()
-        def scale(self):
+    @pyqtSlot()
+    def scale(self):
+        try:
             scale = self.store['content']['settings']['scale'].currentText()
             scale = scale.replace("x", "")
             var.settings['scale'] = scale
             fn.write_config()
+        except Exception as e:
+            fn.error_handling(e, "interface.scale()")
 
-        @pyqtSlot()
-        def bind(self):
+    @pyqtSlot()
+    def bind(self):
+        try:
             # self.store['running'] = True
             function = var.bindings['status']['function']
             control = var.bindings['status']['control']
@@ -1169,23 +1669,21 @@ class MainWindow(QMainWindow):
                                 "input": True,
                             }
                         else:
-                            if var.event['value'] >= var.settings[function]['axis_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                            if var.event['value'] >= var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
                                 var.potential_bind = {
                                 "label": "Unknown device",
                                     "guid": var.event['guid'],
                                     "type": var.event['type'],
                                     "num": var.event['num'],
-                                    "inverted": False,
-                                    "value": var.settings[function]['axis_threshold']
+                                    "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold']
                                 }
-                            if var.event['value'] <= round(1 - var.settings[function]['axis_threshold'], 2) and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                            if var.event['value'] <= var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
                                 var.potential_bind = {
                                 "label": "Unknown device",
                                     "guid": var.event['guid'],
                                     "type": var.event['type'],
                                     "num": var.event['num'],
-                                    "inverted": True,
-                                    "value": round(1 - var.settings[function]['axis_threshold'], 2)
+                                    "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold']
                                 }
                     elif var.event['type'] == "hat":
                         if var.event['value'] != "none" and not var.bindings['status']['input']:
@@ -1222,12 +1720,15 @@ class MainWindow(QMainWindow):
                 "input": None,
             }
             var.potential_bind = {}
-            fn.write_profile()
+            var.status['rewrite_profile'] = True
             var.status['refresh_labels'] = True
             # self.store['running'] = False
+        except Exception as e:
+            fn.error_handling(e, "interface.bind()")
 
-        @pyqtSlot()
-        def bind_start(self, func, ctrl, input=False):
+    @pyqtSlot()
+    def bind_start(self, func, ctrl, input=False):
+        try:
             if not var.bindings['status']['active']:
                 var.bindings['status'] = {
                     "active": True,
@@ -1249,9 +1750,23 @@ class MainWindow(QMainWindow):
                     "input": input,
                 }
                 self.store['thread_pool'].start(self.bind)
+        except Exception as e:
+            fn.error_handling(e, "interface.bind_start()")
 
-        @pyqtSlot()
-        def refresh_profile_list(self):
+    @pyqtSlot()
+    def check_profile_list(self): # returns True if the profile list needs to be refreshed, False if it's okay as is
+        try:
+            old_list = var.status['profile_list']
+            new_list = fn.get_profiles()
+            if old_list != new_list:
+                return True
+            return False
+        except Exception as e:
+            fn.error_handling(e, "interface.check_profile_list()")    
+
+    @pyqtSlot()
+    def refresh_profile_list(self):
+        try:
             self.store['profile_busy'] = True
             file = self.store['content']['settings']['profile_select'].currentText()
             self.store['content']['settings']['profile_select'].clear()
@@ -1259,16 +1774,22 @@ class MainWindow(QMainWindow):
                 self.store['content']['settings']['profile_select'].addItem(name)
             self.store['content']['settings']['profile_select'].setCurrentText(file)
             self.store['profile_busy'] = False
+        except Exception as e:
+            fn.error_handling(e, "interface.refresh_profile_list()")
 
-        @pyqtSlot()
-        def create_profile(self, name):
+    @pyqtSlot()
+    def create_profile(self, name):
+        try:
             if name not in fn.get_profiles():
                 fn.write_profile(name)
             self.refresh_profile_list()
             self.store['content']['settings']['profile_select'].setCurrentText(name)
+        except Exception as e:
+            fn.error_handling(e, "interface.create_profile()")
 
-        @pyqtSlot()
-        def delete_profile(self, name):
+    @pyqtSlot()
+    def delete_profile(self, name):
+        try:
             fn.delete_profile(name)
             if len(fn.get_profiles()) == 0:
                 var.settings['profile']['current'] = 'Default'
@@ -1278,16 +1799,23 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['profile_select'].setCurrentIndex(0)
             var.settings['profile']['current'] = self.store['content']['settings']['profile_select'].currentText()
             fn.read_profile()
+        except Exception as e:
+            fn.error_handling(e, "interface.delete_profile()")
 
-        @pyqtSlot()
-        def update_limits(self):
+    @pyqtSlot()
+    def update_limits(self):
+        try:
             if self.store['content']['display']['car_id'] == "None":
                 self.store['index']['car_id'].setText("None")
                 print("Updating car_id to None")
                 self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['weight_jacker_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['fuel_map_limits'].setStyleSheet("color: red;")
             elif self.store['content']['display']['car_id'] in car_settings:
                 car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(car_settings[car_id]['name'])
@@ -1298,75 +1826,150 @@ class MainWindow(QMainWindow):
                     var.step['weight_jacker'] = 1 / (max - min)
                     self.store['content']['weight_jacker']['switch'].setRange(min, max)
                     self.store['content']['display']['weight_jacker_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['weight_jacker_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['weight_jacker_limits'].setStyleSheet("color: red;")
                 if 'front_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['front_roll_bar'][0]
                     max = car_settings[car_id]['front_roll_bar'][1]
                     var.step['front_roll_bar'] = 1 / (max - min)
                     self.store['content']['front_roll_bar']['switch'].setRange(min, max)
                     self.store['content']['display']['front_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['front_roll_bar_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['front_roll_bar_limits'].setStyleSheet("color: red;")
                 if 'rear_roll_bar' in car_settings[car_id]:
                     min = car_settings[car_id]['rear_roll_bar'][0]
                     max = car_settings[car_id]['rear_roll_bar'][1]
                     var.step['rear_roll_bar'] = 1 / (max - min)
                     self.store['content']['rear_roll_bar']['switch'].setRange(min, max)
                     self.store['content']['display']['rear_roll_bar_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet("color: red;")
                 if 'fuel_map' in car_settings[car_id]:
                     min = car_settings[car_id]['fuel_map'][0]
                     max = car_settings[car_id]['fuel_map'][1]
                     var.step['fuel_map'] = 1 / (max - min)
                     self.store['content']['fuel_map']['switch'].setRange(min, max)
                     self.store['content']['display']['fuel_map_label'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                    self.store['content']['display']['fuel_map_limits'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                 else:
                     self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
+                    self.store['content']['display']['fuel_map_limits'].setStyleSheet("color: red;")
             else:
                 car_id = self.store['content']['display']['car_id']
                 self.store['index']['car_id'].setText(str(car_id) + " (not in car_settings list yet)")
                 print("current_car " + str(car_id) + " not in car_settings!")
                 self.store['content']['display']['weight_jacker_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['weight_jacker_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['front_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['front_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['rear_roll_bar_label'].setStyleSheet("color: red;")
+                self.store['content']['display']['rear_roll_bar_limits'].setStyleSheet("color: red;")
                 self.store['content']['display']['fuel_map_label'].setStyleSheet("color: red;")
-            text = "WJ: " + str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
-            text += ", FARB: " + str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
-            text += ", RARB: " + str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
-            text += ", Fuel Map: " + str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
-            self.store['content']['display']['car_id_limits'].setText(text)
+                self.store['content']['display']['fuel_map_limits'].setStyleSheet("color: red;")
+            text = str(int(self.store['content']['weight_jacker']['switch'].minimum())) + " to " + str(int(self.store['content']['weight_jacker']['switch'].maximum()))
+            self.store['content']['display']['weight_jacker_limits'].setText(text)
+            text = str(int(self.store['content']['front_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['front_roll_bar']['switch'].maximum()))
+            self.store['content']['display']['front_roll_bar_limits'].setText(text)
+            text = str(int(self.store['content']['rear_roll_bar']['switch'].minimum())) + " to " + str(int(self.store['content']['rear_roll_bar']['switch'].maximum()))
+            self.store['content']['display']['rear_roll_bar_limits'].setText(text)
+            text = str(int(self.store['content']['fuel_map']['switch'].minimum())) + " to " + str(int(self.store['content']['fuel_map']['switch'].maximum()))
+            self.store['content']['display']['fuel_map_limits'].setText(text)
+        except Exception as e:
+            fn.error_handling(e, "interface.update_limits()")
 
-        @pyqtSlot()
-        def update_label(self, function, control):
-            try:
-                if var.bindings[function][control]:
-                    if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
-                        self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
-                    else:
-                        self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                    if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
-                        var.status['rewrite']['profile'] = True
-                        self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
-                        if var.status['rewrite']['profile']:
-                            fn.write_profile()
-                            var.status['rewrite']['profile'] = False
-                    self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
-            except KeyError as error:
-                print("in update_label(func,ctrl): ", error)
+    @pyqtSlot()
+    def update_label(self, function, control):
+        try:
+            if var.bindings[function][control]:
+                if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
+                    self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
+                else:
+                    self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
+                if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
+                    var.status['rewrite']['profile'] = True
+                    self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
+                    if var.status['rewrite']['profile']:
+                        var.status['rewrite_profile'] = True
+                        var.status['rewrite']['profile'] = False
+                self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
+        except Exception as e:
+            fn.error_handling(e, "interface.update_label()")
+    
+    @pyqtSlot()
+    def update_label_all(self):
+        try:
+            for function in var.bindings:
+                if function != "status":
+                    for control in var.bindings[function]:
+                        self.update_label(function, control)
+
+        except Exception as e:
+            fn.error_handling(e, "interface.update_label_all()")
+    
+    @pyqtSlot()
+    def refresh_guid_list(self):
+        try:
+            temp = self.store['content']['settings']['axis_threshold_device'].currentText()
+            self.store['content']['settings']['axis_threshold_device'].clear()
+            for data in var.id_table:
+                if data[0] != -2:
+                    if data[1] in dev.device_info:
+                        self.store['content']['settings']['axis_threshold_device'].addItem(dev.device_info[data[1]]['name'])
+                        if temp == dev.device_info[data[1]]['name']:
+                            self.store['content']['settings']['axis_threshold_device'].setCurrentText(temp)
+        except Exception as e:
+            fn.error_handling(e, "interface.refresh_guid_list()")
         
-        def update_label_all(self):
-            try:
-                for function in var.bindings:
-                    if function != "status":
-                        for control in var.bindings[function]:
-                            self.update_label(function, control)
-            except KeyError as error:
-                print("in update_label_all(): ", error)
+    @pyqtSlot()
+    def replace_axis_thresh(self):
+        try:
+            index = self.store['content']['settings']['axis_threshold_device'].currentIndex()
+            print("index in replace_axis_thresh is ", index)
+            if index >= 0:
+                i = 0
+                i2 = -1
+                while i < len(var.id_table) and i2 != index:
+                    if var.id_table[i][0] != -2:
+                        i2 += 1
+                    if i2 != index:
+                        i += 1
+                if i >= len(var.id_table):
+                    print("problem in interface.replace_axis_threshold()")
+                guid = var.id_table[i][1]
+                self.store['content']['settings']['axis_threshold_device_guid'] = str(guid)
+                old_high = self.store['content']['settings']['high_threshold'].value()
+                new_high = int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)
+                new_low = int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)
 
-        @pyqtSlot()
-        def apply_settings(self, file):
+                print(i, i2, guid, new_high, new_low)
+
+                if old_high > new_low:
+                    print("starting with high threshold")
+                    self.store['content']['settings']['high_threshold'].setRange(new_low+1,99)
+                    self.store['content']['settings']['high_threshold'].setValue(new_high)
+                    self.store['content']['settings']['low_threshold'].setRange(1,new_high-1)
+                    self.store['content']['settings']['low_threshold'].setValue(new_low)
+                else:
+                    print("starting with low threshold")
+                    self.store['content']['settings']['low_threshold'].setRange(1,new_high-1)
+                    self.store['content']['settings']['low_threshold'].setValue(new_low)
+                    self.store['content']['settings']['high_threshold'].setRange(new_low+1,99)
+                    self.store['content']['settings']['high_threshold'].setValue(new_high)
+                self.settings_set('high_threshold')
+                self.settings_set('low_threshold')
+                print("new thresholds applied")
+        except Exception as e:
+            fn.error_handling(e, "interface.replace_axis_thresh()")
+
+    @pyqtSlot()
+    def apply_settings(self, file):
+        try:
             # print("try apply_settings")
             if self.store['profile_busy']: #if list is getting cleared or current text is being reset during list refresh, skip this function
                 return
@@ -1393,6 +1996,16 @@ class MainWindow(QMainWindow):
                             self.store['content'][function]['rollover_mode'].setCurrentText(var.lang['unlocked'])
                         else:
                             self.store['content'][function]['rollover_mode'].setCurrentText(var.lang['locked'])
+                    if type == "other":
+                        if function == "hybrid":
+                            if var.settings[function]['regen_toggle']:
+                                self.store['content'][function]['regen_toggle'].setCurrentText(var.lang['toggle'])
+                            else:
+                                self.store['content'][function]['regen_toggle'].setCurrentText(var.lang['hold'])
+                            if var.settings[function]['deploy_toggle']:
+                                self.store['content'][function]['deploy_toggle'].setCurrentText(var.lang['toggle'])
+                            else:
+                                self.store['content'][function]['deploy_toggle'].setCurrentText(var.lang['hold'])
 
             # self.store['content']['settings']['axis_samples'].setValue(int(var.settings['axis_samples']))
             self.store['content']['settings']['scale'].setCurrentText(str(var.settings['scale']) + "x")
@@ -1405,6 +2018,14 @@ class MainWindow(QMainWindow):
                         self.store['content']['sounds']['sound'].setCurrentText('Yes')
                     else:
                         self.store['content']['sounds']['sound'].setCurrentText('No')
+                elif setting == 'low_threshold' or setting == 'high_threshold':
+                    continue
+                    # print("apply_settings before ", setting)
+                    # self.store['content']['settings']['high_threshold'].setRange(min(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold']*100)+1,51), 99)
+                    # self.store['content']['settings']['low_threshold'].setRange(1, max(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold']*100)-1,49))
+                    # self.store['content']['settings']['high_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] * 100))
+                    # self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
+                    # print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
                     if var.settings['local'][setting]:
                         self.store['content']['sounds'][setting].setCurrentText('Yes')
@@ -1418,10 +2039,14 @@ class MainWindow(QMainWindow):
                 else:
                     if not setting == 'version':
                         print("isinstance check failed", setting, var.settings['local'][setting])
+            self.replace_axis_thresh()
             print ("end apply_settings")
+        except Exception as e:
+            fn.error_handling(e, "interface.apply_settings()")
 
-        @pyqtSlot()
-        def start_flash_tab(self, func):
+    @pyqtSlot()
+    def start_flash_tab(self, func):
+        try:
             if not func in var.status['flash_tab']:
                 var.status['flash_tab'].append(func)
                 index = self.tabs['obj'].indexOf(self.tabs[func])
@@ -1430,29 +2055,41 @@ class MainWindow(QMainWindow):
                 self.flashtimer[func] = QTimer()
                 self.flashtimer[func].timeout.connect(lambda: self.alt_flash(index))
                 self.flashtimer[func].start(250)
+        except Exception as e:
+            fn.error_handling(e, "interface.start_flash_tab()")
 
-        @pyqtSlot()
-        def stop_flash_tab(self, func):
+    @pyqtSlot()
+    def stop_flash_tab(self, func):
+        try:
             self.flashtimer[func].stop()
             index = self.tabs['obj'].indexOf(self.tabs[func])
             self.default_tab_color = self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+        except Exception as e:
+            fn.error_handling(e, "interface.stop_flash_tab()")
 
-        @pyqtSlot()
-        def stop_flash_tab_all(self):
+    @pyqtSlot()
+    def stop_flash_tab_all(self):
+        try:
             for func in var.status['flash_tab']:
                 self.flashtimer[func].stop()
                 index = self.tabs['obj'].indexOf(self.tabs[func])
                 self.default_tab_color = self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
+        except Exception as e:
+            fn.error_handling(e, "interface.stop_flash_tab_all()")
 
-        @pyqtSlot()
-        def alt_flash(self, index):
+    @pyqtSlot()
+    def alt_flash(self, index):
+        try:
             if self.tabs['obj'].tabBar().tabTextColor(index) == self.default_tab_color:
                     self.tabs['obj'].tabBar().setTabTextColor(index, QColor("red"))
             else:
                 self.tabs['obj'].tabBar().setTabTextColor(index, self.default_tab_color)
-        
-        @pyqtSlot()
-        def test_play(self, sound):
+        except Exception as e:
+            fn.error_handling(e, "interface.alt_flash()")
+    
+    @pyqtSlot()
+    def test_play(self, sound):
+        try:
             if sound == "upshift_beep" or sound == "downshift_beep":
                 sfx.play(sound)
                 sfx.status[sound] = False
@@ -1461,13 +2098,19 @@ class MainWindow(QMainWindow):
                 sfx.status["p2p_active_single"] = False
             else:
                 fn.start_thread(sfx.play(sound))
+        except Exception as e:
+            fn.error_handling(e, "interface.test_play()")
 
-        @pyqtSlot()
-        def test_play_loop(self, sound): # right now, hardcoded to do 3 loops
+    @pyqtSlot()
+    def test_play_loop(self, sound): # right now, hardcoded to do 3 loops
+        try:
             fn.start_thread(sfx.play_num_loop(sound, 3))
+        except Exception as e:
+            fn.error_handling(e, "interface.test_play_loop()")
 
-        @pyqtSlot()
-        def irsdk_audio(self):
+    @pyqtSlot()
+    def irsdk_audio(self):
+        try:
             # print("shift_beep() start")
             if self.lastval['SessionTick'] != self.ir['SessionTick']: # if the information is not new, do nothing because there is no new information
                 # ideally would copy a snapshot of self.ir at this moment to make sure all the information is from the same set, but this is probably close enough
@@ -1489,13 +2132,13 @@ class MainWindow(QMainWindow):
                 self.lastval['CarIdxList'] = [-1] * length
                 while index >= 0:
                     self.lastval['CarIdxList'][index] = self.ir['DriverInfo']['Drivers'][index]['CarIdx']
-                    if (var.settings['local']['p2p_behind_thresh'] == -1 or (self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] > 0 and self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh']/1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                    if (var.settings['local']['p2p_behind_thresh'] == -1 or (0 < self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh'] / 1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                         if not var.settings['local']['p2p_behind_closest_car']:
                             self.lastval['CarIdx_Within_p2p_Range'].append(index)
                         else:
                             if (self.lastval['CarIdx_Within_p2p_Range'] == [] or self.lastval['CarIdxEstTime'][index] > self.lastval['CarIdxEstTime'][self.lastval['CarIdx_Within_p2p_Range'][0]]) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                                 self.lastval['CarIdx_Within_p2p_Range'] = [index]
-                    if (var.settings['local']['p2p_behind_thresh_cont'] == -1 or (self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] > 0 and self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh_cont']/1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
+                    if (var.settings['local']['p2p_behind_thresh_cont'] == -1 or (0 < self.lastval['CarIdxEstTime'][index] - self.lastval['CarIdxEstTime'][self.lastval['CarIdx']] < var.settings['local']['p2p_behind_thresh_cont'] / 1000)) and self.ir['DriverInfo']['Drivers'][index]['CarIsPaceCar'] == 0 and self.ir['CarIdxOnPitRoad'][index] == False and not self.lastval['CarIdx'] == index:
                         if not var.settings['local']['p2p_behind_closest_car']:
                             self.lastval['CarIdx_Within_Cont_p2p_Range'].append(index)
                         else:
@@ -1504,40 +2147,41 @@ class MainWindow(QMainWindow):
                     index -= 1
                 # print(self.lastval['CarIdx_Within_p2p_Range'], self.lastval['CarIdx_Within_Cont_p2p_Range'])
                 if var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']:
-                    if var.settings['local']['p2p_behind_nobrake'] and self.lastval['Brake'] > 0.05:
-                        var.status['p2p_sound_active']['single'] = False
-                        var.status['p2p_sound_active']['loop'] = False
-                        sfx.p2p_active.stop()
-                    else:
-                        if var.settings['local']['p2p_behind_audio_cont']:
-                            if self.lastval['CarIdx_Within_Cont_p2p_Range'] == []:
-                                var.status['p2p_sound_active']['loop'] = False
-                            # elif var.status['p2p_sound_active']['loop'] == False:
+                    if self.lastval['IsOnTrack_beep']:
+                        if var.settings['local']['p2p_behind_nobrake'] and self.lastval['Brake'] > 0.05:
+                            var.status['p2p_sound_active']['single'] = False
+                            var.status['p2p_sound_active']['loop'] = False
+                            sfx.audio['p2p_active'].stop()
+                        else:
+                            if var.settings['local']['p2p_behind_audio_cont']:
+                                if not self.lastval['CarIdx_Within_Cont_p2p_Range']:
+                                    var.status['p2p_sound_active']['loop'] = False
+                                # elif var.status['p2p_sound_active']['loop'] == False:
+                                else:
+                                    var.status['p2p_sound_active']['loop'] = False
+                                    for CarIdx in self.lastval['CarIdx_Within_Cont_p2p_Range']:
+                                        if self.lastval['CarIdxp2p'][CarIdx]:
+                                            var.status['p2p_sound_active']['loop'] = True
+                                    if var.status['p2p_sound_active']['loop']:
+                                        fn.start_thread(sfx.play_loop('p2p_active'))
                             else:
                                 var.status['p2p_sound_active']['loop'] = False
-                                for CarIdx in self.lastval['CarIdx_Within_Cont_p2p_Range']:
-                                    if self.lastval['CarIdxp2p'][CarIdx] == True:
-                                        var.status['p2p_sound_active']['loop'] = True
-                                if var.status['p2p_sound_active']['loop'] == True:
-                                    fn.start_thread(sfx.play_loop('p2p_active'))
-                        else:
-                            var.status['p2p_sound_active']['loop'] = False
-                        if var.settings['local']['p2p_behind_audio']:
-                            if self.lastval['CarIdx_Within_p2p_Range'] == []:
+                            if var.settings['local']['p2p_behind_audio']:
+                                if not self.lastval['CarIdx_Within_p2p_Range']:
+                                    var.status['p2p_sound_active']['single'] = False
+                                elif not var.status['p2p_sound_active']['single']:
+                                # else:
+                                    var.status['p2p_sound_active']['single'] = False
+                                    for CarIdx in self.lastval['CarIdx_Within_p2p_Range']:
+                                        if self.lastval['CarIdxp2p'][CarIdx]:
+                                            var.status['p2p_sound_active']['single'] = True
+                                    if var.status['p2p_sound_active']['single']:
+                                        fn.start_thread(sfx.play('p2p_active'))
+                                    elif sfx.p2p_active.get_num_channels() == 0:
+                                        sfx.status['p2p_active_single'] = False
+                                    var.status['p2p_sound_active']['single'] = False
+                            else:
                                 var.status['p2p_sound_active']['single'] = False
-                            elif var.status['p2p_sound_active']['single'] == False:
-                            # else:
-                                var.status['p2p_sound_active']['single'] = False
-                                for CarIdx in self.lastval['CarIdx_Within_p2p_Range']:
-                                    if self.lastval['CarIdxp2p'][CarIdx] == True:
-                                        var.status['p2p_sound_active']['single'] = True
-                                if var.status['p2p_sound_active']['single'] == True:
-                                    fn.start_thread(sfx.play('p2p_active'))
-                                elif sfx.p2p_active.get_num_channels() == 0:
-                                    sfx.status['p2p_active_single'] = False
-                                var.status['p2p_sound_active']['single'] = False
-                        else:
-                            var.status['p2p_sound_active']['single'] = False
                 else:
                     var.status['p2p_sound_active']['single'] = False
                     var.status['p2p_sound_active']['loop'] = False
@@ -1590,7 +2234,7 @@ class MainWindow(QMainWindow):
                 
                 if self.lastval['IsOnTrack_beep'] and self.lastval['Gear'] > 0: # determine if a beep is required now
                     if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
-                        if var.settings['local']['beep_mode'] == True: # True -> fixed beep setting
+                        if var.settings['local']['beep_mode']: # True -> fixed beep setting
                             if var.settings['local']['upshift_beep'] and len(var.gearing) >= self.lastval['Gear'] and var.gearing[self.lastval['Gear']-1] != [] and var.gearing[self.lastval['Gear']-1][1] != 0 and var.status['upshift_val'] > 0:
                                 if self.lastval['Speed'] * var.gearing[self.lastval['Gear']-1][1] > var.status['upshift_val'] + (self.lastval['p2p'] == True)*300: # p2p pushes upshift beep up by 300RPM
                                     # print("call play upshift_beep ", var.status['upshift_val'], self.lastval['Speed'], self.lastval['Gear'], var.gearing)
@@ -1609,20 +2253,123 @@ class MainWindow(QMainWindow):
                     sfx.status['upshift_beep'] = False # maybe only do this after upshifting?
                     sfx.status['downshift_beep'] = False # maybe only reset this when an upshift happens?
             # print("shift_beep() end")
-    except Exception as e:
-        fn.error_handling(e)
+        except Exception as e:
+            fn.error_handling(e, "interface.irsdk_audio()")
 
 class CustomComboBox(QComboBox):
     def wheelEvent(self ,event: QWheelEvent):
-        event.ignore() # ignores mouse scroll inputs while hovering over
+        try:
+            event.ignore() # ignores mouse scroll inputs while hovering over
+        except Exception as e:
+            fn.error_handling(e, "interface.wheelEvent() QComboBox")
 
 class CustomSpinBox(QSpinBox):
     def wheelEvent(self, event: QWheelEvent):
-        event.ignore() # ignores mouse scroll inputs while hovering over
+        try:
+            event.ignore() # ignores mouse scroll inputs while hovering over
+        except Exception as e:
+            fn.error_handling(e, "interface.wheelEvent() QSpinBox")
 
 class CustomDoubleSpinBox(QDoubleSpinBox):
     def wheelEvent(self, event: QWheelEvent):
-        event.ignore() # ignores mouse scroll inputs while hovering over
+        try:
+            event.ignore() # ignores mouse scroll inputs while hovering over
+        except Exception as e:
+            fn.error_handling(e, "interface.wheelEvent() QDoubleSpinBox")
+
+class CustomLEDLabel(QLabel):
+    color = {
+        'greenLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #33ff33, stop:1 #008800);
+                border-radius: 8px;
+                border: 1px;
+            """,
+        'redLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #ff3333, stop:1 #880000);
+                border-radius: 8px;
+                border: 1px;
+            """,
+        'offLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #808080, stop:1 #202020);
+                border-radius: 8px;
+                border: 1px;
+            """,
+    }
+    color_code = { # color per signal defined here
+        'off': 'offLED',
+        'standby': 'redLED',
+        'active': 'greenLED',
+    }
+    symbol_code = { # symbol per signal defined here
+        'off': "🔇", # U+1F507
+        'standby': "🔈", # U+1F508
+        'active': "🔊", # U+1F509
+    }
+    active = "None"
+    sound = "None"
+    def __init__(self):
+        super().__init__()
+        self.layout = QVBoxLayout()
+        self.label = QLabel()
+        self.setStyleSheet(self.color[self.color_code['off']])
+    def state(self, signal): # 'off' = sound disabled in settings, 'standby' = sound , 'active' = sound playing
+        if signal != self.active:
+            print(self.sound, "LED turning to", signal)
+            self.setStyleSheet(self.color[self.color_code[signal]])
+            self.setText(self.symbol_code[signal])
+            self.active = signal
+
+class CustomButtonLEDLabel(QLabel):
+    color = {
+        'greenLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #33ff33, stop:1 #008800);
+                border-width: 1px;
+                border-radius: 4px;
+                border-style: solid;
+                border-color: #808080;
+                color: black;
+            """,
+        'redLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #ff3333, stop:1 #880000);
+                border-width: 1px;
+                border-radius: 4px;
+                border-style: solid;
+                border-color: #808080;
+                color: white;
+            """,
+        'offLED': """
+                background-color: qradialgradient(cx:0.3, cy:0.3, radius:1.0, fx:0.3, fy:0.3, 
+                                  stop:0 #808080, stop:1 #202020);
+                border-width: 1px;
+                border-radius: 4px;
+                border-style: solid;
+                border-color: #808080;
+                color: white;
+            """,
+    }
+    color_code = { # color per signal defined here
+        'off': 'offLED',
+        'standby': 'redLED',
+        'active': 'greenLED',
+    }
+    active = "None"
+    label_text = "None"
+    def __init__(self):
+        super().__init__()
+        self.layout = QVBoxLayout()
+        self.label = QLabel()
+        self.setStyleSheet(self.color[self.color_code['off']])
+    def state(self, signal): # 'off' = disabled, 'standby' = inactive, 'active' = active
+        if signal != self.active:
+            self.setStyleSheet(self.color[self.color_code[signal]])
+            if self.label_text != "None":
+                self.setText(self.label_text)
+            self.active = signal
 
 def main():
     os.environ["QT_SCALE_FACTOR"] = str(var.settings['scale'])
