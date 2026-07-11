@@ -146,7 +146,7 @@ def read_profile(profile=None):
                     else:
                         setting = eval(config[section][item])
                     if section == "LOCAL":
-                        if item != 'high_threshold' and item != 'low_threshold':
+                        if item != 'high_threshold' and item != 'low_threshold' and item != 'axis_rollover':
                             var.settings['local'][item] = setting
                     elif section.lower() in var.bindings:
                         if item in var.bindings_info['types']:
@@ -538,80 +538,3 @@ def error_handling(e, loc):
 
 def startup_time():
     var.backend['startup_time'] = str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S'))
-
-
-
-# iRacing related functions
-# Return car travel direction
-def direction(): # Uneeded?
-    prev, forward, backward, none = var.cache['distances'][0], 0, 0, -1
-    for dist in var.cache['distances']:
-        if prev > dist:
-            backward += 1
-        elif prev < dist:
-            forward += 1
-        elif prev == dist:
-            none += 1
-        prev = dist
-    # fn.log("Backward: " + str(backward) + ", Forward: " + str(forward) + ", None: " + str(none))
-    if forward > backward and forward > none:
-        dir = "forward"
-    elif forward < backward and backward > none:
-        dir = "backward"
-    else:
-        dir = "none"
-    return dir
-
-# Unit Conversion Ref:
-#   l * 0.264172 = gal
-#   km * 0.621371 = mi
-#   m * 0.000621371 = mi
-#   (c * 1.8) + 32 = f
-#   kph * 0.6213711922 = mph
-#   rad * 57.295779513 = deg
-#   m/s * 2.2369362920544025 = mph
-#   Hg * 3.38639 = kPa
-#   kg/m^3 * 0.062427960576145 = lb/ft^3
-#   km/l * 2.352145833 = mpg
-
-# Unit functions
-# Return converted distance
-def distance(value, magnitude):
-    if var.telemetry['units'] == "imperial":
-        if magnitude == "m":
-            return str(round(value * 0.000621371, 2)) + "mi"
-        elif magnitude == "km":
-            return str(round(value * 0.621371, 2)) + "mi"
-    elif var.telemetry['units'] == "metric":
-        if magnitude == "m":
-            return str(round(value * 0.001, 2)) + "km"
-        elif magnitude == "km":
-            return str(round(value, 2)) + "km"
-
-# Return formatted time
-def duration(value):
-    return str(round(value, 3)) + "s"
-
-# Return converted economy
-def economy(value):
-    if var.telemetry['units'] == "imperial":
-        return str(round(value * 2.352145833, 2)) + "mpg"
-    elif var.telemetry['units'] == "metric":
-        return str(round(value, 2)) + "km/l"
-
-# Return formatted percentage
-def percent(value):
-    return str(round(value * 100, 2)) + "%"
-
-# Return converted volume
-def volume(value, suffix):
-    if var.telemetry['units'] == "imperial":
-        if suffix == "short":
-            return str(round(value * 0.264172, 3)) + "gal"
-        elif suffix == "long":
-            return str(round(value * 0.264172, 3)) + " gallons"
-    elif var.telemetry['units'] == "metric":
-        if suffix == "short":
-            return str(round(value, 3)) + "l"
-        elif suffix == "long":
-            return str(round(value, 3)) + " liters"
