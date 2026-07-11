@@ -5,6 +5,8 @@ import pyvjoy as vjoy
 import devices as dev
 import variables as var
 import functions as fn
+import ctypes
+import sys
 
 axis_ref = {
     "weight_jacker": vjoy.HID_USAGE_X,
@@ -46,8 +48,14 @@ button_ref = {
 
 try:
     j = vjoy.VJoyDevice(1)
+except vjoy.vJoyNotEnabledException:
+    ctypes.windll.user32.MessageBoxW(0, "vJoy is not enabled. Check to make sure vJoy is actually running.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 1", int("0x10", 16))
+    sys.exit(0)
+except vjoy.vJoyFailedToAcquireException:
+    ctypes.windll.user32.MessageBoxW(0, "Another program is alrady using vJoy. Check if another instance of the app is already running or if any other app using vJoy is open.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 2", int("0x10", 16))
+    sys.exit(0)
 except:
-    raise TypeError("\n\n**vjoy set up failed**\n- Check to make sure vjoy is running\n- Check if an instance of this app is already running\n")
+    raise TypeError("\n\n**vjoy set up failed**\n- Something went wrong with the vJoy setup\n")
 
 queue = []
 number = 0

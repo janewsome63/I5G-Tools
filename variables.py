@@ -2,11 +2,11 @@ import copy
 import os
 
 compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
-                       'v0.7.1b', 'v0.7.1.1b', 'v0.8.0b', 'v0.8.1b']
+                       'v0.7.1b', 'v0.7.1.1b', 'v0.8.0b', 'v0.8.1b', 'v0.8.2b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.8.1b",
+    "version": "v0.8.2b",
     "pedal": "Pedal Axis:",
     "up": "Increase",
     "down": "Decrease",
@@ -119,9 +119,9 @@ lang = {
     "I5GYT": "Team I5G YouTube",
     "I5GYT_link": "https://www.youtube.com/@TeamI5G",
     "discord": "Discord",
-    "discord_link": "https://www.discord.com",
+    "discord_link": "https://discord.gg/hm7ywUygNy",
     "github": "Github",
-    "github_link": "https://www.github.com",
+    "github_link": "https://github.com/janewsome63/I5G-Tools",
 }
 lang['settings_version'] = lang['version']
 

@@ -352,16 +352,6 @@ def is_bind():
     except Exception as e:
         error_handling(e, "functions.is_bind()")
 
-def check_uid(irsdk):
-    try:
-        if irsdk.is_connected:
-            if irsdk['DriverInfo']['DriverUserID'] not in var.backend['whitelist']:
-                response = ctypes.windll.user32.MessageBoxW(0, "You've not been authorized to use this program.", "I5G Tools  -  Unauthorized user!", 0)
-                if response == 1:
-                    sys.exit(0)
-    except Exception as e:
-        error_handling(e, "functions.check_uid()")
-
 def reset_bind_thresh(thresh, value):
     try:
         if not (thresh == 'low_threshold' or thresh == 'high_threshold'):
