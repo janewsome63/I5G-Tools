@@ -7,7 +7,7 @@ compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b'
 lang = {
     "title": "I5G Tools",
     "version": "v0.8.2b",
-    "pedal": "Pedal Axis:",
+    "pedal": "Pedal Axis",
     "up": "Increase",
     "down": "Decrease",
     "switch": "Switch",
@@ -733,8 +733,6 @@ event = {
 }
 
 backend = {
-    "whitelist": (38722, 41368, 64400, 90193, 93858, 114220, 153763, 167574, 288105, 509505, 668169, 821985,
-                  693475, 778565, 292374, 909283, 1177562),
     "startup_time": None,
 }
 
