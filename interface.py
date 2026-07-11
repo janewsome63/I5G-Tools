@@ -61,7 +61,6 @@ class MainWindow(QMainWindow):
                     "other": ("hybrid", "fuel", "display", "sounds", "settings", "about")
                 }
             }
-
             for type in self.tabs['types']:
                 for function in self.tabs['types'][type]:
                     self.tabs[function] = QWidget()
@@ -1545,6 +1544,8 @@ class MainWindow(QMainWindow):
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
+            elif func == 'axis_rollover':
+                value = self.store['content']['settings'][func].currentText()
             else:
                 value = self.store['content']['settings'][func].value()
             if func == 'high_threshold':
@@ -1983,7 +1984,6 @@ class MainWindow(QMainWindow):
                     if type == "adjustment" or type == "input":
                         self.store['content'][function]['increment'].setValue(var.settings[function]['increment'])
                         self.store['content'][function]['switch'].setValue(var.settings[function]['switch_value'])
-                        self.store['content'][function]['axis_threshold'].setValue(int(var.settings[function]['axis_threshold'] * 100))
                         if var.settings[function]['continuous']:
                             self.store['content'][function]['increment_mode'].setCurrentText(var.lang['continuous'])
                         else:
@@ -2027,10 +2027,14 @@ class MainWindow(QMainWindow):
                     # self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
                     # print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
-                    if var.settings['local'][setting]:
-                        self.store['content']['sounds'][setting].setCurrentText('Yes')
+                    if setting == "axis_rollover":
+                        tab = 'settings'
                     else:
-                        self.store['content']['sounds'][setting].setCurrentText('No')
+                        tab = 'sounds'
+                    if var.settings['local'][setting]:
+                        self.store['content'][tab][setting].setCurrentText('Yes')
+                    else:
+                        self.store['content'][tab][setting].setCurrentText('No')
                 elif isinstance(var.settings['local'][setting], (float, int)):
                     if setting == 'volume':
                         self.store['content']['sounds']['volume'].setValue(int(var.settings['local']['volume']*100))

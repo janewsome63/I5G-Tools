@@ -86,7 +86,7 @@ def increment(bind, function, control):
             else:
                 offset = 0.0
         # print("offset: ", offset)
-        if check_pressed(bind, function):
+        if check_pressed(bind):
 
             if var.status[function]['switched']:
                 vjoy.set_axis(function, var.status[function]['secondary'] + offset)
@@ -103,7 +103,7 @@ def increment(bind, function, control):
                 count = 1
                 #print("count check1: ", count)
                 timer = var.settings['timer_first']/1000
-                while check_pressed(bind, function) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
+                while check_pressed(bind) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
                     if count % interval == 0:
                         #print("count check2: ", count, var.status[function]['switched'])
                         #print("continuous loop")
@@ -119,7 +119,7 @@ def increment(bind, function, control):
                     sleep(timer/interval)
                     count += 1
             else:
-                while check_pressed(bind, function) and var.status['calibration']== "None" and not var.bindings['status']['active']:
+                while check_pressed(bind) and var.status['calibration']== "None" and not var.bindings['status']['active']:
                     sleep(var.settings['timer_first']/(1000*interval))
         #else:
             #print("bind check_pressed failed: ", bind)
@@ -130,7 +130,7 @@ def increment(bind, function, control):
 
 def switch(bind, function):
     try:
-        if check_pressed(bind, function):
+        if check_pressed(bind):
             if var.status[function]['switched']:
                 var.status[function]['switched'] = False
                 vjoy.set_axis(function, var.status[function]['primary'])
@@ -138,7 +138,7 @@ def switch(bind, function):
                 var.status[function]['switched'] = True
                 vjoy.set_axis(function, var.status[function]['secondary'])
 
-            while check_pressed(bind, function) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
+            while check_pressed(bind) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
                 sleep(0.05)
 
             if not var.settings[function]['toggle']:
