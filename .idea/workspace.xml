@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.7.4.1b - Start adding framework for fuel functionality">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.8.0b - Revert variables.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -137,14 +139,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1757535539683</updated>
-    </task>
-    <task id="LOCAL-00005" summary="UI tweaks">
-      <option name="closed" value="true" />
-      <created>1757658627583</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1757658627583</updated>
     </task>
     <task id="LOCAL-00006" summary="Working on input device detection">
       <option name="closed" value="true" />
@@ -530,7 +524,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782706333940</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="v0.8.0b - Revert variables.py">
+      <option name="closed" value="true" />
+      <created>1783737674232</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1783737674232</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -545,7 +547,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix bindings being cleared due to checking for GUIDs before all devices had been loaded" />
     <MESSAGE value="Fix TypeError on unbinding, fix KeyError on undetected device binding" />
     <MESSAGE value="Update to Python 3.14.0 and PyQt6" />
     <MESSAGE value="Edit compile script to no longer use Resource Hacker" />
@@ -570,6 +571,7 @@
     <MESSAGE value="v0.7.3.11b - Cleanup" />
     <MESSAGE value="v0.7.3.11b - Add switch status to tool tabs" />
     <MESSAGE value="v0.7.4.1b - Start adding framework for fuel functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.7.4.1b - Start adding framework for fuel functionality" />
+    <MESSAGE value="v0.8.0b - Revert variables.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.8.0b - Revert variables.py" />
   </component>
 </project>

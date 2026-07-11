@@ -146,7 +146,7 @@ def read_profile(profile=None):
                     else:
                         setting = eval(config[section][item])
                     if section == "LOCAL":
-                        if item != 'high_threshold' and item != 'low_threshold' and item != 'axis_rollover':
+                        if item not in var.obsolete:
                             var.settings['local'][item] = setting
                     elif section.lower() in var.bindings:
                         if item in var.bindings_info['types']:

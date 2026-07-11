@@ -1992,6 +1992,10 @@ class MainWindow(QMainWindow):
                             self.store['content'][function]['switch_mode'].setCurrentText(var.lang['toggle'])
                         else:
                             self.store['content'][function]['switch_mode'].setCurrentText(var.lang['hold'])
+                        if var.settings[function]['rollover_mode']:
+                            self.store['content'][function]['rollover_mode'].setCurrentText(var.lang['unlocked'])
+                        else:
+                            self.store['content'][function]['rollover_mode'].setCurrentText(var.lang['locked'])
                     if type == "other":
                         if function == "hybrid":
                             if var.settings[function]['regen_toggle']:
