@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.7.4.1b - Start adding framework for fuel functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/devices.py" beforeDir="false" afterPath="$PROJECT_DIR$/devices.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sdk.py" beforeDir="false" afterPath="$PROJECT_DIR$/sdk.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,25 +59,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Run.executor": "Run",
-    "Python.devices.executor": "Run",
-    "Python.functions.executor": "Run",
-    "Python.interface.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.pyglet.executor": "Run",
-    "Python.pyglet_test.executor": "Run",
-    "Python.test.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Shell Script.Compile.executor": "Run",
-    "git-widget-placeholder": "alt-axes-thresholds",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "E:/User/archive/janewsome63/Development/PyCharmProjects/I5G-Tools",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Run.executor&quot;: &quot;Run&quot;,
+    &quot;Python.devices.executor&quot;: &quot;Run&quot;,
+    &quot;Python.functions.executor&quot;: &quot;Run&quot;,
+    &quot;Python.interface.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pyglet.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pyglet_test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Shell Script.Compile.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;alt-axes-thresholds&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/User/archive/janewsome63/Development/PyCharmProjects/I5G-Tools&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.Run">
     <configuration name="Run" type="PythonConfigurationType" factoryName="Python">
       <module name="I5G-Tools" />
@@ -139,14 +137,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1757535539683</updated>
-    </task>
-    <task id="LOCAL-00004" summary="UI tweaks">
-      <option name="closed" value="true" />
-      <created>1757570419857</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1757570419857</updated>
     </task>
     <task id="LOCAL-00005" summary="UI tweaks">
       <option name="closed" value="true" />
@@ -532,7 +522,15 @@
       <option name="project" value="LOCAL" />
       <updated>1782698455137</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="v0.7.4.1b - Start adding framework for fuel functionality">
+      <option name="closed" value="true" />
+      <created>1782706333940</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1782706333940</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
