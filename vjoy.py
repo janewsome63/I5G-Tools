@@ -46,22 +46,14 @@ button_ref = {
     "deploy": 2,
 }
 
-try:
-    j = vjoy.VJoyDevice(1)
-except vjoy.vJoyNotEnabledException:
-    ctypes.windll.user32.MessageBoxW(0, "vJoy is not enabled. Check to make sure vJoy is actually running.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 1", int("0x10", 16))
-    sys.exit(0)
-except vjoy.vJoyFailedToAcquireException:
-    ctypes.windll.user32.MessageBoxW(0, "Another program is alrady using vJoy. Check if another instance of the app is already running or if any other app using vJoy is open.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 2", int("0x10", 16))
-    sys.exit(0)
-except:
-    raise TypeError("\n\n**vjoy set up failed**\n- Something went wrong with the vJoy setup\n")
+j = None # will be used to hold the vJoy object
 
 queue = []
 number = 0
 
 def set_axis(axis, pct):
     try:
+        global j
         global number
         print("vjoy set check1")
         if axis_busy[axis]:
@@ -109,6 +101,7 @@ def set_axis(axis, pct):
 
 def set_button(button, state):
     try:
+        global j
         print("try set using: ", button, button_ref[button], state)
         j.set_button(button_ref[button], state)
     except Exception as e:
@@ -116,6 +109,7 @@ def set_button(button, state):
 
 def calibrate_axis(axis):
     try:
+        global j
         #var.status['calibration'] = True
         while var.status[axis]['thread']['waiting']: #wait for any hold loops to finish
             sleep(0.05)
@@ -142,6 +136,10 @@ def calibrate_axis(axis):
 
 def intialize():
     try:
+        global j
+        print("vjoy_rid in vjoy.initialize() is " + str(var.settings['vjoy_rid']))
+        j = vjoy.VJoyDevice(var.settings['vjoy_rid'])
+        print("j.rID in vjoy.initialize() is " + str(j.rID))
         j.update()
         set_axis("weight_jacker", 0.5)
         set_axis("front_roll_bar", 1.0)
@@ -153,6 +151,12 @@ def intialize():
         # set("deploy_rate", 1.0)
         set_button("regen", False)
         set_button("deploy", False)
+    except vjoy.vJoyNotEnabledException:
+        ctypes.windll.user32.MessageBoxW(0, "vJoy is not enabled. Check to make sure vJoy is actually running.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 1", int("0x10", 16))
+        sys.exit(0)
+    except vjoy.vJoyFailedToAcquireException:
+        ctypes.windll.user32.MessageBoxW(0, "vJoy rID " + str(var.settings['vjoy_rid']) + " is not available. Check if another instance of the app is already running or if any other app using vJoy is open.\nAlso check if the vJoy device is actually active in Configure vJoy.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 2", int("0x10", 16))
+        sys.exit(0)
     except Exception as e:
         fn.error_handling(e, "vjoy.initialize()")
 

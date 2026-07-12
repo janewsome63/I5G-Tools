@@ -11,6 +11,6 @@ if __name__ == '__main__':
     fn.start_thread(dev.device_detection)
     fn.start_thread(sdk.main)
 
-    vjoy.intialize()
     fn.read_config()
+    vjoy.intialize()
     ui.main()

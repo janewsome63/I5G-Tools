@@ -49,7 +49,14 @@ def read_config():
 
                     if section == "GLOBAL":
                         if not (item == "high_threshold" or item == "low_threshold"): # to make up for a mistake in all 0.6.Xb versions
-                            var.settings[item] = setting
+                            if item == "vjoy_rid":
+                                print('item is vjoy_rid in read_config(): ' + str(setting))
+                                if int(setting) < 1 or int(setting) > 16:
+                                    var.settings[item] = int(1) # temp fix, improve this later, pop up a warning or something
+                                else:
+                                    var.settings[item] = int(setting)
+                            else:
+                                var.settings[item] = setting
                     elif section == "SOUND":
                         var.settings['sound'][item] = setting
                     elif section == "PROFILE":
@@ -211,6 +218,7 @@ def read_profile(profile=None):
 
 def write_config():
     try:
+        print("write_config() start")
         config = parse.ConfigParser()
 
         config['GLOBAL'] = {}
@@ -234,6 +242,7 @@ def write_config():
         with open(var.settings['path'] + "\\"+ "global.ini", 'w') as file:
             # noinspection PyTypeChecker
             config.write(file)
+        print("write_config() end")
     except Exception as e:
         error_handling(e, "functions.write_config()")
         
@@ -519,6 +528,8 @@ def error_handling(e, loc):
     print(str(type(e)) + " " + loc)
     print(error)
     now_pretty = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    if var.backend['startup_time'] == None:
+        startup_time()
     sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
     with open("I5G_Tools_err_" + var.backend['startup_time'] + ".log", "a") as f:
         f.write(now_pretty + "\n")

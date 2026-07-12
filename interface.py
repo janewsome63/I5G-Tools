@@ -1239,6 +1239,9 @@ class MainWindow(QMainWindow):
             if var.status['rewrite_profile']:
                 fn.write_profile()
                 var.status['rewrite_profile'] = False
+            if var.status['rewrite_config']:
+                fn.write_config()
+                var.status['rewrite_config'] = False
         except Exception as e:
             fn.error_handling(e, "interface.updater()")
 
@@ -1612,6 +1615,8 @@ class MainWindow(QMainWindow):
                 else:
                     var.settings[func] = value
                     var.status['rewrite_profile'] = True
+            if func in var.settings:
+                var.status['rewrite_config'] = True
         except Exception as e:
             fn.error_handling(e, "interface.settings_set()")
 
@@ -2010,7 +2015,9 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['timer_loop'].setValue(int(var.settings['timer_loop']))
             self.store['content']['settings']['profile_select'].setCurrentText(var.settings['profile']['current'])
             for setting in var.settings['local']:
-                if setting == "audio":
+                if setting == 'frequency' or setting == 'scale' or setting == 'timer_loop' or setting == 'timer_first' or setting == 'config' or setting == 'path' or setting == 'vjoy_rid':
+                    continue # ignore settings that are in the global.ini
+                elif setting == "audio":
                     if var.settings['local']['audio']:
                         self.store['content']['sounds']['sound'].setCurrentText('Yes')
                     else:
