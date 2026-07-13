@@ -224,7 +224,7 @@ def write_config():
         config['GLOBAL'] = {}
         config['GLOBAL']['version'] = var.lang['settings_version']
         for setting in var.settings:
-            if not isinstance(var.settings[setting], dict):
+            if not isinstance(var.settings[setting], dict) and setting != 'version':
                 config['GLOBAL'][setting] = str(var.settings[setting])
 
         config['SOUND'] = {}
