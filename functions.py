@@ -361,7 +361,7 @@ def is_bind():
     except Exception as e:
         error_handling(e, "functions.is_bind()")
 
-def reset_bind_thresh(thresh, value):
+def reset_bind_thresh(guid, thresh, value):
     try:
         if not (thresh == 'low_threshold' or thresh == 'high_threshold'):
             print("Warning: reset_bind_thresh with arguments: ", thresh, value)
@@ -370,12 +370,10 @@ def reset_bind_thresh(thresh, value):
             if function != 'status':
                 for control in var.bindings[function]:
                     if var.bindings[function][control] is not None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
-                        guid = var.bindings[function][control]['guid']
-                        if (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
-                            var.bindings[function][control]['value'] = value
-                        elif (var.bindings[function][control]['label'][-1] == "+" and thresh == 'high_threshold') or (var.bindings[function][control]['label'][-1] == "-" and thresh == 'low_threshold'):
-                            var.bindings[function][control]['value'] = value
-                            print("using backup method in fn.reset_bind_thresh()")
+                        if guid == var.bindings[function][control]['guid']:
+                            if (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
+                                var.bindings[function][control]['value'] = value
+
     except Exception as e:
         error_handling(e, "functions.reset_bind_thresh()")
 

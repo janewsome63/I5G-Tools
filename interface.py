@@ -1526,16 +1526,6 @@ class MainWindow(QMainWindow):
             fn.error_handling(e, "interface.toggle_mode()")
 
     @pyqtSlot()
-    def axis_threshold(self, func):
-        try:
-            var.settings[func]["axis_threshold"] = self.store['content'][func]['axis_threshold'].value() / 100
-            fn.reset_bind_thresh(func, var.settings[func]["axis_threshold"])
-            print("axis_threshold, func = " + func + ", ", var.settings[func]["axis_threshold"])
-            var.status['rewrite_profile'] = True
-        except Exception as e:
-            fn.error_handling(e, "interface.axis_threshold()")
-
-    @pyqtSlot()
     def settings_set(self, func):
         try:
             print("settings_set ", func)
@@ -1557,7 +1547,7 @@ class MainWindow(QMainWindow):
                         self.store['content']['settings']['low_threshold'].setRange(1, value-1)
                     else:
                         print("not changing low axis limits")
-                    fn.reset_bind_thresh(func, value/100)
+                    fn.reset_bind_thresh(self.store['content']['settings']['axis_threshold_device_guid'], func, value/100)
                     var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['high_threshold'] = value/100
                     var.status['rewrite_profile'] = True
             elif func == 'low_threshold':
@@ -1570,7 +1560,7 @@ class MainWindow(QMainWindow):
                         self.store['content']['settings']['high_threshold'].setRange(value+1, 99)
                     else:
                         print("not changing high axis limits")
-                    fn.reset_bind_thresh(func, value/100)
+                    fn.reset_bind_thresh(self.store['content']['settings']['axis_threshold_device_guid'], func, value/100)
                     var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] = value/100
                     var.status['rewrite_profile'] = True
             elif func == 'axis_rollover':
