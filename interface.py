@@ -2175,7 +2175,7 @@ class MainWindow(QMainWindow):
                                             var.status['p2p_sound_active']['single'] = True
                                     if var.status['p2p_sound_active']['single']:
                                         fn.start_thread(sfx.play('p2p_active'))
-                                    elif sfx.p2p_active.get_num_channels() == 0:
+                                    elif sfx.audio['p2p_active'].get_num_channels() == 0:
                                         sfx.status['p2p_active_single'] = False
                                     var.status['p2p_sound_active']['single'] = False
                             else:
