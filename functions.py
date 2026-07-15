@@ -195,6 +195,23 @@ def read_profile(profile=None):
                                     label = "Unknown device"
                                 var.bindings[function][control] = {"label": label, "guid": 0, "type": "none", "num": 0}
                                 bind_errors.append([str(function), str(control)])
+            
+            for guid in var.settings['device_axis_thresh']:
+                for function in var.bindings:
+                    if function != 'status' and function != 'hybrid':
+                        for control in var.bindings[function]:
+                            bind = var.bindings[function][control]
+                            if bind['guid'] == guid and bind['type'] == 'axis' and not 'input' in bind:
+                                if bind['label'][-1] == '+':
+                                    if bind['value'] != var.settings['device_axis_thresh'][guid]['high_threshold']:
+                                        print("Warning, overriding high bind value for " + str(function) + " " + str(control) + " in fn.read_profile()")
+                                        var.bindings[function][control]['value'] = var.settings['device_axis_thresh'][guid]['high_threshold']
+                                elif bind['label'][-1] == '-':
+                                    if bind['value'] != var.settings['device_axis_thresh'][guid]['low_threshold']:
+                                        print("Warning, overriding low bind value for " + str(setting) + " " + str(control) + " in fn.read_profile()")
+                                        var.bindings[function][control]['value'] = var.settings['device_axis_thresh'][guid]['low_threshold']
+                                else:
+                                    print("Warning, unknown axis label for " + str(bind['label']) + " in fn.read_profile()")
 
         else:
             if not var.status['first']:
