@@ -89,8 +89,8 @@ def play(notif):
                 print ("in sfx.play for p2p_active, statuses are: ", status["p2p_active_single"], status['p2p_active_loop'])
             else:
                 print(notif, " is not valid in sfx.play")
-        else:
-            print(notif, " sound status is already True in sfx.play")
+        # else:
+        #     print(notif, " sound status is already True in sfx.play")
     except Exception as e:
         fn.error_handling(e, "sound_fx.play()")
 
