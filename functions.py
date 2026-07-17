@@ -613,6 +613,12 @@ def open_browser(link):
     except Exception as e:
         error_handling(e, "functions.open_browser()")
 
+def open_path(path):
+    try:
+        os.startfile(path)
+    except Exception as e:
+        error_handling(e, "functions.open_browser()")
+
 def check_audio_setting(sound): # returns true if the settings for this sound are on, returns false if settings for this sound are off
     if not var.settings['local']['audio']:
         return False

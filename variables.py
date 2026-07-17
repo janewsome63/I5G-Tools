@@ -116,6 +116,7 @@ lang = {
                     "Proceed?",
         },
     },
+    "open_folder": "Open Settings Folder",
     "donate": "Support on Ko-Fi",
     "donate_link": "https://ko-fi.com/cmdracer",
     "I5GYT": "Team I5G YouTube",

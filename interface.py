@@ -1093,6 +1093,14 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
             self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+
+            self.store['content']['settings']['open_folder'] = QPushButton()
+            self.store['content']['settings']['open_folder'].setFixedSize(210, 25)
+            self.store['content']['settings']['open_folder'].setText(var.lang['open_folder'])
+            self.store['content']['settings']['open_folder'].clicked.connect(lambda: fn.open_path(var.settings['path']))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['open_folder'], row, column, alignment=Qt.AlignmentFlag.AlignLeft)
 
             self.tabs['settings'].setLayout(self.tabs['settings'].layout)
         except Exception as e:
