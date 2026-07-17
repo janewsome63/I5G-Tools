@@ -12,6 +12,8 @@ import variables as var
 from time import sleep
 import datetime
 import webbrowser
+import car_settings_list
+import csv
 
 def read_config():
     try:
@@ -512,6 +514,98 @@ def translate(file, type, name, ver): # as of right now, this should only ever b
             var.status['rewrite']['profile'] = False
     except Exception as e:
         error_handling(e, "functions.translate()")
+
+def read_car_settings():
+    try:
+        print("starting read_car_settings()")
+        if os.path.exists(var.settings['path'] + "\\" + var.settings['car_settings']):
+            print("car settings file found")
+            with open(var.settings['path'] + "\\" + var.settings['car_settings'], mode='r', newline='', encoding='utf-8') as file:
+                settings = csv.reader(file)
+                header = True
+                for row in settings:
+                    if not header and row[0] != "":
+                        carid = int(row[0])
+                        name = str(row[1])
+                        hybrid = row[2]
+                        weight_jacker_low = row[3]
+                        weight_jacker_high = row[4]
+                        front_roll_bar_low = row[5]
+                        front_roll_bar_high = row[6]
+                        rear_roll_bar_low = row[7]
+                        rear_roll_bar_high = row[8]
+                        fuel_map_low = row[9]
+                        fuel_map_high = row[10]
+                        if name != "":
+                            car_settings_list.car_settings[carid]['name'] = str(name)
+                        if hybrid != "":
+                            car_settings_list.car_settings[carid]['hybrid'] = bool(hybrid)
+                        if weight_jacker_low != "" and weight_jacker_high != "":
+                            car_settings_list.car_settings[carid]['weight_jacker'] = [int(weight_jacker_low), int(weight_jacker_high)]
+                        if front_roll_bar_low != "" and front_roll_bar_high != "":
+                            car_settings_list.car_settings[carid]['front_roll_bar'] = [int(front_roll_bar_low), int(front_roll_bar_high)]
+                        if rear_roll_bar_low != "" and rear_roll_bar_high != "":
+                            car_settings_list.car_settings[carid]['rear_roll_bar'] = [int(rear_roll_bar_low), int(rear_roll_bar_high)]
+                        if fuel_map_low != "" and fuel_map_high != "":
+                            car_settings_list.car_settings[carid]['fuel_map'] = [int(fuel_map_low), int(fuel_map_high)]
+                    else:
+                        header = False
+            print("done in read_car_settings()")
+        else:
+            print("car settings file not found")
+            write_car_settings(var.settings['car_settings'])
+    except Exception as e:
+        error_handling(e, "functions.read_car_settings()")
+
+def write_car_settings(filename):
+    try:
+        print("start write_car_settings()")
+        header = ['CarID', 'name', 'hybrid', 'WJ low', 'WJ high', 'FARB low', 'FARB high', 'RARB low', 'RARB high', 'Map low', 'Map high']
+        list = car_settings_list.car_settings
+        data = [[0 for _ in range(11)] for _ in range(len(list))]
+        i = 0
+        for carid in list:
+            data[i][0] = carid
+            if 'name' in list[carid]:
+                data[i][1] = list[carid]['name']
+            else:
+                data[i][1] = ""
+            if 'hybrid' in list[carid]:
+                data[i][2] = list[carid]['hybrid']
+            else:
+                data[i][2] = ""
+            if 'weight_jacker' in list[carid]:
+                data[i][3] = list[carid]['weight_jacker'][0]
+                data[i][4] = list[carid]['weight_jacker'][1]
+            else:
+                data[i][3] = ""
+                data[i][4] = ""
+            if 'front_roll_bar' in list[carid]:
+                data[i][5] = list[carid]['front_roll_bar'][0]
+                data[i][6] = list[carid]['front_roll_bar'][1]
+            else:
+                data[i][5] = ""
+                data[i][6] = ""
+            if 'rear_roll_bar' in list[carid]:
+                data[i][7] = list[carid]['rear_roll_bar'][0]
+                data[i][8] = list[carid]['rear_roll_bar'][1]
+            else:
+                data[i][7] = ""
+                data[i][8] = ""
+            if 'fuel_map' in list[carid]:
+                data[i][9] = list[carid]['fuel_map'][0]
+                data[i][10] = list[carid]['fuel_map'][1]
+            else:
+                data[i][9] = ""
+                data[i][10] = ""
+            i += 1
+        with open(var.settings['path'] + "\\" + filename, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerows(data)
+        print("Finished write_car_settings()")
+    except Exception as e:
+        error_handling(e, "functions.write_car_settings()")
 
 def open_browser(link):
     try:

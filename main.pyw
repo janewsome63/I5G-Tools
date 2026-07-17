@@ -12,5 +12,6 @@ if __name__ == '__main__':
     fn.start_thread(sdk.main)
 
     fn.read_config()
+    fn.read_car_settings()
     vjoy.intialize()
     ui.main()
