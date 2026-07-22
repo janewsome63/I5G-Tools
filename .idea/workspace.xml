@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.8.0b - Revert variables.py">
+    <list default="true" id="369f1501-c96c-423e-a1e5-f15cd2c3330a" name="Changes" comment="v0.8.1b - Fix rollover mode not being updated in UI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/functions.py" beforeDir="false" afterPath="$PROJECT_DIR$/functions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/variables.py" beforeDir="false" afterPath="$PROJECT_DIR$/variables.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +23,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="test_fixes2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -74,9 +72,9 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Shell Script.Compile.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;alt-axes-thresholds&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/User/archive/janewsome63/Development/PyCharmProjects/I5G-Tools&quot;,
+    &quot;last_opened_file_path&quot;: &quot;B:/janewsome63/Development/PyCharmProjects/I5G-Tools/compile.bat&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
@@ -139,6 +137,46 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1757535539683</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Initial Commit">
+      <option name="closed" value="true" />
+      <created>1757535605230</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1757535605230</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Adding basics">
+      <option name="closed" value="true" />
+      <created>1757536286407</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1757536286407</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Initial UI design">
+      <option name="closed" value="true" />
+      <created>1757569486675</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1757569486675</updated>
+    </task>
+    <task id="LOCAL-00004" summary="UI tweaks">
+      <option name="closed" value="true" />
+      <created>1757570419857</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1757570419857</updated>
+    </task>
+    <task id="LOCAL-00005" summary="UI tweaks">
+      <option name="closed" value="true" />
+      <created>1757658627583</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1757658627583</updated>
     </task>
     <task id="LOCAL-00006" summary="Working on input device detection">
       <option name="closed" value="true" />
@@ -436,103 +474,7 @@
       <option name="project" value="LOCAL" />
       <updated>1781656830759</updated>
     </task>
-    <task id="LOCAL-00043" summary="v0.7.4b - Change leftover variable causing crash">
-      <option name="closed" value="true" />
-      <created>1782249798956</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1782249798956</updated>
-    </task>
-    <task id="LOCAL-00044" summary="v0.7.3.7b - Make error log a bit more detailed">
-      <option name="closed" value="true" />
-      <created>1782405533748</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1782405533748</updated>
-    </task>
-    <task id="LOCAL-00045" summary="v0.7.3.8b - Start infrastructure for vjoy buttons">
-      <option name="closed" value="true" />
-      <created>1782408854560</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1782408854560</updated>
-    </task>
-    <task id="LOCAL-00046" summary="v0.7.3.8b - Finish infrastructure for vjoy buttons, add bindings to hybrid tab (toggle and calibrate UI elements still TODO)">
-      <option name="closed" value="true" />
-      <created>1782413160716</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1782413160716</updated>
-    </task>
-    <task id="LOCAL-00047" summary="v0.7.3.11b - Finish hybrid tab functionality and basic UI">
-      <option name="closed" value="true" />
-      <created>1782617717733</created>
-      <option name="number" value="00047" />
-      <option name="presentableId" value="LOCAL-00047" />
-      <option name="project" value="LOCAL" />
-      <updated>1782617717733</updated>
-    </task>
-    <task id="LOCAL-00048" summary="v0.7.3.11b - Finish hybrid tab functionality and basic UI">
-      <option name="closed" value="true" />
-      <created>1782618350927</created>
-      <option name="number" value="00048" />
-      <option name="presentableId" value="LOCAL-00048" />
-      <option name="project" value="LOCAL" />
-      <updated>1782618350927</updated>
-    </task>
-    <task id="LOCAL-00049" summary="v0.7.3.11b - Finish hybrid tab functionality and basic UI">
-      <option name="closed" value="true" />
-      <created>1782619369567</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1782619369567</updated>
-    </task>
-    <task id="LOCAL-00050" summary="v0.7.3.11b - Cleanup">
-      <option name="closed" value="true" />
-      <created>1782621840286</created>
-      <option name="number" value="00050" />
-      <option name="presentableId" value="LOCAL-00050" />
-      <option name="project" value="LOCAL" />
-      <updated>1782621840286</updated>
-    </task>
-    <task id="LOCAL-00051" summary="v0.7.3.11b - Add switch status to tool tabs">
-      <option name="closed" value="true" />
-      <created>1782623831386</created>
-      <option name="number" value="00051" />
-      <option name="presentableId" value="LOCAL-00051" />
-      <option name="project" value="LOCAL" />
-      <updated>1782623831386</updated>
-    </task>
-    <task id="LOCAL-00052" summary="v0.7.4.1b - Start adding framework for fuel functionality">
-      <option name="closed" value="true" />
-      <created>1782698455137</created>
-      <option name="number" value="00052" />
-      <option name="presentableId" value="LOCAL-00052" />
-      <option name="project" value="LOCAL" />
-      <updated>1782698455137</updated>
-    </task>
-    <task id="LOCAL-00053" summary="v0.7.4.1b - Start adding framework for fuel functionality">
-      <option name="closed" value="true" />
-      <created>1782706333940</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1782706333940</updated>
-    </task>
-    <task id="LOCAL-00054" summary="v0.8.0b - Revert variables.py">
-      <option name="closed" value="true" />
-      <created>1783737674232</created>
-      <option name="number" value="00054" />
-      <option name="presentableId" value="LOCAL-00054" />
-      <option name="project" value="LOCAL" />
-      <updated>1783737674232</updated>
-    </task>
-    <option name="localTasksCounter" value="55" />
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -547,6 +489,15 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Rework control loop; now triggered by creating new thread on device event" />
+    <MESSAGE value="Fix axis bind repeating, streamline control implementation further" />
+    <MESSAGE value="Split roll bar tabs, add fuel map tab functions" />
+    <MESSAGE value="Fix interface switch function to work with all tabs, not just weight jacker" />
+    <MESSAGE value="Add config file system, miscellaneous tweaks, increase calibration step" />
+    <MESSAGE value="Fix crash on creating AppData directory" />
+    <MESSAGE value="Fix crash on launch if a bound controller was not detected on startup" />
+    <MESSAGE value="Fix memory leak caused by creating new vjoy device objects" />
+    <MESSAGE value="Fix bindings being cleared due to checking for GUIDs before all devices had been loaded" />
     <MESSAGE value="Fix TypeError on unbinding, fix KeyError on undetected device binding" />
     <MESSAGE value="Update to Python 3.14.0 and PyQt6" />
     <MESSAGE value="Edit compile script to no longer use Resource Hacker" />
@@ -563,15 +514,6 @@
     <MESSAGE value="v0.7.1b - Fixed missing version in compatible list" />
     <MESSAGE value="v0.7.3b - Add &quot;Fuel&quot; and &quot;About&quot; tabs, change some language, undo non-tool tab consolidation, remove high and low threshold to replace with one axis threshold for each function, remove axis rollover to replace with axis rollover for each function" />
     <MESSAGE value="v0.7.4b - Fix history to use per function threshold, but only uses first returned bind's threshold if multiple are returned" />
-    <MESSAGE value="v0.7.4b - Change leftover variable causing crash" />
-    <MESSAGE value="v0.7.3.7b - Make error log a bit more detailed" />
-    <MESSAGE value="v0.7.3.8b - Start infrastructure for vjoy buttons" />
-    <MESSAGE value="v0.7.3.8b - Finish infrastructure for vjoy buttons, add bindings to hybrid tab (toggle and calibrate UI elements still TODO)" />
-    <MESSAGE value="v0.7.3.11b - Finish hybrid tab functionality and basic UI" />
-    <MESSAGE value="v0.7.3.11b - Cleanup" />
-    <MESSAGE value="v0.7.3.11b - Add switch status to tool tabs" />
-    <MESSAGE value="v0.7.4.1b - Start adding framework for fuel functionality" />
-    <MESSAGE value="v0.8.0b - Revert variables.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="v0.8.0b - Revert variables.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="v0.7.4b - Fix history to use per function threshold, but only uses first returned bind's threshold if multiple are returned" />
   </component>
 </project>

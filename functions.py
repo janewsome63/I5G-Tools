@@ -62,7 +62,10 @@ def read_config():
                     elif section == "SOUND":
                         var.settings['sound'][item] = setting
                     elif section == "PROFILE":
-                        var.settings['profile'][item] = setting
+                        if item == "current":
+                            var.settings['profile'][item] = str(setting)
+                        else:
+                            var.settings['profile'][item] = setting
                     else:
                         if not section in errors:
                             errors.append(section)
