@@ -1,6 +1,7 @@
 from time import sleep
 
 import pyvjoy as vjoy
+from pyvjoy import _sdk
 
 import devices as dev
 import variables as var
@@ -136,6 +137,19 @@ def calibrate_axis(axis):
 
 def intialize():
     try:
+        status_codes = {
+            0: "VJD_STAT_OWN (Owned by this application)",
+            1: "VJD_STAT_FREE (Free / Available)",
+            2: "VJD_STAT_BUSY (Owned by another application)",
+            3: "VJD_STAT_MISS (Device missing or disabled)",
+            4: "VJD_STAT_UNKN (Unknown)",
+        }
+        for device_id in range(1, 17):
+            try:
+                status = _sdk.GetVJDStatus(device_id)
+                print(f"Device ID {device_id}: {status_codes.get(status, 'Invalid Status')}")
+            except Exception as e:
+                print(f"Device ID {device_id}: Error checking status ({e})")
         global j
         print("vjoy_rid in vjoy.initialize() is " + str(var.settings['vjoy_rid']))
         j = vjoy.VJoyDevice(var.settings['vjoy_rid'])
