@@ -53,7 +53,7 @@ def read_config():
                         if not (item == "high_threshold" or item == "low_threshold"): # to make up for a mistake in all 0.6.Xb versions
                             if item == "vjoy_rid":
                                 print('item is vjoy_rid in read_config(): ' + str(setting))
-                                if int(setting) < 1 or int(setting) > 16:
+                                if (int(setting) < 1 or int(setting) > 16) and not int(setting) == -1:
                                     var.settings[item] = int(1) # temp fix, improve this later, pop up a warning or something
                                 else:
                                     var.settings[item] = int(setting)

@@ -137,6 +137,7 @@ def calibrate_axis(axis):
 
 def intialize():
     try:
+        print("vjoy_rid in vjoy.initialize() is " + str(var.settings['vjoy_rid']))
         status_codes = {
             0: "VJD_STAT_OWN (Owned by this application)",
             1: "VJD_STAT_FREE (Free / Available)",
@@ -148,12 +149,18 @@ def intialize():
             try:
                 status = _sdk.GetVJDStatus(device_id)
                 print(f"Device ID {device_id}: {status_codes.get(status, 'Invalid Status')}")
+                if var.settings['vjoy_rid'] == -1 and status == 1:
+                    var.settings['vjoy_rid'] = device_id
+                    print(f"vjoy_rid setting reset to {device_id}")
             except Exception as e:
                 print(f"Device ID {device_id}: Error checking status ({e})")
+        if var.settings['vjoy_rid'] == -1:
+            ctypes.windll.user32.MessageBoxW(0, "Cannot determine which vJoy device to use because no vJoy devices are free to acquire. Check that vJoy is actually running and other programs are not using the only active vJoy devices.\n\nProgram will now close.", "I5G Tools  -  vJoy Setup Error 3", int("0x10", 16))    
+            sys.exit(0)
         global j
-        print("vjoy_rid in vjoy.initialize() is " + str(var.settings['vjoy_rid']))
         j = vjoy.VJoyDevice(var.settings['vjoy_rid'])
         print("j.rID in vjoy.initialize() is " + str(j.rID))
+        print(f"Device ID {var.settings['vjoy_rid']}: {status_codes.get(_sdk.GetVJDStatus(var.settings['vjoy_rid']), 'Invalid Status')}")
         j.update()
         set_axis("weight_jacker", 0.5)
         set_axis("front_roll_bar", 1.0)
@@ -169,7 +176,14 @@ def intialize():
         ctypes.windll.user32.MessageBoxW(0, "vJoy is not enabled. Check to make sure vJoy is actually running.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 1", int("0x10", 16))
         sys.exit(0)
     except vjoy.vJoyFailedToAcquireException:
-        ctypes.windll.user32.MessageBoxW(0, "vJoy rID " + str(var.settings['vjoy_rid']) + " is not available. Check if another instance of the app is already running or if any other app using vJoy is open.\nAlso check if the vJoy device is actually active in Configure vJoy.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 2", int("0x10", 16))
+        status = _sdk.GetVJDStatus(var.settings['vjoy_rid'])
+        text = "vJoy rID (device number) " + str(var.settings['vjoy_rid']) + " is not available due to status code " + status_codes.get(status, 'Invalid Status') + "."
+        if status == 2:
+            text += " Check if another instance of the app is already running or if any other app using vJoy is open and using the same vJoy device number."
+        elif status == 3:
+            text += " Check to make sure the vJoy device number is actually implemented in the \"Configure vJoy\" windows program. Also make sure vJoy is not disabled in Device Manager in windows."
+        text += "\n\nProgram will now close."
+        ctypes.windll.user32.MessageBoxW(0, text, "I5G Tools  -  vJoy Setup Error 2", int("0x10", 16))
         sys.exit(0)
     except Exception as e:
         fn.error_handling(e, "vjoy.initialize()")

@@ -307,7 +307,7 @@ settings = {
     "config": "global.ini",
     "path": os.path.expanduser("~") + "\\AppData\\Local\\I5G Tools",
     "car_settings": "car_settings.csv",
-    "vjoy_rid": 1,
+    "vjoy_rid": -1,
 
     "sound": {
         "path": "sfx",
