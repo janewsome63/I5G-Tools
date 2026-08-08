@@ -1888,11 +1888,11 @@ class MainWindow(QMainWindow):
     def update_label(self, function, control):
         try:
             if var.bindings[function][control]:
-                if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
+                if var.bindings[function][control][0]['label'] != ["None"] and var.bindings[function][control][0]['guid'] == 0:
                     self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
                 else:
                     self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
+                if var.bindings[function][control][0]['label'] and var.bindings[function][control][0]['guid'] in dev.device_info:
                     var.status['rewrite']['profile'] = True
                     self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
                     if var.status['rewrite']['profile']:
