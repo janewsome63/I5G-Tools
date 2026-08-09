@@ -353,10 +353,10 @@ def is_bind():
             if function != "status":
                 for control in var.bindings[function]:
                     bind = copy.deepcopy(var.bindings[function][control])
-                    try:
-                        bind.pop("label")
-                    except KeyError:
-                        pass
+                    # try:
+                    #     bind.pop("label")
+                    # except KeyError:
+                    #     pass
                     if "input" in bind:
                         if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
                             result.append({"function": function, "control": control, "value": var.event['value']})
@@ -369,6 +369,15 @@ def is_bind():
     except Exception as e:
         error_handling(e, "functions.is_bind()")
 
+def sort_input_array(data):
+    try:
+        # print("starting sort_input_array()")
+        output = sorted(data, key=lambda d: [d.get('guid', '-1'), d.get('type', chr(0)), d.get('num', chr(0)), d.get('value', chr(0)), d.get('dir', [chr(0),chr(0)])])
+        print("sorted: " + str(output))
+        return output
+    except Exception as e:
+        error_handling(e, "functions.sort_input_array()")
+
 def reset_bind_thresh(guid, thresh, value):
     try:
         if not (thresh == 'low_threshold' or thresh == 'high_threshold'):
@@ -377,10 +386,12 @@ def reset_bind_thresh(guid, thresh, value):
         for function in var.bindings:
             if function != 'status':
                 for control in var.bindings[function]:
-                    if var.bindings[function][control] is not None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
-                        if guid == var.bindings[function][control]['guid']:
-                            if (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
-                                var.bindings[function][control]['value'] = value
+                    if var.bindings[function][control] is not None and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
+                        for i in range(0,len(var.bindings[function][control])):
+                            if var.bindings[function][control][i]['type'] == 'axis':
+                                if guid == var.bindings[function][control][i]['guid']:
+                                    if (var.bindings[function][control][i]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control][i]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
+                                        var.bindings[function][control][i]['value'] = value
 
     except Exception as e:
         error_handling(e, "functions.reset_bind_thresh()")
