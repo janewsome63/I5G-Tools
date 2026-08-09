@@ -1011,6 +1011,21 @@ class MainWindow(QMainWindow):
             row += 1
             column = 0
 
+            self.store['content']['settings']['chording_mode_label'] = QLabel()
+            self.store['content']['settings']['chording_mode_label'].setText(var.lang['chording_mode_label'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['chording_mode_label'], row, column)
+            column += 2
+
+            self.store['content']['settings']['chording_mode'] = CustomComboBox()
+            self.store['content']['settings']['chording_mode'].setFixedSize(70, 25)
+            self.store['content']['settings']['chording_mode'].addItem("Yes")
+            self.store['content']['settings']['chording_mode'].addItem("No")
+            self.store['content']['settings']['chording_mode'].setCurrentText(str(var.settings['local']['chording_mode']))
+            self.store['content']['settings']['chording_mode'].currentIndexChanged.connect(lambda: self.settings_set('chording_mode'))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['chording_mode'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+
             self.store['content']['settings']['profile_create_label'] = QLabel()
             self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], row, column)
@@ -1547,7 +1562,7 @@ class MainWindow(QMainWindow):
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
-            elif func == 'axis_rollover':
+            elif func == 'axis_rollover' or func == 'chording_mode':
                 value = self.store['content']['settings'][func].currentText()
             else:
                 value = self.store['content']['settings'][func].value()
@@ -1589,7 +1604,7 @@ class MainWindow(QMainWindow):
                 else:
                     var.settings['local']['audio'] = (value == "Yes")
                     var.status['rewrite_profile'] = True
-            elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
+            elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car" or func == "chording_mode":
                 if (value == "Yes") == var.settings['local'][func]:
                     print("skipping setting ", func, " because it's already at ", value)
                 else:
@@ -2041,7 +2056,7 @@ class MainWindow(QMainWindow):
                     # self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
                     # print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
-                    if setting == "axis_rollover":
+                    if setting == "axis_rollover" or setting == "chording_mode":
                         tab = 'settings'
                     else:
                         tab = 'sounds'

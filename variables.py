@@ -83,6 +83,7 @@ lang = {
     "p2p_behind_thresh_cont_label": "P2P Continuous Warning Threshold (in ms, -1 is any distance)",
     "p2p_behind_closest_car_label": "P2P Warning For Closest Car Behind Only",
     'vjoy_device': "Using vJoy device number: ",
+    'chording_mode_label': "Chorded Input Deactivates All Sub-Chord Inputs",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",
@@ -349,6 +350,7 @@ settings = {
         "p2p_behind_thresh": int(3000),
         "p2p_behind_thresh_cont": int(1000),
         "p2p_behind_closest_car": True,
+        "chording_mode": False,
     },
 
     "weight_jacker": {
