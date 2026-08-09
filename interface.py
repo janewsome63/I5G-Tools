@@ -1888,17 +1888,23 @@ class MainWindow(QMainWindow):
     def update_label(self, function, control):
         try:
             if var.bindings[function][control]:
-                if var.bindings[function][control][0]['label'] != "None" and not var.bindings[function][control][0]['guid'] in dev.device_info:
+                active = True
+                for i in range(0,len(var.bindings[function][control])):
+                    if var.bindings[function][control][i]['label'] != "None" and not var.bindings[function][control][i]['guid'] in dev.device_info:
+                        active = False
+                if not active:
                     self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
+                    label = ""
+                    for i in range(0,len(var.bindings[function][control])):
+                        label += var.bindings[function][control][i]['label']
+                        if i < len(var.bindings[function][control])-1:
+                            label += "\n"
+                    self.store['content'][function][control + '_device'].setText(label)
                 else:
                     self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                if var.bindings[function][control][0]['label'] and var.bindings[function][control][0]['guid'] in dev.device_info:
                     var.status['rewrite']['profile'] = True
                     self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
-                    if var.status['rewrite']['profile']:
-                        var.status['rewrite_profile'] = True
-                        var.status['rewrite']['profile'] = False
-                self.store['content'][function][control + '_device'].setText(var.bindings[function][control][0]['label'])
+                # self.store['content'][function][control + '_device'].setText(var.bindings[function][control][0]['label'])
         except Exception as e:
             fn.error_handling(e, "interface.update_label()")
     
