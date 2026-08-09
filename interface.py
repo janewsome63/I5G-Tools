@@ -1096,6 +1096,12 @@ class MainWindow(QMainWindow):
             row += 1
             column = 0
 
+            self.store['content']['settings']['vjoy_device'] = QLabel()
+            self.store['content']['settings']['vjoy_device'].setText(var.lang['vjoy_device'] + str(var.settings['vjoy_rid']))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['vjoy_device'], row, column, alignment=Qt.AlignmentFlag.AlignLeft)
+            row += 1
+            column = 0
+
             self.store['content']['settings']['open_folder'] = QPushButton()
             self.store['content']['settings']['open_folder'].setFixedSize(210, 25)
             self.store['content']['settings']['open_folder'].setText(var.lang['open_folder'])

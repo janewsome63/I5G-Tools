@@ -82,6 +82,7 @@ lang = {
     "p2p_behind_thresh_label": "P2P Single Warning Threshold (in ms, -1 is any distance)",
     "p2p_behind_thresh_cont_label": "P2P Continuous Warning Threshold (in ms, -1 is any distance)",
     "p2p_behind_closest_car_label": "P2P Warning For Closest Car Behind Only",
+    'vjoy_device': "Using vJoy device number: ",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",
