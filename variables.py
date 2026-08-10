@@ -739,6 +739,8 @@ event = {
     "value": None,
 }
 
+bind_event_list = []
+
 backend = {
     "startup_time": None,
 }

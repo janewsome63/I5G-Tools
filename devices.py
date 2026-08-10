@@ -143,6 +143,8 @@ def log_event(instance_id, type, num, value):
                 # print(var.event)
                 # pass
             print(var.event)
+            if var.bindings['status']['active']:
+                var.bind_event_list.append(var.event)
         # else:
             # print("guid in device_info failed: ", guid, device_info)
     except Exception as e:

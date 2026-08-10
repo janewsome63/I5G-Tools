@@ -1659,7 +1659,7 @@ class MainWindow(QMainWindow):
 
             self.store['index'][function][control]['bind'].setText(var.lang['binding'])
 
-            var.event = {
+            event = {
                 "guid": 0,
                 "type": "",
                 "num": 0,
@@ -1671,64 +1671,66 @@ class MainWindow(QMainWindow):
             hat_update = False
             last_keyboard_input = ""
             while not release and var.bindings['status']['active'] and (var.potential_bind == [] or var.potential_bind[0]['label'] != "None"):
-                if var.event['guid'] != 0 and var.event != last_event:
-                    last_event = var.event
-                    if var.event['type'] == "button":
+                if len(var.bind_event_list) >= 1:
+                    event = var.bind_event_list.pop(0)
+                if event['guid'] != 0 and event != last_event:
+                    last_event = event
+                    if event['type'] == "button":
                         if not var.bindings['status']['input']:
                             input = {
                                     "label": "Unknown device",
-                                    "guid": var.event['guid'],
-                                    "type": var.event['type'],
-                                    "num": var.event['num'],
+                                    "guid": event['guid'],
+                                    "type": event['type'],
+                                    "num": event['num'],
                                 }
-                            if var.event['value']:
+                            if event['value']:
                                 var.potential_bind.append(input)
                             elif input in var.potential_bind: # if button released and it's part of the potential bind, flag that binding is over
                                 release = True
-                    elif var.event['type'] == "axis":
+                    elif event['type'] == "axis":
                         if var.bindings['status']['input']:
                             var.potential_bind.append({
                                 "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
                                 "input": True,
                             })
                             release = True
                         else:
                             input = { # not actually the input, but ready to add to the potential bind list if applicable
                                 "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
-                                "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold']
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
+                                "value": var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold']
                                 }
-                            if var.event['value'] >= var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
+                            if event['value'] >= var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold'] and history.check_valid(event['guid'], event['num'], event['value'], True):
                                 if input not in var.potential_bind:
-                                    print("adding high threshold to potential bind due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                                    print("adding high threshold to potential bind due to: ", str(event['guid']), str(event['num']), str(event['value']))
                                     var.potential_bind.append(input)
-                            elif input in var.potential_bind and not history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True): # if axis released and it's part of the potential bind, flag that binding is over
-                                print("high threshold release detected due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                            elif input in var.potential_bind and not history.check_valid(event['guid'], event['num'], event['value'], True): # if axis released and it's part of the potential bind, flag that binding is over
+                                print("high threshold release detected due to: ", str(event['guid']), str(event['num']), str(event['value']))
                                 release = True
                             else:
-                                input['value'] = var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold']
-                                if var.event['value'] <= var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                                input['value'] = var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold']
+                                if event['value'] <= var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold'] and history.check_valid(event['guid'], event['num'], event['value'], False):
                                     if input not in var.potential_bind:
-                                        print("adding low threshold to potential bind due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                                        print("adding low threshold to potential bind due to: ", str(event['guid']), str(event['num']), str(event['value']))
                                         var.potential_bind.append(input)
-                                elif input in var.potential_bind and not history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False): # if axis released and it's part of the potential bind, flag that binding is over
-                                    print("low threshold release detected due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                                elif input in var.potential_bind and not history.check_valid(event['guid'], event['num'], event['value'], False): # if axis released and it's part of the potential bind, flag that binding is over
+                                    print("low threshold release detected due to: ", str(event['guid']), str(event['num']), str(event['value']))
                                     release = True
-                    elif var.event['type'] == "hat":
+                    elif event['type'] == "hat":
                         if not var.bindings['status']['input']:
                             input = {
                                 "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
-                                "dir": var.event['value'],
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
+                                "dir": event['value'],
                                 }
-                            if var.event['value'] != "none":
+                            if event['value'] != "none":
                                 for i in range(0,len(var.potential_bind)):
                                     if var.potential_bind[i]["guid"] == input["guid"] and var.potential_bind[i]["type"] == input["type"] and var.potential_bind[i]["num"] == input["num"]:
                                         if input['dir'] in var.potential_bind[i]['dir'] and input['dir'] != var.potential_bind[i]['dir']:
@@ -1741,16 +1743,16 @@ class MainWindow(QMainWindow):
                                 hat_update = False
                             else:
                                 release = True
-                    elif var.event['type'] == "key":
-                        if var.event['value']:
-                            if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
+                    elif event['type'] == "key":
+                        if event['value']:
+                            if not event['value'].endswith('ctrl') and not event['value'].endswith('shift') and not event['value'].endswith('alt') and not event['value'].endswith('alt gr'):
                                 if not var.bindings['status']['input']:
                                     input = {
                                         "label": "Unknown device",
-                                        "guid": var.event['guid'],
-                                        "type": var.event['type'],
-                                        "num": var.event['num'],
-                                        "value": var.event['value'],
+                                        "guid": event['guid'],
+                                        "type": event['type'],
+                                        "num": event['num'],
+                                        "value": event['value'],
                                         }
                                     if not input['value'] in last_keyboard_input:
                                         found = False
@@ -1766,9 +1768,9 @@ class MainWindow(QMainWindow):
                         else:
                             input = {
                                 "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
                                 }
                             release = True
                         if release == True:
@@ -1780,7 +1782,7 @@ class MainWindow(QMainWindow):
                                     found = True
                             if not found:
                                 var.potential_bind.append(input)
-                        last_keyboard_input = var.event['value']
+                        last_keyboard_input = event['value']
                 sleep(0.001)
             if var.potential_bind == []:
                 var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]
@@ -1802,6 +1804,9 @@ class MainWindow(QMainWindow):
             var.status['rewrite_profile'] = True
             var.status['refresh_labels'] = True
             # self.store['running'] = False
+            if len(var.bind_event_list) >= 1:
+                print("Warning! Dropping the last", len(var.bind_event_list),"inputs due to binding ending before got to the end of the bind event list!!!")
+            var.bind_event_list = []
         except Exception as e:
             fn.error_handling(e, "interface.bind()")
 
