@@ -1695,7 +1695,7 @@ class MainWindow(QMainWindow):
                             })
                             release = True
                         else:
-                            input = {
+                            input = { # not actually the input, but ready to add to the potential bind list if applicable
                                 "label": "Unknown device",
                                 "guid": var.event['guid'],
                                 "type": var.event['type'],
@@ -1703,14 +1703,21 @@ class MainWindow(QMainWindow):
                                 "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold']
                                 }
                             if var.event['value'] >= var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
-                                var.potential_bind.append(input)
-                            elif input in var.potential_bind: # if axis released and it's part of the potential bind, flag that binding is over
+                                if input not in var.potential_bind:
+                                    print("adding high threshold to potential bind due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                                    var.potential_bind.append(input)
+                            elif input in var.potential_bind and not history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True): # if axis released and it's part of the potential bind, flag that binding is over
+                                print("high threshold release detected due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
                                 release = True
-                            input['value'] = var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold']
-                            if var.event['value'] <= var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
-                                var.potential_bind.append(input)
-                            elif input in var.potential_bind: # if axis released and it's part of the potential bind, flag that binding is over
-                                release = True
+                            else:
+                                input['value'] = var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold']
+                                if var.event['value'] <= var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
+                                    if input not in var.potential_bind:
+                                        print("adding low threshold to potential bind due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                                        var.potential_bind.append(input)
+                                elif input in var.potential_bind and not history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False): # if axis released and it's part of the potential bind, flag that binding is over
+                                    print("low threshold release detected due to: ", str(var.event['guid']), str(var.event['num']), str(var.event['value']))
+                                    release = True
                     elif var.event['type'] == "hat":
                         if not var.bindings['status']['input']:
                             input = {

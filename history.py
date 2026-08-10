@@ -54,14 +54,14 @@ def check_valid(guid, num, threshold, ascending):
             #print("Check False0")
             return False
         if ascending:
-            if (hist[0] < threshold) and hist[var.settings['axis_samples']-1 >= threshold]:
+            if (hist[0] < threshold) and hist[var.settings['axis_samples']-1] >= threshold:
                 #print("Check True1: ", hist[0], threshold, ascending, hist[var.settings['axis_samples']-1])
                 return True
             else:
                 #print("Check False1: ", hist[0], threshold, ascending, hist[var.settings['axis_samples']-1])
                 return False
         else:
-            if (hist[0] > threshold) and hist[var.settings['axis_samples']-1 <= threshold]:
+            if (hist[0] > threshold) and hist[var.settings['axis_samples']-1] <= threshold:
                 #print("Check True2: ", hist[0], threshold, ascending, hist[var.settings['axis_samples']-1])
                 return True
             else:
