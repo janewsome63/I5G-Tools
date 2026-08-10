@@ -1669,6 +1669,7 @@ class MainWindow(QMainWindow):
             var.potential_bind = []
             release = False
             hat_update = False
+            last_keyboard_input = ""
             while not release and var.bindings['status']['active'] and (var.potential_bind == [] or var.potential_bind[0]['label'] != "None"):
                 if var.event['guid'] != 0 and var.event != last_event:
                     last_event = var.event
@@ -1740,20 +1741,46 @@ class MainWindow(QMainWindow):
                                 hat_update = False
                             else:
                                 release = True
-                    elif var.event['type'] == "key" and var.event['value']:
-                        if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
-                            if not var.bindings['status']['input']:
-                                input = {
-                                    "label": "Unknown device",
-                                    "guid": var.event['guid'],
-                                    "type": var.event['type'],
-                                    "num": var.event['num'],
-                                    "value": var.event['value'],
-                                    }
-                                if var.event['value']:
-                                    var.potential_bind.append(input)
-                                elif input in var.potential_bind:
-                                    release = True
+                    elif var.event['type'] == "key":
+                        if var.event['value']:
+                            if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
+                                if not var.bindings['status']['input']:
+                                    input = {
+                                        "label": "Unknown device",
+                                        "guid": var.event['guid'],
+                                        "type": var.event['type'],
+                                        "num": var.event['num'],
+                                        "value": var.event['value'],
+                                        }
+                                    if not input['value'] in last_keyboard_input:
+                                        found = False
+                                        for i in range(0,len(var.potential_bind)):
+                                            if var.potential_bind[i]['guid'] == input['guid'] and var.potential_bind[i]['type'] == input['type'] and var.potential_bind[i]['num'] == input['num']:
+                                                var.potential_bind[i]['value'] = input['value']
+                                                found = True
+                                        if not found:
+                                            var.potential_bind.append(input)
+                                        pass
+                                    elif input['value'] in last_keyboard_input and input['value'] != last_keyboard_input:
+                                        release = True       
+                        else:
+                            input = {
+                                "label": "Unknown device",
+                                "guid": var.event['guid'],
+                                "type": var.event['type'],
+                                "num": var.event['num'],
+                                }
+                            release = True
+                        if release == True:
+                            input['value'] = last_keyboard_input
+                            found = False
+                            for i in range(0,len(var.potential_bind)):
+                                if var.potential_bind[i]['guid'] == input['guid'] and var.potential_bind[i]['type'] == input['type'] and var.potential_bind[i]['num'] == input['num']:
+                                    var.potential_bind[i]['value'] = input['value']
+                                    found = True
+                            if not found:
+                                var.potential_bind.append(input)
+                        last_keyboard_input = var.event['value']
                 sleep(0.001)
             if var.potential_bind == []:
                 var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]

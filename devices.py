@@ -139,9 +139,10 @@ def log_event(instance_id, type, num, value):
                 "num": num,
                 "value": value,
             }
-            if type != "key" or fn.is_bind(): # don't print keystrokes that aren't binds
-                print(var.event)
-                pass
+            # if type != "key" or fn.is_bind(): # don't print keystrokes that aren't binds
+                # print(var.event)
+                # pass
+            print(var.event)
         # else:
             # print("guid in device_info failed: ", guid, device_info)
     except Exception as e:
@@ -235,7 +236,7 @@ def format_device(function, control):
                     dev_pretty += "-"
             elif var.bindings[function][control][i]['type'] == "key":
                 name = device_info[var.bindings[function][control][i]['guid']]['name']
-                value = var.bindings[function][control]['value']
+                value = var.bindings[function][control][i]['value']
                 dev_pretty = name + " - " + value.upper()
             else:
                 name = device_info[var.bindings[function][control][i]['guid']]['name']
