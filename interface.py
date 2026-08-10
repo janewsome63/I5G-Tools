@@ -1668,7 +1668,8 @@ class MainWindow(QMainWindow):
             last_event = None
             var.potential_bind = []
             release = False
-            while not release and var.bindings['status']['active']:
+            hat_update = False
+            while not release and var.bindings['status']['active'] and (var.potential_bind == [] or var.potential_bind[0]['label'] != "None"):
                 if var.event['guid'] != 0 and var.event != last_event:
                     last_event = var.event
                     if var.event['type'] == "button":
@@ -1722,10 +1723,16 @@ class MainWindow(QMainWindow):
                             if var.event['value'] != "none":
                                 for i in range(0,len(var.potential_bind)):
                                     if var.potential_bind[i]["guid"] == input["guid"] and var.potential_bind[i]["type"] == input["type"] and var.potential_bind[i]["num"] == input["num"]:
-                                        if (input['dir'][0] == 0 and var.potential_bind[i]['value'][0] != 0) or (input['dir'][1] == 0 and var.potential_bind[i]['value'][1] != 0):
+                                        if input['dir'] in var.potential_bind[i]['dir'] and input['dir'] != var.potential_bind[i]['dir']:
                                             release = True
-                                if not release:
+                                        elif var.potential_bind[i]['dir'] in input['dir'] and input['dir'] != var.potential_bind[i]['dir']:
+                                            var.potential_bind[i]['dir'] = input['dir']
+                                            hat_update = True
+                                if not release and not hat_update:
                                     var.potential_bind.append(input)
+                                hat_update = False
+                            else:
+                                release = True
                     elif var.event['type'] == "key" and var.event['value']:
                         if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
                             if not var.bindings['status']['input']:
@@ -1741,6 +1748,8 @@ class MainWindow(QMainWindow):
                                 elif input in var.potential_bind:
                                     release = True
                 sleep(0.001)
+            if var.potential_bind == []:
+                var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]
             print("potential bind preliminary: " + str(var.potential_bind))
             if var.bindings['status']['active']: # for if binding is suddenly deactiviated due to driver getting in car, keep the last bind and discard the current potential bind
                 var.bindings[function][control] = fn.sort_input_array(var.potential_bind)
@@ -1775,17 +1784,17 @@ class MainWindow(QMainWindow):
                 self.store['thread_pool'].start(self.bind)
             elif func == var.bindings['status']['function'] and ctrl == var.bindings['status']['control'] and input == var.bindings['status']['input']:
                 var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]
-            # else:
-            #     var.bindings['status']['active'] = False
-            #     # self.store['running'] = False
-            #     sleep(0.01) # race condition, potentially
-            #     var.bindings['status'] = {
-            #         "active": True,
-            #         "function": func,
-            #         "control": ctrl,
-            #         "input": input,
-            #     }
-            #     self.store['thread_pool'].start(self.bind)
+            else:
+                var.bindings['status']['active'] = False
+                # self.store['running'] = False
+                sleep(0.01) # race condition, potentially
+                var.bindings['status'] = {
+                    "active": True,
+                    "function": func,
+                    "control": ctrl,
+                    "input": input,
+                }
+                self.store['thread_pool'].start(self.bind)
         except Exception as e:
             fn.error_handling(e, "interface.bind_start()")
 
