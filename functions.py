@@ -352,16 +352,17 @@ def is_bind():
         for function in var.bindings:
             if function != "status":
                 for control in var.bindings[function]:
-                    bind = copy.deepcopy(var.bindings[function][control])
-                    # try:
-                    #     bind.pop("label")
-                    # except KeyError:
-                    #     pass
-                    if "input" in bind:
-                        if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
-                            result.append({"function": function, "control": control, "value": var.event['value']})
-                    elif event == bind:
-                        result.append({"function": function, "control": control})
+                    for i in range(0,len(var.bindings[function][control])):
+                        bind = copy.deepcopy(var.bindings[function][control][i])
+                        # try:
+                        #     bind.pop("label")
+                        # except KeyError:
+                        #     pass
+                        if "input" in bind:
+                            if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
+                                result.append({"function": function, "control": control, "value": var.event['value']})
+                        elif event == bind:
+                            result.append({"function": function, "control": control})
 
         if not result:
             result = False

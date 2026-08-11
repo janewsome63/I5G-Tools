@@ -1786,6 +1786,24 @@ class MainWindow(QMainWindow):
                 sleep(0.001)
             if var.potential_bind == []:
                 var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]
+            for i in range(0,len(var.potential_bind)):
+                if var.potential_bind[i]['type'] == 'key':
+                    keys = var.potential_bind[i]['value'].split('+')
+                    print(keys)
+                    for j in range(0,len(keys)):
+                        if j == 0:
+                            print(j, keys[j])
+                            var.potential_bind[i]['value'] = keys[j]
+                        else:
+                            event = {  
+                                "label": var.potential_bind[i]['label'],
+                                "guid": var.potential_bind[i]['guid'],
+                                "type": var.potential_bind[i]['type'],
+                                "num": var.potential_bind[i]['num'],
+                                "value": keys[j]
+                            }
+                            print(j, event)
+                            var.potential_bind.append(event)
             print("potential bind preliminary: " + str(var.potential_bind))
             if var.bindings['status']['active']: # for if binding is suddenly deactiviated due to driver getting in car, keep the last bind and discard the current potential bind
                 var.bindings[function][control] = fn.sort_input_array(var.potential_bind)
