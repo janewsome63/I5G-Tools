@@ -44,7 +44,7 @@ def check_valid(guid, num, threshold, ascending):
         global length_list
         guidnum = guid + str(num)
         if not guidnum in guidnum_list:
-            print("Warning: guidnum not found in list ???")
+            print("Warning: guidnum ", guid, num, " not found in list ???")
             return False
         index = guidnum_list.index(guidnum)
         hist = hist_list[index]

@@ -221,6 +221,7 @@ def interpret_profile():
                                             var.bindings[function][control][i]['value'] = var.settings['device_axis_thresh'][guid]['low_threshold']
                                     else:
                                         print("Warning, unknown axis label for " + str(bind[i]['label']) + " in fn.interpret_profile()")
+        update_subbind_list()
     except Exception as e:
         error_handling(e, "functions.interpret_profile()")
 
@@ -354,16 +355,15 @@ def is_bind():
                 for control in var.bindings[function]:
                     for i in range(0,len(var.bindings[function][control])):
                         bind = copy.deepcopy(var.bindings[function][control][i])
-                        # try:
-                        #     bind.pop("label")
-                        # except KeyError:
-                        #     pass
+                        try:
+                            bind.pop("label")
+                        except KeyError:
+                            pass
                         if "input" in bind:
                             if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
                                 result.append({"function": function, "control": control, "value": var.event['value']})
                         elif event == bind:
                             result.append({"function": function, "control": control})
-
         if not result:
             result = False
         return result
@@ -378,6 +378,42 @@ def sort_input_array(data):
         return output
     except Exception as e:
         error_handling(e, "functions.sort_input_array()")
+
+def update_subbind_list():
+    try:
+        print("starting fn.update_subbind_list()")
+        for function in var.bindings:
+            if function != 'status':
+                for control in var.bindings[function]:
+                    var.bindings_subbind[function][control] = [{
+                        'function': None,
+                        'control': None,
+                    }]
+                    if var.bindings[function][control][0]['label'] != "None":
+                        for function2 in var.bindings:
+                            if function2 != 'status':
+                                for control2 in var.bindings[function2]:
+                                    if not (function == function2 and control == control2):
+                                        subbind = True # stores if control function is a subbind of control2 function2
+                                        if var.bindings[function][control] == var.bindings[function2][control2]: # if a bind is used multiple times, don't let them block each other
+                                            subbind = False
+                                        else:
+                                            for bind in var.bindings[function][control]:
+                                                if not bind in var.bindings[function2][control2]:
+                                                    subbind = False
+                                            if subbind:
+                                                if var.bindings_subbind[function][control][0] == {'function': None, 'control': None}:
+                                                    var.bindings_subbind[function][control][0] = {'function': function2, 'control': control2}
+                                                else:
+                                                    var.bindings_subbind[function][control].append({'function': function2, 'control': control2})
+
+        print("new subbind list:")
+        for function in var.bindings_subbind:
+            if function != 'status':
+                for control in var.bindings_subbind[function]:
+                    print(function, control, ":", var.bindings_subbind[function][control])
+    except Exception as e:
+        error_handling(e, "functions.update_subbind_list()")
 
 def reset_bind_thresh(guid, thresh, value):
     try:

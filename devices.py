@@ -18,7 +18,7 @@ device_info = {
         "instance": None,
         "initialized": True,
         "keys": {
-            "0": ""
+            0: ""
         },
     },
 }
@@ -229,6 +229,7 @@ def format_device(function, control):
                     dev_pretty = " + " + type + " " + num + " " + dir
                 else:
                     dev_pretty = name + " - " + type + " " + num + " " + dir
+                dev_pretty_single = name + " - " + type + " " + num + " " + dir
             elif var.bindings[function][control][i]['type'] == "axis":
                 name = device_info[var.bindings[function][control][i]['guid']]['name']
                 type = capwords(var.bindings[function][control][i]['type'])
@@ -237,11 +238,14 @@ def format_device(function, control):
                     dev_pretty = " + " + type + " " + num
                 else:
                     dev_pretty = name + " - " + type + " " + num
+                dev_pretty_single = name + " - " + type + " " + num
                 axis_dir = var.bindings[function][control][i]['value'] >= var.settings['device_axis_thresh'][var.bindings[function][control][i]['guid']]['high_threshold']
                 if axis_dir:
                     dev_pretty += ">"
+                    dev_pretty_single == ">"
                 else:
                     dev_pretty += "<"
+                    dev_pretty_single += "<"
             elif var.bindings[function][control][i]['type'] == "key":
                 name = device_info[var.bindings[function][control][i]['guid']]['name']
                 value = var.bindings[function][control][i]['value']
@@ -249,6 +253,7 @@ def format_device(function, control):
                     dev_pretty = "+" + value.upper()
                 else:
                     dev_pretty = name + " - " + value.upper()
+                dev_pretty_single = name + " - " + value.upper()
             else:
                 name = device_info[var.bindings[function][control][i]['guid']]['name']
                 type = capwords(var.bindings[function][control][i]['type'])
@@ -257,7 +262,8 @@ def format_device(function, control):
                     dev_pretty = " + " + type + " " + num
                 else:
                     dev_pretty = name + " - " + type + " " + num
-            var.bindings[function][control][i]['label'] = dev_pretty
+                dev_pretty_single = dev_pretty = name + " - " + type + " " + num
+            var.bindings[function][control][i]['label'] = dev_pretty_single
             if i > 0 and name in dev_pretty:
                 output += "  &  "
             output += dev_pretty

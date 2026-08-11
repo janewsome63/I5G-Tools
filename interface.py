@@ -1823,8 +1823,9 @@ class MainWindow(QMainWindow):
             var.status['refresh_labels'] = True
             # self.store['running'] = False
             if len(var.bind_event_list) >= 1:
-                print("Warning! Dropping the last", len(var.bind_event_list),"inputs due to binding ending before got to the end of the bind event list!!!")
+                print("Warning! Dropping the last", len(var.bind_event_list),"inputs due to binding ending before got to the end of the bind event list!!!\n",var.bind_event_list)
             var.bind_event_list = []
+            fn.update_subbind_list()
         except Exception as e:
             fn.error_handling(e, "interface.bind()")
 
