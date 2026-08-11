@@ -262,7 +262,7 @@ def format_device(function, control):
                     dev_pretty = " + " + type + " " + num
                 else:
                     dev_pretty = name + " - " + type + " " + num
-                dev_pretty_single = dev_pretty = name + " - " + type + " " + num
+                dev_pretty_single = name + " - " + type + " " + num
             var.bindings[function][control][i]['label'] = dev_pretty_single
             if i > 0 and name in dev_pretty:
                 output += "  &  "
