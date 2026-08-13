@@ -362,6 +362,15 @@ def is_bind():
                         if "input" in bind:
                             if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
                                 result.append({"function": function, "control": control, "value": var.event['value']})
+                        elif event['type'] == 'key' and bind['type'] == 'key':
+                            if not {"function": function, "control": control} in result and event['guid'] == bind['guid'] and event['num'] == bind['num'] and event['value']:
+                                single_keys = event['value'].split('+')
+                                valid = False
+                                for single_key in single_keys:
+                                    if single_key == bind['value']:
+                                        valid = True
+                                if valid:
+                                    result.append({"function": function, "control": control})
                         elif event == bind:
                             result.append({"function": function, "control": control})
         if not result:

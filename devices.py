@@ -142,6 +142,8 @@ def log_event(instance_id, type, num, value):
             if type != "key" or fn.is_bind(): # don't print keystrokes that aren't binds
                 # print(var.event)
                 pass
+            # else:
+                # print('not bind key:', var.event)
             # print(var.event)
             if var.bindings['status']['active']:
                 var.bind_event_list.append(var.event)

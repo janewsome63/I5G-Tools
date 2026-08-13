@@ -54,7 +54,7 @@ def check_pressed(multi_bind, function, control, subbind_check):
                 if not bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
                     return False
             elif bind['type'] == "key":
-                if not bind['value'] == dev.device_info[bind['guid']]['keys'][bind['num']]:
+                if dev.device_info[bind['guid']]['keys'][bind['num']] == None or not bind['value'] in dev.device_info[bind['guid']]['keys'][bind['num']]:
                     return False
             else:
                 return False
