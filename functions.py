@@ -112,9 +112,9 @@ def read_profile(profile=None):
                     if response == 1:
                         sys.exit(0)
 
-            if var.status['rewrite']['profile']:
-                translate(config, 'profile', profile, ver)
-                read_profile()
+                if var.status['rewrite']['profile']:
+                    translate(config, 'profile', profile, ver)
+                    read_profile()
                 return
 
             copy_from_profile(config)
