@@ -24,8 +24,17 @@ def read_config():
 
             ver = check_ver(config, 'config')
             if not ver in var.compatible_settings:
-                if ver in var.single_input_settings: # need to update how input settings are stored, no changes to config actually needed
+                if ver == "v0.4.Xb": # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
                     var.settings['version'] = var.lang['settings_version']
+                    var.status['rewrite']['config'] = True
+                # elif ver in var.lang['compatible_versions']: # for the future, if/when the config file has changed between versions
+                #     var.status['rewrite']['config'] = True
+                elif ver == "v0.5.0b":
+                    var.settings['version'] = var.lang['settings_version']
+                    var.status['rewrite']['config'] = True
+                elif ver == "v0.5.2b":
+                    var.settings['version'] = var.lang['settings_version']
+                    var.status['rewrite']['config'] = True
                 else: # if the version isn't valid, then something
                     #TODO
                     response = ctypes.windll.user32.MessageBoxW(0, "The config file " + var.settings['config'] + " has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
@@ -104,21 +113,110 @@ def read_profile(profile=None):
 
             ver = check_ver(config, 'profile')
             if not ver in var.compatible_settings:
-                if ver in var.single_input_settings: # just need to update the structure of how binds are stored
-                    var.status['rewrite']['profile'] = True
+                if ver == "v0.4.Xb": # either 0.4.4b or 0.4.10b
+                    if "LOCAL" in config: # assume 0.4.10b, only need to inject version number into file, don't need to ask user since config has not changed
+                        var.settings['version'] = var.lang['settings_version']
+                        var.status['rewrite']['config'] = True
+                    elif "GENERAL" in config: # assume 0.4.4b
+                        ver = "v0.4.4b"
+                        response = ctypes.windll.user32.MessageBoxW(0, "The profile " + profile + ".ini being loaded does not have a self-identifying version. Click OK if you are upgrading from 0.4.4b and only want to use " + var.lang['settings_version'] + " (or newer) going forward.\n\nNote: If you are not upgrading from 0.4.4b, this will also edit your current global config file.", "I5G Tools  -  Profile Translation Needed!", 1)
+                        if response == 1:
+                            pass
+                        elif response == 2:
+                            sys.exit(0)
+                        var.status['rewrite']['profile'] = True
+                # elif ver in var.lang['compatible_versions']: # for the future, if/when the config file has changed between versions
+                #     var.status['rewrite']['profile'] = True
+                elif ver == "v0.5.0b":
+                    var.settings['version'] = var.lang['settings_version']
+                    # var.status['rewrite']['profile'] = True
+                elif ver == "v0.5.2b":
+                    var.settings['version'] = var.lang['settings_version']
                 else: # if the version isn't valid, then something
                     #TODO
                     response = ctypes.windll.user32.MessageBoxW(0, "The profile file " + profile + ".ini has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
                     if response == 1:
                         sys.exit(0)
 
-                if var.status['rewrite']['profile']:
-                    translate(config, 'profile', profile, ver)
-                    read_profile()
+            if var.status['rewrite']['profile']:
+                translate(config, 'profile', profile, ver)
+                var.status['rewrite']['profile'] = False
+                read_profile()
                 return
 
-            copy_from_profile(config)
-            interpret_profile()
+            errors = []
+            for section in config.sections():
+                for item in config[section]:
+                    if section == 'LOCAL':
+                        if item == 'version':
+                            print (item, var.lang['settings_version'])
+                        else:
+                            print(item, eval(config[section][item]))
+                    if item == 'version':
+                        # setting = config[section][item]
+                        setting = var.lang['settings_version']
+                    else:
+                        setting = eval(config[section][item])
+                    if section == "LOCAL":
+                        if item not in var.obsolete:
+                            var.settings['local'][item] = setting
+                    elif section.lower() in var.bindings:
+                        if item in var.bindings_info['types']:
+                            var.bindings[section.lower()][item] = setting
+                        else:
+                            var.settings[section.lower()][item] = setting
+                    elif section == "DEVICE_AXIS_THRESH":
+                        var.settings['device_axis_thresh'][item] = setting
+                    else:
+                        if not section in errors:
+                            errors.append(section)
+
+            if errors:
+                text = var.lang['section_errors']['profile']['intro']
+                for error in errors:
+                    text += error + "\n"
+                text += var.lang['section_errors']['profile']['outro']
+                response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['section_errors']['profile']['title'], 1)
+                if response == 1:
+                    pass
+                elif response == 2:
+                    sys.exit(0)
+
+            while not var.status['devices_loaded']:
+                sleep(0.1)
+            bind_errors = []
+            for function in var.bindings:
+                if function != "status":
+                    for control in var.bindings[function]:
+                        guid = var.bindings[function][control]['guid']
+                        if guid != 0:
+                            try:
+                                dev.device_info[guid]
+                            except KeyError:
+                                var.bindings_cache[function][control] = var.bindings[function][control]
+                                if var.bindings[function][control]['label']:
+                                    label = var.bindings[function][control]['label']
+                                else:
+                                    label = "Unknown device"
+                                var.bindings[function][control] = {"label": label, "guid": 0, "type": "none", "num": 0}
+                                bind_errors.append([str(function), str(control)])
+            
+            for guid in var.settings['device_axis_thresh']:
+                for function in var.bindings:
+                    if function != 'status' and function != 'hybrid':
+                        for control in var.bindings[function]:
+                            bind = var.bindings[function][control]
+                            if bind['guid'] == guid and bind['type'] == 'axis' and not 'input' in bind:
+                                if bind['label'][-1] == '+':
+                                    if bind['value'] != var.settings['device_axis_thresh'][guid]['high_threshold']:
+                                        print("Warning, overriding high bind value for " + str(function) + " " + str(control) + " in fn.read_profile()")
+                                        var.bindings[function][control]['value'] = var.settings['device_axis_thresh'][guid]['high_threshold']
+                                elif bind['label'][-1] == '-':
+                                    if bind['value'] != var.settings['device_axis_thresh'][guid]['low_threshold']:
+                                        print("Warning, overriding low bind value for " + str(setting) + " " + str(control) + " in fn.read_profile()")
+                                        var.bindings[function][control]['value'] = var.settings['device_axis_thresh'][guid]['low_threshold']
+                                else:
+                                    print("Warning, unknown axis label for " + str(bind['label']) + " in fn.read_profile()")
 
         else:
             if not var.status['first']:
@@ -139,91 +237,6 @@ def read_profile(profile=None):
         print("read_profile() end")
     except Exception as e:
         error_handling(e, "functions.read_profile()")
-
-def copy_from_profile(config): # copy data out of profile and store it in var.settings and var.settings
-    try:
-        errors = []
-        for section in config.sections():
-            for item in config[section]:
-                if section == 'LOCAL':
-                    if item == 'version':
-                        print (item, var.lang['settings_version'])
-                    else:
-                        print(item, eval(config[section][item]))
-                if item == 'version':
-                    # setting = config[section][item]
-                    setting = var.lang['settings_version']
-                else:
-                    setting = eval(config[section][item])
-                if section == "LOCAL":
-                    if item not in var.obsolete:
-                        var.settings['local'][item] = setting
-                elif section.lower() in var.bindings:
-                    if item in var.bindings_info['types']:
-                        var.bindings[section.lower()][item] = setting
-                    else:
-                        var.settings[section.lower()][item] = setting
-                elif section == "DEVICE_AXIS_THRESH":
-                    var.settings['device_axis_thresh'][item] = setting
-                else:
-                    if not section in errors:
-                        errors.append(section)
-
-        if errors:
-            text = var.lang['section_errors']['profile']['intro']
-            for error in errors:
-                text += error + "\n"
-            text += var.lang['section_errors']['profile']['outro']
-            response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['section_errors']['profile']['title'], 1)
-            if response == 1:
-                pass
-            elif response == 2:
-                sys.exit(0)
-
-    except Exception as e:
-        error_handling(e, "functions.copy_from_profile()")
-
-def interpret_profile():
-    try:
-        while not var.status['devices_loaded']:
-            sleep(0.1)
-            bind_errors = []
-            for function in var.bindings:
-                if function != "status":
-                    for control in var.bindings[function]:
-                        guid = var.bindings[function][control][0]['guid']
-                        if guid != 0:
-                            try:
-                                dev.device_info[guid]
-                            except KeyError:
-                                var.bindings_cache[function][control] = var.bindings[function][control]
-                                if var.bindings[function][control][0]['label']:
-                                    label = var.bindings[function][control][0]['label']
-                                else:
-                                    label = "Unknown device"
-                                var.bindings[function][control] = [{"label": label, "guid": 0, "type": "none", "num": 0}]
-                                bind_errors.append([str(function), str(control)])
-            
-            for guid in var.settings['device_axis_thresh']:
-                for function in var.bindings:
-                    if function != 'status' and function != 'hybrid':
-                        for control in var.bindings[function]:
-                            bind = var.bindings[function][control]
-                            for i in range(0,len(bind)):
-                                if bind[i]['guid'] == guid and bind[i]['type'] == 'axis' and not 'input' in bind[i]:
-                                    if bind[i]['label'][-1] == '+':
-                                        if bind[i]['value'] != var.settings['device_axis_thresh'][guid]['high_threshold']:
-                                            print("Warning, overriding high bind value for " + str(function) + " " + str(control) + " in fn.interpret_profile()")
-                                            var.bindings[function][control][i]['value'] = var.settings['device_axis_thresh'][guid]['high_threshold']
-                                    elif bind[i]['label'][-1] == '-':
-                                        if bind[i]['value'] != var.settings['device_axis_thresh'][guid]['low_threshold']:
-                                            print("Warning, overriding low bind value for " + str(function) + " " + str(control) + " in fn.interpret_profile()")
-                                            var.bindings[function][control][i]['value'] = var.settings['device_axis_thresh'][guid]['low_threshold']
-                                    else:
-                                        print("Warning, unknown axis label for " + str(bind[i]['label']) + " in fn.interpret_profile()")
-        update_subbind_list()
-    except Exception as e:
-        error_handling(e, "functions.interpret_profile()")
 
 def write_config():
     try:
@@ -276,7 +289,7 @@ def write_profile(profile=None):
                     for subsetting in var.settings[bind]:
                         config[bind.upper()][subsetting] = str(var.settings[bind][subsetting])
                 for subbind in var.bindings[bind]:
-                    if var.bindings[bind][subbind][0]['label'] != "None" and var.bindings[bind][subbind][0]['guid'] == 0:
+                    if var.bindings[bind][subbind]['label'] != "None" and var.bindings[bind][subbind]['guid'] == 0:
                         config[bind.upper()][subbind] = str(var.bindings_cache[bind][subbind])
                     else:
                         config[bind.upper()][subbind] = str(var.bindings[bind][subbind])
@@ -353,76 +366,22 @@ def is_bind():
         for function in var.bindings:
             if function != "status":
                 for control in var.bindings[function]:
-                    for i in range(0,len(var.bindings[function][control])):
-                        bind = copy.deepcopy(var.bindings[function][control][i])
-                        try:
-                            bind.pop("label")
-                        except KeyError:
-                            pass
-                        if "input" in bind:
-                            if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
-                                result.append({"function": function, "control": control, "value": var.event['value']})
-                        elif event['type'] == 'key' and bind['type'] == 'key':
-                            if not {"function": function, "control": control} in result and event['guid'] == bind['guid'] and event['num'] == bind['num'] and event['value']:
-                                single_keys = event['value'].split('+')
-                                valid = False
-                                for single_key in single_keys:
-                                    if single_key == bind['value']:
-                                        valid = True
-                                if valid:
-                                    result.append({"function": function, "control": control})
-                        elif event == bind:
-                            result.append({"function": function, "control": control})
+                    bind = copy.deepcopy(var.bindings[function][control])
+                    try:
+                        bind.pop("label")
+                    except KeyError:
+                        pass
+                    if "input" in bind:
+                        if event['guid'] == bind['guid'] and event['num'] == bind['num'] and bind['type'] == "axis":
+                            result.append({"function": function, "control": control, "value": var.event['value']})
+                    elif event == bind:
+                        result.append({"function": function, "control": control})
+
         if not result:
             result = False
         return result
     except Exception as e:
         error_handling(e, "functions.is_bind()")
-
-def sort_input_array(data):
-    try:
-        # print("starting sort_input_array()")
-        output = sorted(data, key=lambda d: [d.get('guid', '-1'), d.get('type', chr(0)), d.get('num', chr(0)), d.get('value', chr(0)), d.get('dir', [chr(0),chr(0)])])
-        print("sorted: " + str(output))
-        return output
-    except Exception as e:
-        error_handling(e, "functions.sort_input_array()")
-
-def update_subbind_list():
-    try:
-        print("starting fn.update_subbind_list()")
-        for function in var.bindings:
-            if function != 'status':
-                for control in var.bindings[function]:
-                    var.bindings_subbind[function][control] = [{
-                        'function': None,
-                        'control': None,
-                    }]
-                    if var.bindings[function][control][0]['label'] != "None":
-                        for function2 in var.bindings:
-                            if function2 != 'status':
-                                for control2 in var.bindings[function2]:
-                                    if not (function == function2 and control == control2):
-                                        subbind = True # stores if control function is a subbind of control2 function2
-                                        if var.bindings[function][control] == var.bindings[function2][control2]: # if a bind is used multiple times, don't let them block each other
-                                            subbind = False
-                                        else:
-                                            for bind in var.bindings[function][control]:
-                                                if not bind in var.bindings[function2][control2]:
-                                                    subbind = False
-                                            if subbind:
-                                                if var.bindings_subbind[function][control][0] == {'function': None, 'control': None}:
-                                                    var.bindings_subbind[function][control][0] = {'function': function2, 'control': control2}
-                                                else:
-                                                    var.bindings_subbind[function][control].append({'function': function2, 'control': control2})
-
-        print("new subbind list:")
-        for function in var.bindings_subbind:
-            if function != 'status':
-                for control in var.bindings_subbind[function]:
-                    print(function, control, ":", var.bindings_subbind[function][control])
-    except Exception as e:
-        error_handling(e, "functions.update_subbind_list()")
 
 def reset_bind_thresh(guid, thresh, value):
     try:
@@ -432,12 +391,10 @@ def reset_bind_thresh(guid, thresh, value):
         for function in var.bindings:
             if function != 'status':
                 for control in var.bindings[function]:
-                    if var.bindings[function][control] is not None and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
-                        for i in range(0,len(var.bindings[function][control])):
-                            if var.bindings[function][control][i]['type'] == 'axis':
-                                if guid == var.bindings[function][control][i]['guid']:
-                                    if (var.bindings[function][control][i]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control][i]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
-                                        var.bindings[function][control][i]['value'] = value
+                    if var.bindings[function][control] is not None and var.bindings[function][control]['type'] == 'axis' and not ((function == 'clutch' or function == 'throttle') and control == 'pedal'):
+                        if guid == var.bindings[function][control]['guid']:
+                            if (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['high_threshold'] and thresh == 'high_threshold') or (var.bindings[function][control]['value'] == var.settings['device_axis_thresh'][str(guid)]['low_threshold'] and thresh == 'low_threshold'):
+                                var.bindings[function][control]['value'] = value
 
     except Exception as e:
         error_handling(e, "functions.reset_bind_thresh()")
@@ -466,27 +423,74 @@ def check_ver(file, type):
     except Exception as e:
         error_handling(e, "functions.check_ver()")
 
-def translate(file, type, name, ver):
+def translate(file, type, name, ver): # as of right now, this should only ever be called to translate a v0.4.4b config file into a current profile file
     try:
-        print('fn_translate() start')
         # if type == 'config': # for when future versions change the config file
         if type == 'profile':
-            # backup the current profile file if something goes wrong
-            now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-            with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + ver + now + ".bak", 'w') as newfile:
-                file.write(newfile)
-            if ver in var.single_input_settings: # convert binds to a single dict to an array of a single dict, except for pedal inputs
-                print('Converting from single input to chorded input')
-                copy_from_profile(file)
-                for function in var.bindings:
-                    if function != "status":
-                        for control in var.bindings[function]:
-                            copy = var.bindings[function][control]
-                            var.bindings[function][control] = [None]
-                            var.bindings[function][control][0] = copy
-                            # print('copying single input: ' + str(copy) + " to: " + str(var.bindings[function][control]))
-                interpret_profile()
-                
+            if ver == "v0.4.4b":
+                # backup the current profile file if something goes wrong
+                now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+                with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + ver + now + ".bak", 'w') as newfile:
+                    file.write(newfile)
+
+                # check for any errors before starting the translation:
+                errors = []
+                for section in file.sections():
+                    if not section.lower() in var.bindings and section.lower() != "general" and section.lower() != "bite_point" and section.lower() != "engine_warming":
+                        if not section in errors:
+                            errors.append(section)
+
+                if errors:
+                    text = var.lang['section_errors']['profile']['intro']
+                    for error in errors:
+                        text += error + "\n"
+                    text += var.lang['section_errors']['profile']['outro']
+                    response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['section_errors']['profile']['title'], 1)
+                    if response == 1:
+                        pass
+                    elif response == 2:
+                        sys.exit(0)
+
+                var.settings['timer_loop'] = file['GENERAL']['timer_loop']
+                var.settings['timer_first'] = file['GENERAL']['timer_first']
+                # scale and axis samples could go here, but neither actually do anything
+                var.status['rewrite']['config'] = True
+
+                for section in file:
+                    if section == "GENERAL":
+                        var.settings['local']['version'] = var.lang['settings_version']
+                        var.settings['local']['high_threshold'] = float(file[section]['high_threshold'])
+                        var.settings['local']['low_threshold'] = float(file[section]['low_threshold'])
+                        var.status['rewrite']['config'] = True
+                    else:
+                        if section == "BITE_POINT":
+                            section_name = "clutch"
+                        elif section == "ENGINE_WARMING":
+                            section_name = "throttle"
+                        else:
+                            section_name = section.lower()
+                        if not section in errors: # Skip all identified section errors that were OK'd
+                            for item in file[section]:
+                                if item == "up" or item == "down" or item == "switch" or item == "pedal":
+                                    bind = eval(file[section][item])
+                                    guid = bind['guid']
+                                    if guid == 0:
+                                        var.bindings[section_name][item] = {"label": 'None', "guid": 0, "type": 'none', "num": 'none'}
+                                    else:
+                                        label = 'Unknown device'
+                                        type = bind['type']
+                                        num = bind['num']
+                                        if item != "pedal" and type == 'axis':
+                                            var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "value": float(bind['value'])}
+                                        elif item == "pedal":
+                                            var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "input": True}
+                                        elif type == 'hat':
+                                            var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num, "dir": bind['dir']}
+                                        else:
+                                            var.bindings[section_name][item] = {"label": label, "guid": guid, "type": type, "num": num}
+                                else:
+                                    var.settings[section_name][item] = file[section][item]
+                                
                 var.status['rewrite']['profile'] = True
             # elif ver in var.lang['compatible_versions']:
             #     var.settings['local']['version'] = var.lang['settings_version']
@@ -511,7 +515,6 @@ def translate(file, type, name, ver):
         if var.status['rewrite']['profile']:
             var.status['rewrite_profile'] = True
             var.status['rewrite']['profile'] = False
-            write_profile()
     except Exception as e:
         error_handling(e, "functions.translate()")
 
