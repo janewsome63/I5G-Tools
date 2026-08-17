@@ -106,17 +106,15 @@ def read_profile(profile=None):
             if not ver in var.compatible_settings:
                 if ver in var.single_input_settings: # just need to update the structure of how binds are stored
                     var.status['rewrite']['profile'] = True
+                    translate(config, 'profile', profile, ver)
+                    read_profile()
+                    return
                 else: # if the version isn't valid, then something
                     #TODO
                     response = ctypes.windll.user32.MessageBoxW(0, "The profile file " + profile + ".ini has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
                     if response == 1:
                         sys.exit(0)
-
-                if var.status['rewrite']['profile']:
-                    translate(config, 'profile', profile, ver)
-                    read_profile()
-                return
-
+                        
             copy_from_profile(config)
             interpret_profile()
 
