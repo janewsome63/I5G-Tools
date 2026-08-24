@@ -222,9 +222,12 @@ def format_device(function, control):
         #     num = str(var.bindings[function][control][0]['num'])
         #     return name + " - " + type + " " + num
         for i in range(0,len(var.bindings[function][control])):
-            if var.bindings[function][control][i]['type'] == "hat":
+            if var.bindings[function][control][i]['guid'] in device_info:
                 name = device_info[var.bindings[function][control][i]['guid']]['name']
-                type = capwords(var.bindings[function][control][i]['type'])
+            else:
+                name = var.bindings[function][control][i]['label'].split(" - ", maxsplit=1)[0]
+            type = capwords(var.bindings[function][control][i]['type'])
+            if var.bindings[function][control][i]['type'] == "hat":
                 num = str(var.bindings[function][control][i]['num'])
                 dir = capwords(var.bindings[function][control][i]['dir'])
                 if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
@@ -233,23 +236,21 @@ def format_device(function, control):
                     dev_pretty = name + " - " + type + " " + num + " " + dir
                 dev_pretty_single = name + " - " + type + " " + num + " " + dir
             elif var.bindings[function][control][i]['type'] == "axis":
-                name = device_info[var.bindings[function][control][i]['guid']]['name']
-                type = capwords(var.bindings[function][control][i]['type'])
                 num = str(var.bindings[function][control][i]['num'])
                 if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
                     dev_pretty = " + " + type + " " + num
                 else:
                     dev_pretty = name + " - " + type + " " + num
                 dev_pretty_single = name + " - " + type + " " + num
-                axis_dir = var.bindings[function][control][i]['value'] >= var.settings['device_axis_thresh'][var.bindings[function][control][i]['guid']]['high_threshold']
-                if axis_dir:
-                    dev_pretty += ">"
-                    dev_pretty_single == ">"
-                else:
-                    dev_pretty += "<"
-                    dev_pretty_single += "<"
+                if 'value' in var.bindings[function][control][i]:
+                    axis_dir = var.bindings[function][control][i]['value'] >= var.settings['device_axis_thresh'][var.bindings[function][control][i]['guid']]['high_threshold']
+                    if axis_dir:
+                        dev_pretty += ">"
+                        dev_pretty_single == ">"
+                    else:
+                        dev_pretty += "<"
+                        dev_pretty_single += "<"
             elif var.bindings[function][control][i]['type'] == "key":
-                name = device_info[var.bindings[function][control][i]['guid']]['name']
                 value = var.bindings[function][control][i]['value']
                 if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
                     dev_pretty = "+" + value.upper()
@@ -257,8 +258,6 @@ def format_device(function, control):
                     dev_pretty = name + " - " + value.upper()
                 dev_pretty_single = name + " - " + value.upper()
             else:
-                name = device_info[var.bindings[function][control][i]['guid']]['name']
-                type = capwords(var.bindings[function][control][i]['type'])
                 num = str(var.bindings[function][control][i]['num'])
                 if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
                     dev_pretty = " + " + type + " " + num

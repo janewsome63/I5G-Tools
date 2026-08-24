@@ -2002,7 +2002,7 @@ class MainWindow(QMainWindow):
                         label += var.bindings[function][control][i]['label']
                         if i < len(var.bindings[function][control])-1:
                             label += "\n"
-                    self.store['content'][function][control + '_device'].setText(label)
+                    self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
                 else:
                     self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
                     var.status['rewrite']['profile'] = True
