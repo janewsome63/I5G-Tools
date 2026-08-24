@@ -1011,6 +1011,21 @@ class MainWindow(QMainWindow):
             row += 1
             column = 0
 
+            self.store['content']['settings']['chording_mode_label'] = QLabel()
+            self.store['content']['settings']['chording_mode_label'].setText(var.lang['chording_mode_label'] + ":")
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['chording_mode_label'], row, column)
+            column += 2
+
+            self.store['content']['settings']['chording_mode'] = CustomComboBox()
+            self.store['content']['settings']['chording_mode'].setFixedSize(70, 25)
+            self.store['content']['settings']['chording_mode'].addItem("Yes")
+            self.store['content']['settings']['chording_mode'].addItem("No")
+            self.store['content']['settings']['chording_mode'].setCurrentText(str(var.settings['local']['chording_mode']))
+            self.store['content']['settings']['chording_mode'].currentIndexChanged.connect(lambda: self.settings_set('chording_mode'))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['chording_mode'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+
             self.store['content']['settings']['profile_create_label'] = QLabel()
             self.store['content']['settings']['profile_create_label'].setText(var.lang['profile_create'] + ":")
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['profile_create_label'], row, column)
@@ -1093,6 +1108,12 @@ class MainWindow(QMainWindow):
             self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
             self.store['content']['settings']['low_threshold'].valueChanged.connect(lambda: self.settings_set('low_threshold'))
             self.tabs['settings'].layout.addWidget(self.store['content']['settings']['low_threshold'], row, column, alignment=Qt.AlignmentFlag.AlignRight)
+            row += 1
+            column = 0
+
+            self.store['content']['settings']['vjoy_device'] = QLabel()
+            self.store['content']['settings']['vjoy_device'].setText(var.lang['vjoy_device'] + str(var.settings['vjoy_rid']))
+            self.tabs['settings'].layout.addWidget(self.store['content']['settings']['vjoy_device'], row, column, alignment=Qt.AlignmentFlag.AlignLeft)
             row += 1
             column = 0
 
@@ -1541,7 +1562,7 @@ class MainWindow(QMainWindow):
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
-            elif func == 'axis_rollover':
+            elif func == 'axis_rollover' or func == 'chording_mode':
                 value = self.store['content']['settings'][func].currentText()
             else:
                 value = self.store['content']['settings'][func].value()
@@ -1583,7 +1604,7 @@ class MainWindow(QMainWindow):
                 else:
                     var.settings['local']['audio'] = (value == "Yes")
                     var.status['rewrite_profile'] = True
-            elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
+            elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car" or func == "chording_mode":
                 if (value == "Yes") == var.settings['local'][func]:
                     print("skipping setting ", func, " because it's already at ", value)
                 else:
@@ -1638,76 +1659,154 @@ class MainWindow(QMainWindow):
 
             self.store['index'][function][control]['bind'].setText(var.lang['binding'])
 
-            var.event = {
+            event = {
                 "guid": 0,
                 "type": "",
                 "num": 0,
                 "value": None,
             }
-            var.potential_bind = {}
-            # var.bindings[function][control] = {}
-            while not var.potential_bind and var.bindings['status']['active']:
-                # if not self.store['running']:
-                #     var.potential_bind = {"label": "None", "guid": 0, "type": "none", "num": 0}
-
-                if var.event['guid'] != 0:
-                    if var.event['type'] == "button":
-                        if var.event['value'] and not var.bindings['status']['input']:
-                            var.potential_bind = {
-                                "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
-                            }
-                    elif var.event['type'] == "axis":
-                        if var.bindings['status']['input']:
-                            var.potential_bind = {
-                                "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
-                                "input": True,
-                            }
-                        else:
-                            if var.event['value'] >= var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], True):
-                                var.potential_bind = {
-                                "label": "Unknown device",
-                                    "guid": var.event['guid'],
-                                    "type": var.event['type'],
-                                    "num": var.event['num'],
-                                    "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['high_threshold']
-                                }
-                            if var.event['value'] <= var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold'] and history.check_valid(var.event['guid'], var.event['num'], var.event['value'], False):
-                                var.potential_bind = {
-                                "label": "Unknown device",
-                                    "guid": var.event['guid'],
-                                    "type": var.event['type'],
-                                    "num": var.event['num'],
-                                    "value": var.settings['device_axis_thresh'][str(var.event['guid'])]['low_threshold']
-                                }
-                    elif var.event['type'] == "hat":
-                        if var.event['value'] != "none" and not var.bindings['status']['input']:
-                            var.potential_bind = {
-                                "label": "Unknown device",
-                                "guid": var.event['guid'],
-                                "type": var.event['type'],
-                                "num": var.event['num'],
-                                "dir": var.event['value'],
-                            }
-                    elif var.event['type'] == "key" and var.event['value']:
-                        if not var.event['value'].endswith('ctrl') and not var.event['value'].endswith('shift') and not var.event['value'].endswith('alt') and not var.event['value'].endswith('alt gr'):
-                            if var.event['value'] and not var.bindings['status']['input']:
-                                var.potential_bind = {
+            last_event = None
+            var.potential_bind = []
+            release = False
+            hat_update = False
+            last_keyboard_input = ""
+            while not release and var.bindings['status']['active'] and (var.potential_bind == [] or var.potential_bind[0]['label'] != "None"):
+                if len(var.bind_event_list) >= 1:
+                    event = var.bind_event_list.pop(0)
+                if event['guid'] != 0 and event != last_event:
+                    last_event = event
+                    if event['type'] == "button":
+                        if not var.bindings['status']['input']:
+                            input = {
                                     "label": "Unknown device",
-                                    "guid": var.event['guid'],
-                                    "type": var.event['type'],
-                                    "num": var.event['num'],
-                                    "value": var.event['value'],
+                                    "guid": event['guid'],
+                                    "type": event['type'],
+                                    "num": event['num'],
                                 }
+                            if event['value']:
+                                var.potential_bind.append(input)
+                            elif input in var.potential_bind: # if button released and it's part of the potential bind, flag that binding is over
+                                release = True
+                    elif event['type'] == "axis":
+                        if var.bindings['status']['input']:
+                            var.potential_bind.append({
+                                "label": "Unknown device",
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
+                                "input": True,
+                            })
+                            release = True
+                        else:
+                            input = { # not actually the input, but ready to add to the potential bind list if applicable
+                                "label": "Unknown device",
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
+                                "value": var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold']
+                                }
+                            if event['value'] >= var.settings['device_axis_thresh'][str(event['guid'])]['high_threshold'] and history.check_valid(event['guid'], event['num'], event['value'], True):
+                                if input not in var.potential_bind:
+                                    print("adding high threshold to potential bind due to: ", str(event['guid']), str(event['num']), str(event['value']))
+                                    var.potential_bind.append(input)
+                            elif input in var.potential_bind and not history.check_valid(event['guid'], event['num'], event['value'], True): # if axis released and it's part of the potential bind, flag that binding is over
+                                print("high threshold release detected due to: ", str(event['guid']), str(event['num']), str(event['value']))
+                                release = True
+                            else:
+                                input['value'] = var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold']
+                                if event['value'] <= var.settings['device_axis_thresh'][str(event['guid'])]['low_threshold'] and history.check_valid(event['guid'], event['num'], event['value'], False):
+                                    if input not in var.potential_bind:
+                                        print("adding low threshold to potential bind due to: ", str(event['guid']), str(event['num']), str(event['value']))
+                                        var.potential_bind.append(input)
+                                elif input in var.potential_bind and not history.check_valid(event['guid'], event['num'], event['value'], False): # if axis released and it's part of the potential bind, flag that binding is over
+                                    print("low threshold release detected due to: ", str(event['guid']), str(event['num']), str(event['value']))
+                                    release = True
+                    elif event['type'] == "hat":
+                        if not var.bindings['status']['input']:
+                            input = {
+                                "label": "Unknown device",
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
+                                "dir": event['value'],
+                                }
+                            if event['value'] != "none":
+                                for i in range(0,len(var.potential_bind)):
+                                    if var.potential_bind[i]["guid"] == input["guid"] and var.potential_bind[i]["type"] == input["type"] and var.potential_bind[i]["num"] == input["num"]:
+                                        if input['dir'] in var.potential_bind[i]['dir'] and input['dir'] != var.potential_bind[i]['dir']:
+                                            release = True
+                                        elif var.potential_bind[i]['dir'] in input['dir'] and input['dir'] != var.potential_bind[i]['dir']:
+                                            var.potential_bind[i]['dir'] = input['dir']
+                                            hat_update = True
+                                if not release and not hat_update:
+                                    var.potential_bind.append(input)
+                                hat_update = False
+                            else:
+                                release = True
+                    elif event['type'] == "key":
+                        if event['value']:
+                            if not event['value'].endswith('ctrl') and not event['value'].endswith('shift') and not event['value'].endswith('alt') and not event['value'].endswith('alt gr'):
+                                if not var.bindings['status']['input']:
+                                    input = {
+                                        "label": "Unknown device",
+                                        "guid": event['guid'],
+                                        "type": event['type'],
+                                        "num": event['num'],
+                                        "value": event['value'],
+                                        }
+                                    if not input['value'] in last_keyboard_input:
+                                        found = False
+                                        for i in range(0,len(var.potential_bind)):
+                                            if var.potential_bind[i]['guid'] == input['guid'] and var.potential_bind[i]['type'] == input['type'] and var.potential_bind[i]['num'] == input['num']:
+                                                var.potential_bind[i]['value'] = input['value']
+                                                found = True
+                                        if not found:
+                                            var.potential_bind.append(input)
+                                        pass
+                                    elif input['value'] in last_keyboard_input and input['value'] != last_keyboard_input:
+                                        release = True       
+                        else:
+                            input = {
+                                "label": "Unknown device",
+                                "guid": event['guid'],
+                                "type": event['type'],
+                                "num": event['num'],
+                                }
+                            release = True
+                        if release == True:
+                            input['value'] = last_keyboard_input
+                            found = False
+                            for i in range(0,len(var.potential_bind)):
+                                if var.potential_bind[i]['guid'] == input['guid'] and var.potential_bind[i]['type'] == input['type'] and var.potential_bind[i]['num'] == input['num']:
+                                    var.potential_bind[i]['value'] = input['value']
+                                    found = True
+                            if not found:
+                                var.potential_bind.append(input)
+                        last_keyboard_input = event['value']
                 sleep(0.001)
-
-            if var.bindings['status']['active']: # for if binding is suddenly deactiviated due to driver getting in car, keep the last bind
-                var.bindings[function][control] = var.potential_bind
+            if var.potential_bind == []:
+                var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]
+            for i in range(0,len(var.potential_bind)):
+                if var.potential_bind[i]['type'] == 'key':
+                    keys = var.potential_bind[i]['value'].split('+')
+                    print(keys)
+                    for j in range(0,len(keys)):
+                        if j == 0:
+                            print(j, keys[j])
+                            var.potential_bind[i]['value'] = keys[j]
+                        else:
+                            event = {  
+                                "label": var.potential_bind[i]['label'],
+                                "guid": var.potential_bind[i]['guid'],
+                                "type": var.potential_bind[i]['type'],
+                                "num": var.potential_bind[i]['num'],
+                                "value": keys[j]
+                            }
+                            print(j, event)
+                            var.potential_bind.append(event)
+            print("potential bind preliminary: " + str(var.potential_bind))
+            if var.bindings['status']['active']: # for if binding is suddenly deactiviated due to driver getting in car, keep the last bind and discard the current potential bind
+                var.bindings[function][control] = fn.sort_input_array(var.potential_bind)
 
             self.store['index'][function][control]['bind'].setText(var.lang['bind'])
 
@@ -1723,6 +1822,10 @@ class MainWindow(QMainWindow):
             var.status['rewrite_profile'] = True
             var.status['refresh_labels'] = True
             # self.store['running'] = False
+            if len(var.bind_event_list) >= 1:
+                print("Warning! Dropping the last", len(var.bind_event_list),"inputs due to binding ending before got to the end of the bind event list!!!\n",var.bind_event_list)
+            var.bind_event_list = []
+            fn.update_subbind_list()
         except Exception as e:
             fn.error_handling(e, "interface.bind()")
 
@@ -1738,7 +1841,7 @@ class MainWindow(QMainWindow):
                 }
                 self.store['thread_pool'].start(self.bind)
             elif func == var.bindings['status']['function'] and ctrl == var.bindings['status']['control'] and input == var.bindings['status']['input']:
-                var.potential_bind = {"label": "None", "guid": 0, "type": "none", "num": 0}
+                var.potential_bind = [{"label": "None", "guid": 0, "type": "none", "num": 0}]
             else:
                 var.bindings['status']['active'] = False
                 # self.store['running'] = False
@@ -1888,17 +1991,23 @@ class MainWindow(QMainWindow):
     def update_label(self, function, control):
         try:
             if var.bindings[function][control]:
-                if var.bindings[function][control]['label'] != "None" and var.bindings[function][control]['guid'] == 0:
+                active = True
+                for i in range(0,len(var.bindings[function][control])):
+                    if var.bindings[function][control][i]['label'] != "None" and not var.bindings[function][control][i]['guid'] in dev.device_info:
+                        active = False
+                if not active:
                     self.store['content'][function][control + '_device'].setStyleSheet("color: firebrick;")
+                    label = ""
+                    for i in range(0,len(var.bindings[function][control])):
+                        label += var.bindings[function][control][i]['label']
+                        if i < len(var.bindings[function][control])-1:
+                            label += "\n"
+                    self.store['content'][function][control + '_device'].setText(label)
                 else:
                     self.store['content'][function][control + '_device'].setStyleSheet(QLabel.styleSheet(self.store['index']['car_id']))
-                if var.bindings[function][control]['label'] and var.bindings[function][control]['guid'] in dev.device_info:
                     var.status['rewrite']['profile'] = True
                     self.store['content'][function][control + '_device'].setText(dev.format_device(function, control))
-                    if var.status['rewrite']['profile']:
-                        var.status['rewrite_profile'] = True
-                        var.status['rewrite']['profile'] = False
-                self.store['content'][function][control + '_device'].setText(var.bindings[function][control]['label'])
+                # self.store['content'][function][control + '_device'].setText(var.bindings[function][control][0]['label'])
         except Exception as e:
             fn.error_handling(e, "interface.update_label()")
     
@@ -2029,7 +2138,7 @@ class MainWindow(QMainWindow):
                     # self.store['content']['settings']['low_threshold'].setValue(int(var.settings['device_axis_thresh'][self.store['content']['settings']['axis_threshold_device_guid']]['low_threshold'] * 100))
                     # print("apply_settings after, ", setting)
                 elif isinstance(var.settings['local'][setting], bool):
-                    if setting == "axis_rollover":
+                    if setting == "axis_rollover" or setting == "chording_mode":
                         tab = 'settings'
                     else:
                         tab = 'sounds'

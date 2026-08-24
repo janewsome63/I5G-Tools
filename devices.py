@@ -18,7 +18,7 @@ device_info = {
         "instance": None,
         "initialized": True,
         "keys": {
-            "0": ""
+            0: ""
         },
     },
 }
@@ -140,8 +140,13 @@ def log_event(instance_id, type, num, value):
                 "value": value,
             }
             if type != "key" or fn.is_bind(): # don't print keystrokes that aren't binds
-                #print(var.event)
+                # print(var.event)
                 pass
+            # else:
+                # print('not bind key:', var.event)
+            # print(var.event)
+            if var.bindings['status']['active']:
+                var.bind_event_list.append(var.event)
         # else:
             # print("guid in device_info failed: ", guid, device_info)
     except Exception as e:
@@ -207,40 +212,67 @@ def device_detection():
 
 def format_device(function, control):
     try:
-        if var.bindings[function][control]:
-            if var.bindings[function][control]['type'] == "none":
-                dev_pretty = "None"
-            elif var.bindings[function][control]['type'] == "hat":
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                type = capwords(var.bindings[function][control]['type'])
-                num = str(var.bindings[function][control]['num'])
-                dir = capwords(var.bindings[function][control]['dir'])
-                dev_pretty = name + " - " + type + " " + num + " " + dir
-            elif var.bindings[function][control]['type'] == "axis":
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                type = capwords(var.bindings[function][control]['type'])
-                num = str(var.bindings[function][control]['num'])
-                dev_pretty = name + " - " + type + " " + num
-                if control != 'pedal':
-                    axis_dir = var.bindings[function][control]['value'] >= var.settings['device_axis_thresh'][var.bindings[function][control]['guid']]['high_threshold']
-                    if axis_dir:
-                        dev_pretty += "+"
-                    else:
-                        dev_pretty += "-"
-            elif var.bindings[function][control]['type'] == "key":
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                value = var.bindings[function][control]['value']
-                dev_pretty = name + " - " + value.upper()
+        dev_pretty = ""
+        output = ""
+        if not var.bindings[function][control] or var.bindings[function][control][0]['type'] == "none":
+            return "None"
+        # if control == 'pedal':
+        #     name = device_info[var.bindings[function][control][0]['guid']]['name']
+        #     type = capwords(var.bindings[function][control][0]['type'])
+        #     num = str(var.bindings[function][control][0]['num'])
+        #     return name + " - " + type + " " + num
+        for i in range(0,len(var.bindings[function][control])):
+            if var.bindings[function][control][i]['type'] == "hat":
+                name = device_info[var.bindings[function][control][i]['guid']]['name']
+                type = capwords(var.bindings[function][control][i]['type'])
+                num = str(var.bindings[function][control][i]['num'])
+                dir = capwords(var.bindings[function][control][i]['dir'])
+                if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
+                    dev_pretty = " + " + type + " " + num + " " + dir
+                else:
+                    dev_pretty = name + " - " + type + " " + num + " " + dir
+                dev_pretty_single = name + " - " + type + " " + num + " " + dir
+            elif var.bindings[function][control][i]['type'] == "axis":
+                name = device_info[var.bindings[function][control][i]['guid']]['name']
+                type = capwords(var.bindings[function][control][i]['type'])
+                num = str(var.bindings[function][control][i]['num'])
+                if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
+                    dev_pretty = " + " + type + " " + num
+                else:
+                    dev_pretty = name + " - " + type + " " + num
+                dev_pretty_single = name + " - " + type + " " + num
+                axis_dir = var.bindings[function][control][i]['value'] >= var.settings['device_axis_thresh'][var.bindings[function][control][i]['guid']]['high_threshold']
+                if axis_dir:
+                    dev_pretty += ">"
+                    dev_pretty_single == ">"
+                else:
+                    dev_pretty += "<"
+                    dev_pretty_single += "<"
+            elif var.bindings[function][control][i]['type'] == "key":
+                name = device_info[var.bindings[function][control][i]['guid']]['name']
+                value = var.bindings[function][control][i]['value']
+                if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
+                    dev_pretty = "+" + value.upper()
+                else:
+                    dev_pretty = name + " - " + value.upper()
+                dev_pretty_single = name + " - " + value.upper()
             else:
-                name = device_info[var.bindings[function][control]['guid']]['name']
-                type = capwords(var.bindings[function][control]['type'])
-                num = str(var.bindings[function][control]['num'])
-                dev_pretty = name + " - " + type + " " + num
+                name = device_info[var.bindings[function][control][i]['guid']]['name']
+                type = capwords(var.bindings[function][control][i]['type'])
+                num = str(var.bindings[function][control][i]['num'])
+                if i > 0 and var.bindings[function][control][i]['guid'] == var.bindings[function][control][i-1]['guid']:
+                    dev_pretty = " + " + type + " " + num
+                else:
+                    dev_pretty = name + " - " + type + " " + num
+                dev_pretty_single = name + " - " + type + " " + num
+            var.bindings[function][control][i]['label'] = dev_pretty_single
+            if i > 0 and name in dev_pretty:
+                output += "  &  "
+            output += dev_pretty
+            # if i < len(var.bindings[function][control])-1:
+            #     output += "\n"
 
-            var.bindings[function][control]['label'] = dev_pretty
-
-            return var.bindings[function][control]['label']
-        else:
-            return 'None'
+        # var.bindings[function][control]['label'] = dev_pretty
+        return output
     except Exception as e:
         fn.error_handling(e, "devices.format_device()")

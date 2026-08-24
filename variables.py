@@ -1,12 +1,13 @@
 import copy
 import os
 
-compatible_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
+single_input_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
                        'v0.7.1b', 'v0.7.1.1b', 'v0.8.0b', 'v0.8.1b', 'v0.8.2b', 'v0.8.3b', 'v0.8.4b', 'v0.8.5b']
+compatible_settings = ['v0.9.0b']
 
 lang = {
     "title": "I5G Tools",
-    "version": "v0.8.5b",
+    "version": "v0.9.0b",
     "pedal": "Pedal Axis",
     "up": "Increase",
     "down": "Decrease",
@@ -81,6 +82,8 @@ lang = {
     "p2p_behind_thresh_label": "P2P Single Warning Threshold (in ms, -1 is any distance)",
     "p2p_behind_thresh_cont_label": "P2P Continuous Warning Threshold (in ms, -1 is any distance)",
     "p2p_behind_closest_car_label": "P2P Warning For Closest Car Behind Only",
+    'vjoy_device': "Using vJoy device number: ",
+    'chording_mode_label': "Chorded Input Deactivates All Sub-Chord Inputs",
     "section_errors": {
         "config": {
             "title": "I5G Tools  -  Unknown sections in global config file!",
@@ -145,150 +148,150 @@ bindings = {
         "control": None,
     },
     "weight_jacker": {
-        "up": {
+        "up": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "down": {
+        }],
+        "down": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "switch": {
+        }],
+        "switch": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
     "front_roll_bar": {
-        "up": {
+        "up": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "down": {
+        }],
+        "down": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "switch": {
+        }],
+        "switch": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
     "rear_roll_bar": {
-        "up": {
+        "up": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "down": {
+        }],
+        "down": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "switch": {
+        }],
+        "switch": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
     "fuel_map": {
-        "up": {
+        "up": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "down": {
+        }],
+        "down": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "switch": {
+        }],
+        "switch": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
     "clutch": {
-        "pedal": {
+        "pedal": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "up": {
+        }],
+        "up": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "down": {
+        }],
+        "down": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "switch": {
+        }],
+        "switch": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
     "throttle": {
-        "pedal": {
+        "pedal": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "up": {
+        }],
+        "up": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "down": {
+        }],
+        "down": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "switch": {
+        }],
+        "switch": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
     "hybrid": {
-        "regen": {
+        "regen": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
-        "deploy": {
+        }],
+        "deploy": [{
             "label": "None",
             "guid": 0,
             "type": "none",
             "num": 0,
-        },
+        }],
     },
 }
 
@@ -297,6 +300,16 @@ bindings_cache = copy.deepcopy(bindings)
 bindings_info = {
     "types": ("up", "down", "switch", "pedal", "label", "regen", "deploy")
 }
+
+bindings_subbind = {}
+for function in bindings:
+    if function != 'status':
+        bindings_subbind[function] = {}
+        for control in bindings[function]:
+            bindings_subbind[function][control] = [{
+                'function': None,
+                'control': None,
+            }]
 
 settings = {
     "frequency": 0.1,
@@ -347,6 +360,7 @@ settings = {
         "p2p_behind_thresh": int(3000),
         "p2p_behind_thresh_cont": int(1000),
         "p2p_behind_closest_car": True,
+        "chording_mode": False,
     },
 
     "weight_jacker": {
@@ -734,6 +748,8 @@ event = {
     "num": 0,
     "value": None,
 }
+
+bind_event_list = []
 
 backend = {
     "startup_time": None,

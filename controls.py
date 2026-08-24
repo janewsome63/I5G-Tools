@@ -37,57 +37,58 @@ def controls():
     except Exception as e:
         fn.error_handling(e, "controls.controls()")
 
-def check_pressed(bind):
+def check_pressed(multi_bind, function, control, subbind_check):
     try:
-        if bind['type'] == "button":
-            if dev.device_info[bind['guid']]['buttons'][bind['num']]:
-                pressed = True
+        for bind in multi_bind:
+            if bind['type'] == "button":
+                if not dev.device_info[bind['guid']]['buttons'][bind['num']]:
+                    return False
+            elif bind['type'] == "axis":
+                if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['device_axis_thresh'][str(bind['guid'])]['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['device_axis_thresh'][str(bind['guid'])]['high_threshold']:
+                    pass
+                elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['device_axis_thresh'][str(bind['guid'])]['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['device_axis_thresh'][str(bind['guid'])]['low_threshold']:
+                    pass
+                else:
+                    return False
+            elif bind['type'] == "hat":
+                if not bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
+                    return False
+            elif bind['type'] == "key":
+                if dev.device_info[bind['guid']]['keys'][bind['num']] == None or not bind['value'] in dev.device_info[bind['guid']]['keys'][bind['num']]:
+                    return False
             else:
-                pressed = False
-        elif bind['type'] == "axis":
-            if dev.device_info[bind['guid']]['axes'][bind['num']] >= var.settings['device_axis_thresh'][str(bind['guid'])]['high_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], True) and bind['value'] == var.settings['device_axis_thresh'][str(bind['guid'])]['high_threshold']:
-                pressed = True
-            elif dev.device_info[bind['guid']]['axes'][bind['num']] <= var.settings['device_axis_thresh'][str(bind['guid'])]['low_threshold'] and history.check_valid(bind['guid'], bind['num'], dev.device_info[bind['guid']]['axes'][bind['num']], False) and bind['value'] == var.settings['device_axis_thresh'][str(bind['guid'])]['low_threshold']:
-                pressed = True
-            else:
-                pressed = False
-        elif bind['type'] == "hat":
-            if bind['dir'] in dev.device_info[bind['guid']]['hats'][bind['num']]:
-                pressed = True
-            else:
-                pressed = False
-        elif bind['type'] == "key":
-            if bind['value'] == dev.device_info[bind['guid']]['keys'][bind['num']]:
-                pressed = True
-            else:
-                pressed = False
-        else:
-            pressed = False
-
-        return pressed
+                return False
+        if subbind_check == True: # Check if this bind is a subbind of any other binds. If so, check if the superbinds are being pressed and return that this bind is not active
+            superbinds = var.bindings_subbind[function][control]
+            # print(superbinds)
+            if not superbinds[0]['function'] == None:
+               for superbind in superbinds:
+                   if check_pressed(var.bindings[superbind['function']][superbind['control']], superbind['function'], superbind['control'], False):
+                       return False
+                #    else:
+                    #    print("in check_pressed,", superbind['function'], superbind['control'], "returned false")
+        return True
     except Exception as e:
         fn.error_handling(e, "controls.check_pressed()")
+        print("variables at exception:", multi_bind, function, control, subbind_check)
 
 def increment(bind, function, control):
     try:
-        #print("increment function print1: ", bind, function, control)
-        if function == 'clutch' or function == 'throttle':
-            if control == "up":
-                offset = var.settings[function]['increment']/100
-            elif control == "down":
-                offset = -var.settings[function]['increment']/100
+        if check_pressed(bind, function, control, var.settings['local']['chording_mode']):
+            if function == 'clutch' or function == 'throttle':
+                if control == "up":
+                    offset = var.settings[function]['increment']/100
+                elif control == "down":
+                    offset = -var.settings[function]['increment']/100
+                else:
+                    offset = 0.0
             else:
-                offset = 0.0
-        else:
-            if control == "up":
-                offset = var.step[function] * var.settings[function]['increment']
-            elif control == "down":
-                offset = var.step[function] * var.settings[function]['increment'] * -1
-            else:
-                offset = 0.0
-        # print("offset: ", offset)
-        if check_pressed(bind):
-
+                if control == "up":
+                    offset = var.step[function] * var.settings[function]['increment']
+                elif control == "down":
+                    offset = var.step[function] * var.settings[function]['increment'] * -1
+                else:
+                    offset = 0.0
             if var.status[function]['switched']:
                 vjoy.set_axis(function, var.status[function]['secondary'] + offset)
                 #print("secondary")
@@ -103,7 +104,7 @@ def increment(bind, function, control):
                 count = 1
                 #print("count check1: ", count)
                 timer = var.settings['timer_first']/1000
-                while check_pressed(bind) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
+                while check_pressed(bind, function, control, var.settings['local']['chording_mode']) and var.status['calibration'] == "None" and not var.bindings['status']['active']:
                     if count % interval == 0:
                         #print("count check2: ", count, var.status[function]['switched'])
                         #print("continuous loop")
@@ -119,7 +120,7 @@ def increment(bind, function, control):
                     sleep(timer/interval)
                     count += 1
             else:
-                while check_pressed(bind) and var.status['calibration']== "None" and not var.bindings['status']['active']:
+                while check_pressed(bind, function, control, var.settings['local']['chording_mode']) and var.status['calibration']== "None" and not var.bindings['status']['active']:
                     sleep(var.settings['timer_first']/(1000*interval))
         #else:
             #print("bind check_pressed failed: ", bind)
@@ -130,7 +131,7 @@ def increment(bind, function, control):
 
 def switch(bind, function):
     try:
-        if check_pressed(bind):
+        if check_pressed(bind, function, 'switch', var.settings['local']['chording_mode']):
             if var.status[function]['switched']:
                 var.status[function]['switched'] = False
                 vjoy.set_axis(function, var.status[function]['primary'])
@@ -138,7 +139,7 @@ def switch(bind, function):
                 var.status[function]['switched'] = True
                 vjoy.set_axis(function, var.status[function]['secondary'])
 
-            while check_pressed(bind) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
+            while check_pressed(bind, function, 'switch', var.settings['local']['chording_mode']) and not var.bindings['status']['active'] and var.status['calibration'] == "None":
                 sleep(0.05)
 
             if not var.settings[function]['toggle']:
@@ -163,14 +164,14 @@ def pedal(function, value):
 
 def button(bind, function, control):
     try:
-        if check_pressed(bind):
+        if check_pressed(bind, function, control, var.settings['local']['chording_mode']):
             if var.status[function][control]['state']:
                 var.status[function][control]['state'] = False
             elif not var.status[function][control]['state']:
                 var.status[function][control]['state'] = True
             vjoy.set_button(control, var.status[function][control]['state'])
 
-            while check_pressed(bind) and not var.bindings['status']['active']:
+            while check_pressed(bind, function, control, var.settings['local']['chording_mode']) and not var.bindings['status']['active']:
                 sleep(0.05)
 
             if not var.settings[function][control + '_toggle']:
