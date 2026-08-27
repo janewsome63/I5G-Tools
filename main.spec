@@ -23,7 +23,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='I5G-Tools-v0.9.1b',
+    name='I5G-Tools-v0.10.0b',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
