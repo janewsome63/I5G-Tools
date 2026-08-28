@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
                 "height": 260,
                 "running": False,
                 "profile_busy": False,
+                "sound_files_busy": False,
                 "content": {},
                 "index": {},
                 "timer": QTimer(),
@@ -89,6 +90,7 @@ class MainWindow(QMainWindow):
 
             self.apply_settings(var.settings['profile']['current'])
             self.refresh_profile_list()
+            self.refresh_sound_files_list()
 
             self.store['index']['car_id'] = self.store['content']['display']['car_id']
 
@@ -110,7 +112,7 @@ class MainWindow(QMainWindow):
                 'Clutch': -1,
                 'RPM': -1,
                 'Speed': 0,
-                'IsOnTrack_beep': False,
+                'IsOnTrack': False,
                 'p2p': False,
                 'CarIdxp2p': [],
                 'CarIdxEstTime': [],
@@ -718,6 +720,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['hybrid_low_file'].setFixedSize(150, 25)
             self.store['content']['sounds']['hybrid_low_file'].addItem(str(var.settings['sound']['hybrid_low']))
             self.store['content']['sounds']['hybrid_low_file'].setCurrentText(str(var.settings['sound']['hybrid_low']))
+            self.store['content']['sounds']['hybrid_low_file'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_low_file'))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_file'], row, column)
 
             column += 1
@@ -735,7 +738,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['hybrid_low_test'] = QPushButton()
             self.store['content']['sounds']['hybrid_low_test'].setFixedSize(70, 25)
             self.store['content']['sounds']['hybrid_low_test'].setText(var.lang['play_sound'])
-            self.store['content']['sounds']['hybrid_low_test'].clicked.connect(lambda: self.test_play("low"))
+            self.store['content']['sounds']['hybrid_low_test'].clicked.connect(lambda: self.test_play("hybrid_low"))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_test'], row, column)
 
             row += 1
@@ -751,6 +754,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['hybrid_high_file'].setFixedSize(150, 25)
             self.store['content']['sounds']['hybrid_high_file'].addItem(str(var.settings['sound']['hybrid_high']))
             self.store['content']['sounds']['hybrid_high_file'].setCurrentText(str(var.settings['sound']['hybrid_high']))
+            self.store['content']['sounds']['hybrid_high_file'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_high_file'))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_file'], row, column)
 
             column += 1
@@ -768,7 +772,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['hybrid_high_test'] = QPushButton()
             self.store['content']['sounds']['hybrid_high_test'].setFixedSize(70, 25)
             self.store['content']['sounds']['hybrid_high_test'].setText(var.lang['play_sound'])
-            self.store['content']['sounds']['hybrid_high_test'].clicked.connect(lambda: self.test_play("high"))
+            self.store['content']['sounds']['hybrid_high_test'].clicked.connect(lambda: self.test_play("hybrid_high"))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_high_test'], row, column)
 
             row += 1
@@ -784,6 +788,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['hybrid_limit_file'].setFixedSize(150, 25)
             self.store['content']['sounds']['hybrid_limit_file'].addItem(str(var.settings['sound']['hybrid_limit']))
             self.store['content']['sounds']['hybrid_limit_file'].setCurrentText(str(var.settings['sound']['hybrid_limit']))
+            self.store['content']['sounds']['hybrid_limit_file'].currentIndexChanged.connect(lambda: self.settings_set('hybrid_limit_file'))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_file'], row, column)
 
             column += 1
@@ -801,7 +806,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['hybrid_limit_test'] = QPushButton()
             self.store['content']['sounds']['hybrid_limit_test'].setFixedSize(70, 25)
             self.store['content']['sounds']['hybrid_limit_test'].setText(var.lang['play_sound'])
-            self.store['content']['sounds']['hybrid_limit_test'].clicked.connect(lambda: self.test_play("limit"))
+            self.store['content']['sounds']['hybrid_limit_test'].clicked.connect(lambda: self.test_play("hybrid_limit"))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_limit_test'], row, column)
 
             row += 1
@@ -865,6 +870,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['upshift_beep_file'].setFixedSize(150, 25)
             self.store['content']['sounds']['upshift_beep_file'].addItem(str(var.settings['sound']['upshift_beep']))
             self.store['content']['sounds']['upshift_beep_file'].setCurrentText(str(var.settings['sound']['upshift_beep']))
+            self.store['content']['sounds']['upshift_beep_file'].currentIndexChanged.connect(lambda: self.settings_set('upshift_beep_file'))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['upshift_beep_file'], row, column)
 
             column += 1
@@ -898,6 +904,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['downshift_beep_file'].setFixedSize(150, 25)
             self.store['content']['sounds']['downshift_beep_file'].addItem(str(var.settings['sound']['downshift_beep']))
             self.store['content']['sounds']['downshift_beep_file'].setCurrentText(str(var.settings['sound']['downshift_beep']))
+            self.store['content']['sounds']['downshift_beep_file'].currentIndexChanged.connect(lambda: self.settings_set('downshift_beep_file'))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['downshift_beep_file'], row, column)
 
             column += 1
@@ -996,11 +1003,12 @@ class MainWindow(QMainWindow):
 
             column += 1
 
-            self.store['content']['sounds']['p2p_behind_file'] = CustomComboBox()
-            self.store['content']['sounds']['p2p_behind_file'].setFixedSize(150, 25)
-            self.store['content']['sounds']['p2p_behind_file'].addItem(str(var.settings['sound']['p2p_active']))
-            self.store['content']['sounds']['p2p_behind_file'].setCurrentText(str(var.settings['sound']['p2p_active']))
-            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_file'], row, column)
+            self.store['content']['sounds']['p2p_active_single_file'] = CustomComboBox()
+            self.store['content']['sounds']['p2p_active_single_file'].setFixedSize(150, 25)
+            self.store['content']['sounds']['p2p_active_single_file'].addItem(str(var.settings['sound']['p2p_active_single']))
+            self.store['content']['sounds']['p2p_active_single_file'].setCurrentText(str(var.settings['sound']['p2p_active_single']))
+            self.store['content']['sounds']['p2p_active_single_file'].currentIndexChanged.connect(lambda: self.settings_set('p2p_active_single_file'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_active_single_file'], row, column)
 
             column += 1
 
@@ -1017,7 +1025,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['p2p_behind_test'] = QPushButton()
             self.store['content']['sounds']['p2p_behind_test'].setFixedSize(70, 25)
             self.store['content']['sounds']['p2p_behind_test'].setText(var.lang['play_sound'])
-            self.store['content']['sounds']['p2p_behind_test'].clicked.connect(lambda: self.test_play("p2p_active"))
+            self.store['content']['sounds']['p2p_behind_test'].clicked.connect(lambda: self.test_play("p2p_active_single"))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_test'], row, column)
 
             row += 1
@@ -1030,11 +1038,12 @@ class MainWindow(QMainWindow):
 
             column += 1
 
-            self.store['content']['sounds']['p2p_behind_cont_file'] = CustomComboBox()
-            self.store['content']['sounds']['p2p_behind_cont_file'].setFixedSize(150, 25)
-            self.store['content']['sounds']['p2p_behind_cont_file'].addItem(str(var.settings['sound']['p2p_active']))
-            self.store['content']['sounds']['p2p_behind_cont_file'].setCurrentText(str(var.settings['sound']['p2p_active']))
-            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_cont_file'], row, column)
+            self.store['content']['sounds']['p2p_active_loop_file'] = CustomComboBox()
+            self.store['content']['sounds']['p2p_active_loop_file'].setFixedSize(150, 25)
+            self.store['content']['sounds']['p2p_active_loop_file'].addItem(str(var.settings['sound']['p2p_active_loop']))
+            self.store['content']['sounds']['p2p_active_loop_file'].setCurrentText(str(var.settings['sound']['p2p_active_loop']))
+            self.store['content']['sounds']['p2p_active_loop_file'].currentIndexChanged.connect(lambda: self.settings_set('p2p_active_loop_file'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_active_loop_file'], row, column)
 
             column += 1
 
@@ -1051,7 +1060,7 @@ class MainWindow(QMainWindow):
             self.store['content']['sounds']['p2p_behind_cont_test'] = QPushButton()
             self.store['content']['sounds']['p2p_behind_cont_test'].setFixedSize(70, 25)
             self.store['content']['sounds']['p2p_behind_cont_test'].setText(var.lang['play_sound'])
-            self.store['content']['sounds']['p2p_behind_cont_test'].clicked.connect(lambda: self.test_play_loop("p2p_active"))
+            self.store['content']['sounds']['p2p_behind_cont_test'].clicked.connect(lambda: self.test_play_loop("p2p_active_loop"))
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['p2p_behind_cont_test'], row, column)
 
             row += 1
@@ -1527,21 +1536,21 @@ class MainWindow(QMainWindow):
                     if self.lastval['soc'] != 999.0:
                         if self.store['content']['hybrid']['soc_axis'].value() <= var.settings['local']['hybrid_low_val'] < self.lastval['soc'] and var.settings['local']['hybrid_low_audio']:
                             print("call play low")
-                            fn.start_thread(sfx.play('low'))
+                            fn.start_thread(sfx.play('hybrid_low'))
                         if self.store['content']['hybrid']['soc_axis'].value() >= var.settings['local']['hybrid_high_val'] > self.lastval['soc'] and var.settings['local']['hybrid_high_audio']:
                             print("call play high")
-                            fn.start_thread(sfx.play('high'))
+                            fn.start_thread(sfx.play('hybrid_high'))
                     if self.lastval['deploy_lim'] != 999.0:
                         if self.store['content']['hybrid']['deploy_lim_axis'].value() >= var.settings['local']['hybrid_limit_val'] > self.lastval['deploy_lim'] and var.settings['local']['hybrid_limit_audio']:
                             print("call play deploy limit")
-                            fn.start_thread(sfx.play('limit'))
+                            fn.start_thread(sfx.play('hybrid_limit'))
                     self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
                     self.lastval['deploy_lim'] = self.store['content']['hybrid']['deploy_lim_axis'].value()
             for item in self.store['content']['display']: # update audio LEDs
                 if '_led' in item and item[:-4] in sfx.audio:
                     sound = item[:-4]
                     if sound == 'p2p_active':
-                        if sfx.audio['p2p_active'].get_num_channels() != 0:
+                        if sfx.audio['p2p_active_single'].get_num_channels() != 0 or sfx.audio['p2p_active_loop'].get_num_channels() != 0:
                             self.store['content']['display'][item].state('active')
                         else:
                             if fn.check_audio_setting(sound):
@@ -1557,6 +1566,8 @@ class MainWindow(QMainWindow):
                             self.store['content']['display'][item].state('off')
             if self.check_profile_list():
                 self.refresh_profile_list()
+            if self.check_sound_files_list():
+                self.refresh_sound_files_list()
         except Exception as e:
             fn.error_handling(e, "interface.display()")
         
@@ -1732,6 +1743,10 @@ class MainWindow(QMainWindow):
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
+            elif func == 'hybrid_low_file' or func == 'hybrid_high_file' or func == 'hybrid_limit_file' or func == 'upshift_beep_file' or func == 'downshift_beep_file' or func == 'p2p_active_single_file' or func == 'p2p_active_loop_file':
+                value = self.store['content']['sounds'][func].currentText()
+                if value == "":
+                    return
             elif func == 'axis_rollover' or func == 'chording_mode':
                 value = self.store['content']['settings'][func].currentText()
             else:
@@ -1798,6 +1813,13 @@ class MainWindow(QMainWindow):
                 else:
                     var.settings['local'][func] = value
                     var.status['rewrite_profile'] = True
+            elif func == "hybrid_low_file" or func == "hybrid_high_file" or func == "hybrid_limit_file" or func == "upshift_beep_file" or func == "downshift_beep_file" or func == "p2p_active_single_file" or func == "p2p_active_loop_file":
+                if value == var.settings['sound'][func[:-5]]:
+                    print("skipping setting ", func, " because it's already at ", value)
+                else:
+                    var.settings['sound'][func[:-5]] = value
+                    sfx.reset(func[:-5])
+                    var.status['rewrite_config'] = True
             else:
                 if value == var.settings[func]:
                     print("skipping setting ", func, " because it's already at ", value)
@@ -2075,6 +2097,32 @@ class MainWindow(QMainWindow):
             fn.read_profile()
         except Exception as e:
             fn.error_handling(e, "interface.delete_profile()")
+
+    @pyqtSlot()
+    def check_sound_files_list(self): # returns True if the sound files list needs to be refreshed, False if it's okay as is
+        try:
+            old_list = var.status['sound_files_list']
+            new_list = fn.get_sound_files()
+            if old_list != new_list:
+                return True
+            return False
+        except Exception as e:
+            fn.error_handling(e, "interface.check_sound_files_list()")    
+
+    @pyqtSlot()
+    def refresh_sound_files_list(self):
+        try:
+            self.store['sound_files_busy'] = True
+            files = fn.get_sound_files()
+            for sound in sfx.audio:
+                file = self.store['content']['sounds'][sound + '_file'].currentText()
+                self.store['content']['sounds'][sound + '_file'].clear()
+                for name in files:
+                    self.store['content']['sounds'][sound + '_file'].addItem(name)
+                self.store['content']['sounds'][sound + '_file'].setCurrentText(file)
+            self.store['sound_files_busy'] = False
+        except Exception as e:
+            fn.error_handling(e, "interface.refresh_sound_files_list()")
 
     @pyqtSlot()
     def update_limits(self):
@@ -2375,12 +2423,9 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def test_play(self, sound):
         try:
-            if sound == "upshift_beep" or sound == "downshift_beep":
+            if sound == "upshift_beep" or sound == "downshift_beep" or sound == "p2p_active_single":
                 sfx.play(sound)
                 sfx.status[sound] = False
-            elif sound == "p2p_active":
-                sfx.play(sound)
-                sfx.status["p2p_active_single"] = False
             else:
                 fn.start_thread(sfx.play(sound))
         except Exception as e:
@@ -2399,7 +2444,7 @@ class MainWindow(QMainWindow):
             # print("shift_beep() start")
             if self.lastval['SessionTick'] != self.ir['SessionTick']: # if the information is not new, do nothing because there is no new information
                 # ideally would copy a snapshot of self.ir at this moment to make sure all the information is from the same set, but this is probably close enough
-                self.lastval['IsOnTrack_beep'] = self.ir['IsOnTrack']
+                self.lastval['IsOnTrack'] = self.ir['IsOnTrack']
                 self.lastval['OnPitRoad'] = self.ir['OnPitRoad']
                 self.lastval['Throttle'] = self.ir['Throttle']
                 self.lastval['Brake'] = self.ir['Brake']
@@ -2432,11 +2477,12 @@ class MainWindow(QMainWindow):
                     index -= 1
                 # print(self.lastval['CarIdx_Within_p2p_Range'], self.lastval['CarIdx_Within_Cont_p2p_Range'])
                 if var.settings['local']['p2p_behind_audio'] or var.settings['local']['p2p_behind_audio_cont']:
-                    if self.lastval['IsOnTrack_beep']:
+                    if self.lastval['IsOnTrack']:
                         if var.settings['local']['p2p_behind_nobrake'] and self.lastval['Brake'] > 0.05:
                             var.status['p2p_sound_active']['single'] = False
                             var.status['p2p_sound_active']['loop'] = False
-                            sfx.audio['p2p_active'].stop()
+                            sfx.audio['p2p_active_single'].stop()
+                            sfx.audio['p2p_active_loop'].stop()
                         else:
                             if var.settings['local']['p2p_behind_audio_cont']:
                                 if not self.lastval['CarIdx_Within_Cont_p2p_Range']:
@@ -2448,7 +2494,7 @@ class MainWindow(QMainWindow):
                                         if self.lastval['CarIdxp2p'][CarIdx]:
                                             var.status['p2p_sound_active']['loop'] = True
                                     if var.status['p2p_sound_active']['loop']:
-                                        fn.start_thread(sfx.play_loop('p2p_active'))
+                                        fn.start_thread(sfx.play_loop('p2p_active_loop'))
                             else:
                                 var.status['p2p_sound_active']['loop'] = False
                             if var.settings['local']['p2p_behind_audio']:
@@ -2461,8 +2507,8 @@ class MainWindow(QMainWindow):
                                         if self.lastval['CarIdxp2p'][CarIdx]:
                                             var.status['p2p_sound_active']['single'] = True
                                     if var.status['p2p_sound_active']['single']:
-                                        fn.start_thread(sfx.play('p2p_active'))
-                                    elif sfx.audio['p2p_active'].get_num_channels() == 0:
+                                        fn.start_thread(sfx.play('p2p_active_single'))
+                                    elif sfx.audio['p2p_active_single'].get_num_channels() == 0:
                                         sfx.status['p2p_active_single'] = False
                                     var.status['p2p_sound_active']['single'] = False
                             else:
@@ -2473,14 +2519,14 @@ class MainWindow(QMainWindow):
                     sfx.status["p2p_active"] = False
                     sfx.status["p2p_active_single"] = False
                 if var.status['p2p_sound_active']['loop'] == False and sfx.status['p2p_active_loop']:
-                    fn.start_thread(sfx.stop_loop('p2p_active'))
+                    fn.start_thread(sfx.stop_loop('p2p_active_loop'))
 
 
                 if self.lastval['Speed'] == 0:
                     self.lastval['RPM/Speed'] = 0
                 else:
                     self.lastval['RPM/Speed'] = self.lastval['RPM']/self.lastval['Speed']
-                if self.lastval['IsOnTrack_beep'] and not self.lastval['OnPitRoad'] and self.lastval['Throttle'] == 1.0 and self.lastval['Brake'] == 0.0 and self.lastval['Clutch'] == 1.0 and self.lastval['Gear'] > 0: # update RPM to gear guesses
+                if self.lastval['IsOnTrack'] and not self.lastval['OnPitRoad'] and self.lastval['Throttle'] == 1.0 and self.lastval['Brake'] == 0.0 and self.lastval['Clutch'] == 1.0 and self.lastval['Gear'] > 0: # update RPM to gear guesses
                     if len(var.gearing) < self.lastval['Gear']:
                         ind = 0
                         while ind <= self.lastval['Gear']:
@@ -2503,7 +2549,7 @@ class MainWindow(QMainWindow):
                             var.gearing[self.lastval['Gear']-1][2] += (self.lastval['RPM/Speed']-var.gearing[self.lastval['Gear']-1][1])*(self.lastval['RPM/Speed']-old_avg)
                             var.gearing[self.lastval['Gear']-1][2] /= var.gearing[self.lastval['Gear']-1][0]-1
                     # print(var.gearing)
-                elif not self.lastval['IsOnTrack_beep']: # if the car physics are reset, wipe gearing data as don't know if setup changed or not
+                elif not self.lastval['IsOnTrack']: # if the car physics are reset, wipe gearing data as don't know if setup changed or not
                     i = 0
                     while i < len(var.gearing):
                         var.gearing[i] = [0, 0, 0]
@@ -2517,7 +2563,7 @@ class MainWindow(QMainWindow):
                             ind += 1
 
                 
-                if self.lastval['IsOnTrack_beep'] and self.lastval['Gear'] > 0: # determine if a beep is required now
+                if self.lastval['IsOnTrack'] and self.lastval['Gear'] > 0: # determine if a beep is required now
                     if var.settings['local']['audio'] and (var.settings['local']['upshift_beep'] or var.settings['local']['downshift_beep']):
                         if var.settings['local']['beep_mode']: # True -> fixed beep setting
                             if var.settings['local']['upshift_beep'] and len(var.gearing) >= self.lastval['Gear'] and var.gearing[self.lastval['Gear']-1] != [] and var.gearing[self.lastval['Gear']-1][1] != 0 and var.status['upshift_val'] > 0:

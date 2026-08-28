@@ -329,7 +329,8 @@ settings = {
         "hybrid_limit": "limit.mp3",
         "upshift_beep": "upshift_beep.mp3",
         "downshift_beep": "downshift_beep.mp3",
-        "p2p_active": "p2p_behind.mp3",
+        "p2p_active_single": "p2p_behind.mp3",
+        "p2p_active_loop": "p2p_behind.mp3",
     },
 
     "profile": {
@@ -429,6 +430,7 @@ status = {
     "key_prev": None,
     "profile_prev": "None",
     "profile_list": [],
+    "sound_files_list": [],
     "first": False,
     "refresh_labels": False,
     "refresh_guid_list": False,

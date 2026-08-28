@@ -313,6 +313,17 @@ def get_profiles():
     except Exception as e:
         error_handling(e, "functions.get_profiles()")
 
+def get_sound_files():
+    try:
+        directory = var.settings['path'] + "\\" + 'sfx'
+        var.status['sound_files_list'] = []
+        for name in os.listdir(path = directory):
+            if name.endswith(".mp3") or name.endswith(".wav") or name.endswith(".ogg"):
+                var.status['sound_files_list'].append(name)#.split('.', 1)[0])
+        return var.status['sound_files_list']
+    except Exception as e:
+        error_handling(e, "functions.get_profiles()")
+
 def is_bind():
     try:
         if var.event['type'] == "axis":
