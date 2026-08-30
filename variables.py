@@ -3,7 +3,10 @@ import os
 
 single_input_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
                        'v0.7.1b', 'v0.7.1.1b', 'v0.8.0b', 'v0.8.1b', 'v0.8.2b', 'v0.8.3b', 'v0.8.4b', 'v0.8.5b']
-compatible_settings = ['v0.9.0b', 'v0.9.1b','v0.10.0b']
+fixed_audio_files_settings = []
+fixed_audio_files_settings.extend(single_input_settings)
+fixed_audio_files_settings.extend(['v0.9.0b', 'v0.9.1b'])
+compatible_settings = ['v0.10.0b']
 
 lang = {
     "title": "I5G Tools",

@@ -26,51 +26,19 @@ def read_config():
             if not ver in var.compatible_settings:
                 if ver in var.single_input_settings: # need to update how input settings are stored, no changes to config actually needed
                     var.settings['version'] = var.lang['settings_version']
-                else: # if the version isn't valid, then something
+                if ver in var.fixed_audio_files_settings: # need to remove audio settings from config
+                    var.status['rewrite']['config'] = True
+                    var.status['rewrite']['profile'] = True
+                    translate(config, 'config', config, ver)
+                    return
+                if not ver in var.single_input_settings and not ver in var.fixed_audio_files_settings: # if the version isn't valid, then something
                     #TODO
                     response = ctypes.windll.user32.MessageBoxW(0, "The config file " + var.settings['config'] + " has an unknown version number. The version number in this file must be valid.", "I5G Tools  -  Unknown config file!", 0)
                     if response == 1:
                         sys.exit(0)
 
-            errors = []
-            for section in config.sections():
-                for item in config[section]:
-                    try:
-                        setting = eval(config[section][item])
-                    except (SyntaxError, ValueError):
-                        setting = config[section][item]
+            copy_from_config(config)
 
-                    if section == "GLOBAL":
-                        if not (item == "high_threshold" or item == "low_threshold"): # to make up for a mistake in all 0.6.Xb versions
-                            if item == "vjoy_rid":
-                                print('item is vjoy_rid in read_config(): ' + str(setting))
-                                if (int(setting) < 1 or int(setting) > 16) and not int(setting) == -1:
-                                    var.settings[item] = int(1) # temp fix, improve this later, pop up a warning or something
-                                else:
-                                    var.settings[item] = int(setting)
-                            else:
-                                var.settings[item] = setting
-                    elif section == "SOUND":
-                        var.settings['sound'][item] = setting
-                    elif section == "PROFILE":
-                        if item == "current":
-                            var.settings['profile'][item] = str(setting)
-                        else:
-                            var.settings['profile'][item] = setting
-                    else:
-                        if not section in errors:
-                            errors.append(section)
-
-            if errors: # and not var.status['rewrite']['config']:
-                text = var.lang['section_errors']['config']['intro']
-                for error in errors:
-                    text += error + "\n"
-                text += var.lang['section_errors']['config']['outro']
-                response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['section_errors']['config']['title'], 1)
-                if response == 1:
-                    pass
-                elif response == 2:
-                    sys.exit(0)
             if var.status['rewrite']['config']:
                 write_config()
                 var.status['rewrite']['config'] = False
@@ -105,6 +73,11 @@ def read_profile(profile=None):
             ver = check_ver(config, 'profile')
             if not ver in var.compatible_settings:
                 if ver in var.single_input_settings: # just need to update the structure of how binds are stored
+                    var.status['rewrite']['profile'] = True
+                    translate(config, 'profile', profile, ver)
+                    read_profile()
+                    return
+                if ver in var.fixed_audio_files_settings:
                     var.status['rewrite']['profile'] = True
                     translate(config, 'profile', profile, ver)
                     read_profile()
@@ -151,11 +124,15 @@ def copy_from_profile(config): # copy data out of profile and store it in var.se
                 if item == 'version':
                     # setting = config[section][item]
                     setting = var.lang['settings_version']
+                elif section == 'SOUND':
+                    setting = config[section][item]
                 else:
                     setting = eval(config[section][item])
                 if section == "LOCAL":
                     if item not in var.obsolete:
                         var.settings['local'][item] = setting
+                elif section == 'SOUND':
+                    var.settings['sound'][item] = setting
                 elif section.lower() in var.bindings:
                     if item in var.bindings_info['types']:
                         var.bindings[section.lower()][item] = setting
@@ -223,6 +200,50 @@ def interpret_profile():
     except Exception as e:
         error_handling(e, "functions.interpret_profile()")
 
+def copy_from_config(config):
+    try:
+        errors = []
+        for section in config.sections():
+            for item in config[section]:
+                try:
+                    setting = eval(config[section][item])
+                except (SyntaxError, ValueError):
+                    setting = config[section][item]
+
+                if section == "GLOBAL":
+                    if not (item == "high_threshold" or item == "low_threshold"): # to make up for a mistake in all 0.6.Xb versions
+                        if item == "vjoy_rid":
+                            print('item is vjoy_rid in read_config(): ' + str(setting))
+                            if (int(setting) < 1 or int(setting) > 16) and not int(setting) == -1:
+                                var.settings[item] = int(1) # temp fix, improve this later, pop up a warning or something
+                            else:
+                                var.settings[item] = int(setting)
+                        else:
+                            var.settings[item] = setting
+                elif section == "SOUND":
+                    var.settings['sound'][item] = setting
+                elif section == "PROFILE":
+                    if item == "current":
+                        var.settings['profile'][item] = str(setting)
+                    else:
+                        var.settings['profile'][item] = setting
+                else:
+                    if not section in errors:
+                        errors.append(section)
+
+        if errors: # and not var.status['rewrite']['config']:
+            text = var.lang['section_errors']['config']['intro']
+            for error in errors:
+                text += error + "\n"
+            text += var.lang['section_errors']['config']['outro']
+            response = ctypes.windll.user32.MessageBoxW(0, text, var.lang['section_errors']['config']['title'], 1)
+            if response == 1:
+                pass
+            elif response == 2:
+                sys.exit(0)
+    except Exception as e:
+        error_handling(e, "functions.copy_from_config()")
+
 def write_config():
     try:
         print("write_config() start")
@@ -235,8 +256,7 @@ def write_config():
                 config['GLOBAL'][setting] = str(var.settings[setting])
 
         config['SOUND'] = {}
-        for setting in var.settings['sound']:
-            config['SOUND'][setting] = str(var.settings['sound'][setting])
+        config['SOUND']['path'] = str(var.settings['sound']['path'])
 
         config['PROFILE'] = {}
         for setting in var.settings['profile']:
@@ -266,6 +286,11 @@ def write_profile(profile=None):
         config['LOCAL']['version'] = var.lang['settings_version']
         for setting in var.settings['local']:
             config['LOCAL'][setting] = str(var.settings['local'][setting])
+
+        config['SOUND'] = {}
+        for setting in var.settings['sound']:
+            if setting != "previous" and setting != "path":
+                config['SOUND'][setting] = str(var.settings['sound'][setting])
 
         for bind in var.bindings:
             if bind != "status":
@@ -497,16 +522,25 @@ def translate(file, type, name, ver):
                 interpret_profile()
                 
                 var.status['rewrite']['profile'] = True
-            # elif ver in var.lang['compatible_versions']:
-            #     var.settings['local']['version'] = var.lang['settings_version']
-            #     var.status['rewrite']['config'] = True
-            else:
+            if ver in var.fixed_audio_files_settings:
+                print('Converting from fixed audio files settings for profile')
+                copy_from_profile(file)
+                if 'p2p_active' in var.settings['sound']:
+                    del var.settings['sound']['p2p_active']
+            if not ver in var.single_input_settings and not ver in var.fixed_audio_files_settings:
                 response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong in fn.translate(). Error Code 1. Program closing", "I5G Tools  -  Translate Error 1!", 0)
                 if response == 1:
                     sys.exit(0)
                 sys.exit(0)
 
             # else: # for when future versions change things
+        elif type == 'config':
+            now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
+            with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + ver + now + ".bak", 'w') as newfile:
+                file.write(newfile)
+            if ver in var.fixed_audio_files_settings():
+                copy_from_config(file)
+
         else:
             response = ctypes.windll.user32.MessageBoxW(0, "Oops! Something went wrong in fn.translate(). Error Code 2. Program closing", "I5G Tools  -  Translate Error 2!", 0)
             if response == 1:
