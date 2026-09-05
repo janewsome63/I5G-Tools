@@ -69,7 +69,8 @@ def play(notif):
                 status[notif] = True
                 audio[notif].set_volume(var.settings['local']['volume'])
                 audio[notif].play()
-                status[notif] = False
+                if 'hybrid' in notif: # only reset status of hybrid noises, upshift and downshift beeps are handled in interface.py
+                    status[notif] = False
             else:
                 print(notif, " is not valid in sfx.play")
         # else:
