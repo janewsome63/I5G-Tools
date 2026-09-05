@@ -29,7 +29,7 @@ def read_config():
                 if ver in var.fixed_audio_files_settings: # need to remove audio settings from config
                     var.status['rewrite']['config'] = True
                     var.status['rewrite']['profile'] = True
-                    translate(config, 'config', config, ver)
+                    translate(config, 'config', 'global', ver)
                     return
                 if not ver in var.single_input_settings and not ver in var.fixed_audio_files_settings: # if the version isn't valid, then something
                     #TODO
@@ -73,14 +73,14 @@ def read_profile(profile=None):
             ver = check_ver(config, 'profile')
             if not ver in var.compatible_settings:
                 if ver in var.single_input_settings: # just need to update the structure of how binds are stored
-                    var.status['rewrite']['profile'] = True
                     translate(config, 'profile', profile, ver)
                     read_profile()
+                    var.status['rewrite']['profile'] = True
                     return
                 if ver in var.fixed_audio_files_settings:
-                    var.status['rewrite']['profile'] = True
                     translate(config, 'profile', profile, ver)
                     read_profile()
+                    var.status['rewrite']['profile'] = True
                     return
                 else: # if the version isn't valid, then something
                     #TODO
@@ -524,7 +524,8 @@ def translate(file, type, name, ver):
                 var.status['rewrite']['profile'] = True
             if ver in var.fixed_audio_files_settings:
                 print('Converting from fixed audio files settings for profile')
-                copy_from_profile(file)
+                if not ver in var.single_input_settings: # only copy from profile if haven't done that already, otherwise this will undo some of the translation
+                    copy_from_profile(file)
                 if 'p2p_active' in var.settings['sound']:
                     del var.settings['sound']['p2p_active']
             if not ver in var.single_input_settings and not ver in var.fixed_audio_files_settings:
@@ -536,9 +537,9 @@ def translate(file, type, name, ver):
             # else: # for when future versions change things
         elif type == 'config':
             now = datetime.datetime.today().strftime('%Y%m%d%H%M%S')
-            with open(var.settings['path'] + "\\" + var.settings['profile']['path'] + "\\" + name + ".ini." + ver + now + ".bak", 'w') as newfile:
+            with open(var.settings['path'] + "\\" + name + ".ini." + ver + now + ".bak", 'w') as newfile:
                 file.write(newfile)
-            if ver in var.fixed_audio_files_settings():
+            if ver in var.fixed_audio_files_settings:
                 copy_from_config(file)
 
         else:
