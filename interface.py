@@ -1547,7 +1547,7 @@ class MainWindow(QMainWindow):
                     self.lastval['soc'] = self.store['content']['hybrid']['soc_axis'].value()
                     self.lastval['deploy_lim'] = self.store['content']['hybrid']['deploy_lim_axis'].value()
             for item in self.store['content']['display']: # update audio LEDs
-                if '_led' in item and item[:-4] in sfx.audio:
+                if '_led' in item and item[:-4] in sfx.status:
                     sound = item[:-4]
                     if sound == 'p2p_active':
                         if sfx.audio['p2p_active_single'].get_num_channels() != 0 or sfx.audio['p2p_active_loop'].get_num_channels() != 0:
