@@ -7,8 +7,6 @@ import shutil
 
 p.mixer.init()
 
-sounds = {}
-
 status = {
     "hybrid_low": False,
     "hybrid_high": False,
@@ -30,12 +28,18 @@ except:
 if not os.path.exists(var.settings['path'] + "\\" + var.settings['sound']['path']):
     os.mkdir(var.settings['path'] + "\\" + var.settings['sound']['path'])
 
-for sound in var.settings['sound']:
-    if sound != "path" and "val" not in sound:
-        source = resources + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound'][sound]
-        sounds[sound] = var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound'][sound]
-        if not os.path.exists(sounds[sound]):
-            shutil.copyfile(source, sounds[sound])
+source_folder = resources + "\\" + var.settings['sound']['path']
+
+for file in os.listdir(path = source_folder):
+    if file != "path" and len(file) > 4 and file[-4:] in var.audio_valid_file_types:
+        print('checking for', file, 'file')
+        source = source_folder + "\\" + file
+        sound_file = var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + file
+        if not os.path.exists(sound_file):
+            print('copying', file, 'file')
+            shutil.copyfile(source, sound_file)
+        else:
+            print(file,'found')
 
 audio = {
     'hybrid_low': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_low']),

@@ -1814,12 +1814,12 @@ class MainWindow(QMainWindow):
                     var.settings['local'][func] = value
                     var.status['rewrite_profile'] = True
             elif func == "hybrid_low_file" or func == "hybrid_high_file" or func == "hybrid_limit_file" or func == "upshift_beep_file" or func == "downshift_beep_file" or func == "p2p_active_single_file" or func == "p2p_active_loop_file":
-                if value == var.settings['sound'][func[:-5]]:
+                if value == var.settings['sound'][func[:-5]]: #[:-5] to ignore the _file part of the string
                     print("skipping setting ", func, " because it's already at ", value)
                 else:
                     var.settings['sound'][func[:-5]] = value
                     sfx.reset(func[:-5])
-                    var.status['rewrite_config'] = True
+                    var.status['rewrite_profile'] = True
             else:
                 if value == var.settings[func]:
                     print("skipping setting ", func, " because it's already at ", value)
