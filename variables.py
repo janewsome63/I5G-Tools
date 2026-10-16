@@ -67,6 +67,8 @@ lang = {
     "playing_sound": "Playing",
     "sound_label": "Sound",
     "volume_label": "Volume",
+    "wj_prim_audio_label": "WJ to Primary Status Audio (if Sound is Yes)",
+    "wj_sec_audio_label": "WJ to Secondary Status Audio (if Sound is Yes)",
     "hybrid_low_audio_label": "Hybrid Low Audio (if Sound is Yes)",
     "hybrid_high_audio_label": "Hybrid High Audio (if Sound is Yes)",
     "hybrid_limit_audio_label": "Hybrid Limit Audio (if Sound is Yes)",
@@ -327,13 +329,15 @@ settings = {
 
     "sound": {
         "path": "sfx",
-        "hybrid_high": "high.mp3",
-        "hybrid_low": "low.mp3",
-        "hybrid_limit": "limit.mp3",
-        "upshift_beep": "upshift_beep.mp3",
-        "downshift_beep": "downshift_beep.mp3",
-        "p2p_active_single": "p2p_behind.mp3",
-        "p2p_active_loop": "p2p_behind.mp3",
+        "hybrid_high": "b737_pullup.mp3",
+        "hybrid_low": "b737_windshear.mp3",
+        "hybrid_limit": "ac7_ammo_zero.mp3",
+        "upshift_beep": "beep_07a.mp3",
+        "downshift_beep": "beep_05.mp3",
+        "p2p_active_single": "f14_rdr_lock_warn.mp3",
+        "p2p_active_loop": "f14_rdr_lock_warn.mp3",
+        "wj_prim": "ac8_sw_msl.wav",
+        "wj_sec": "ac8_sw_spwp2.wav",
     },
 
     "profile": {
@@ -346,6 +350,8 @@ settings = {
         # "low_threshold": 0.10,
         "audio": False,
         "volume": 0.5,
+        "wj_prim_audio": False,
+        "wj_sec_audio": False,
         "hybrid_low_audio": True,
         "hybrid_high_audio": True,
         "hybrid_limit_audio": True,
@@ -765,3 +771,5 @@ potential_bind = {}
 gearing = [[]] # the first index is the gear-1 and the second index gives the number of sample points, the current average, and the current variance (std dev squared)
 
 obsolete = ('high_threshold', 'low_threshold', 'axis_rollover')
+
+audio_valid_file_types = ['.mp3', '.ogg', '.wav']

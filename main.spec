@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-added_files = [('sfx/*.mp3', 'sfx'), ('icon.ico', '.')]
+added_files = [('sfx/*.mp3', 'sfx'), ('sfx/*.wav', 'sfx'), ('icon.ico', '.')]
 
 a = Analysis(
     ['main.pyw'],

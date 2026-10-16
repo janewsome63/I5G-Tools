@@ -710,6 +710,74 @@ class MainWindow(QMainWindow):
             row += 1
             column = 0
 
+            self.store['content']['sounds']['wj_prim_audio_label'] = QLabel()
+            self.store['content']['sounds']['wj_prim_audio_label'].setText(var.lang['wj_prim_audio_label'] + ":")
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_prim_audio_label'], row, column)
+
+            column += 1
+
+            self.store['content']['sounds']['wj_prim_file'] = CustomComboBox()
+            self.store['content']['sounds']['wj_prim_file'].setFixedSize(150, 25)
+            self.store['content']['sounds']['wj_prim_file'].addItem(str(var.settings['sound']['wj_prim']))
+            self.store['content']['sounds']['wj_prim_file'].setCurrentText(str(var.settings['sound']['wj_prim']))
+            self.store['content']['sounds']['wj_prim_file'].currentIndexChanged.connect(lambda: self.settings_set('wj_prim_file'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_prim_file'], row, column)
+
+            column += 1
+
+            self.store['content']['sounds']['wj_prim_audio'] = CustomComboBox()
+            self.store['content']['sounds']['wj_prim_audio'].setFixedSize(70, 25)
+            self.store['content']['sounds']['wj_prim_audio'].addItem("Yes")
+            self.store['content']['sounds']['wj_prim_audio'].addItem("No")
+            self.store['content']['sounds']['wj_prim_audio'].setCurrentText(str(var.settings['local']['wj_prim_audio']))
+            self.store['content']['sounds']['wj_prim_audio'].currentIndexChanged.connect(lambda: self.settings_set('wj_prim_audio'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_prim_audio'], row, column)
+
+            column += 1
+
+            self.store['content']['sounds']['wj_prim_test'] = QPushButton()
+            self.store['content']['sounds']['wj_prim_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['wj_prim_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['wj_prim_test'].clicked.connect(lambda: self.test_play("wj_prim"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_prim_test'], row, column)
+
+            row += 1
+            column = 0
+
+            self.store['content']['sounds']['wj_sec_audio_label'] = QLabel()
+            self.store['content']['sounds']['wj_sec_audio_label'].setText(var.lang['wj_sec_audio_label'] + ":")
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_sec_audio_label'], row, column)
+
+            column += 1
+
+            self.store['content']['sounds']['wj_sec_file'] = CustomComboBox()
+            self.store['content']['sounds']['wj_sec_file'].setFixedSize(150, 25)
+            self.store['content']['sounds']['wj_sec_file'].addItem(str(var.settings['sound']['wj_sec']))
+            self.store['content']['sounds']['wj_sec_file'].setCurrentText(str(var.settings['sound']['wj_sec']))
+            self.store['content']['sounds']['wj_sec_file'].currentIndexChanged.connect(lambda: self.settings_set('wj_sec_file'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_sec_file'], row, column)
+
+            column += 1
+
+            self.store['content']['sounds']['wj_sec_audio'] = CustomComboBox()
+            self.store['content']['sounds']['wj_sec_audio'].setFixedSize(70, 25)
+            self.store['content']['sounds']['wj_sec_audio'].addItem("Yes")
+            self.store['content']['sounds']['wj_sec_audio'].addItem("No")
+            self.store['content']['sounds']['wj_sec_audio'].setCurrentText(str(var.settings['local']['wj_sec_audio']))
+            self.store['content']['sounds']['wj_sec_audio'].currentIndexChanged.connect(lambda: self.settings_set('wj_sec_audio'))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_sec_audio'], row, column)
+
+            column += 1
+
+            self.store['content']['sounds']['wj_sec_test'] = QPushButton()
+            self.store['content']['sounds']['wj_sec_test'].setFixedSize(70, 25)
+            self.store['content']['sounds']['wj_sec_test'].setText(var.lang['play_sound'])
+            self.store['content']['sounds']['wj_sec_test'].clicked.connect(lambda: self.test_play("wj_sec"))
+            self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['wj_sec_test'], row, column)
+
+            row += 1
+            column = 0
+
             self.store['content']['sounds']['hybrid_low_audio_label'] = QLabel()
             self.store['content']['sounds']['hybrid_low_audio_label'].setText(var.lang['hybrid_low_audio_label'] + ":")
             self.tabs['sounds'].layout.addWidget(self.store['content']['sounds']['hybrid_low_audio_label'], row, column)
@@ -1359,12 +1427,16 @@ class MainWindow(QMainWindow):
                     self.store['content'][function]['switch'].setValue(value)
 
                     if function in self.tabs['types']['adjustment'] or function in self.tabs['types']['input']:
-                        if var.status[function]['switched']:
+                        if var.status[function]['switched'] and self.store['content'][function]['switch_led'].active == 'standby': #prim/off to sec/on
                             self.store['content'][function]['switch_led'].label_text = var.lang['secondary']
                             self.store['content'][function]['switch_led'].state('active')
-                        elif not var.status[function]['switched']:
+                            if function == 'weight_jacker' and var.settings['local']['wj_sec_audio']:
+                                sfx.play('wj_sec')
+                        elif not var.status[function]['switched'] and self.store['content'][function]['switch_led'].active == 'active': #sec/on to prim/off
                             self.store['content'][function]['switch_led'].label_text = var.lang['primary']
                             self.store['content'][function]['switch_led'].state('standby')
+                            if function == 'weight_jacker' and var.settings['local']['wj_prim_audio']:
+                                sfx.play('wj_prim')
                 elif function in self.store['content'] and function == "hybrid":
                     for control in var.status[function]:
                         if var.status[function][control]['state']:
@@ -1739,11 +1811,14 @@ class MainWindow(QMainWindow):
     def settings_set(self, func):
         try:
             print("settings_set ", func)
-            if func == 'sound' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
+            if func == 'sound' or func == 'wj_prim_audio' or func == 'wj_sec_audio' or func == 'upshift_beep' or func == 'downshift_beep' or func == 'beep_mode' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car":
                 value = self.store['content']['sounds'][func].currentText()
             elif func == 'volume' or func == 'hybrid_low_val' or func == 'hybrid_high_val' or func == 'hybrid_limit_val' or func == 'dynamic_mode_offset' or func == 'upshift_offset' or func == 'downshift_offset' or func == 'p2p_behind_thresh' or func == 'p2p_behind_thresh_cont':
                 value = self.store['content']['sounds'][func].value()
-            elif func == 'hybrid_low_file' or func == 'hybrid_high_file' or func == 'hybrid_limit_file' or func == 'upshift_beep_file' or func == 'downshift_beep_file' or func == 'p2p_active_single_file' or func == 'p2p_active_loop_file':
+            elif func == 'wj_prim_file' or func == 'wj_sec_file' or func == 'hybrid_low_file' or func == 'hybrid_high_file' or func == 'hybrid_limit_file' or func == 'upshift_beep_file' or func == 'downshift_beep_file' or func == 'p2p_active_single_file' or func == 'p2p_active_loop_file':
+                if self.store['sound_files_busy']:
+                    print("skipping due to sound_files_busy")
+                    return
                 value = self.store['content']['sounds'][func].currentText()
                 if value == "":
                     return
@@ -1789,7 +1864,7 @@ class MainWindow(QMainWindow):
                 else:
                     var.settings['local']['audio'] = (value == "Yes")
                     var.status['rewrite_profile'] = True
-            elif func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car" or func == "chording_mode":
+            elif func == 'wj_prim_audio' or func == 'wj_sec_audio' or func == 'upshift_beep' or func == 'downshift_beep' or func == "hybrid_low_audio" or func == "hybrid_high_audio" or func == "hybrid_limit_audio" or func == "p2p_behind_audio" or func == "p2p_behind_audio_cont" or func == "p2p_behind_nobrake" or func == "p2p_behind_closest_car" or func == "chording_mode":
                 if (value == "Yes") == var.settings['local'][func]:
                     print("skipping setting ", func, " because it's already at ", value)
                 else:
@@ -1813,7 +1888,7 @@ class MainWindow(QMainWindow):
                 else:
                     var.settings['local'][func] = value
                     var.status['rewrite_profile'] = True
-            elif func == "hybrid_low_file" or func == "hybrid_high_file" or func == "hybrid_limit_file" or func == "upshift_beep_file" or func == "downshift_beep_file" or func == "p2p_active_single_file" or func == "p2p_active_loop_file":
+            elif func == 'wj_prim_file' or func == 'wj_sec_file' or func == "hybrid_low_file" or func == "hybrid_high_file" or func == "hybrid_limit_file" or func == "upshift_beep_file" or func == "downshift_beep_file" or func == "p2p_active_single_file" or func == "p2p_active_loop_file":
                 if value == var.settings['sound'][func[:-5]]: #[:-5] to ignore the _file part of the string
                     print("skipping setting ", func, " because it's already at ", value)
                 else:
@@ -2423,7 +2498,7 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def test_play(self, sound):
         try:
-            if sound == "upshift_beep" or sound == "downshift_beep" or sound == "p2p_active_single":
+            if sound == 'wj_prim' or sound == 'wj_sec' or sound == "upshift_beep" or sound == "downshift_beep" or sound == "p2p_active_single":
                 sfx.play(sound)
                 sfx.status[sound] = False
                 if sound == "p2p_active_single":

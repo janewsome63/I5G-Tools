@@ -8,6 +8,8 @@ import shutil
 p.mixer.init()
 
 status = {
+    "wj_prim": False,
+    "wj_sec": False,
     "hybrid_low": False,
     "hybrid_high": False,
     "hybrid_limit": False,
@@ -42,6 +44,8 @@ for file in os.listdir(path = source_folder):
             print(file,'found')
 
 audio = {
+    'wj_prim': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['wj_prim']),
+    'wj_sec': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['wj_sec']),
     'hybrid_low': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_low']),
     'hybrid_high': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_high']),
     'hybrid_limit': p.mixer.Sound(var.settings['path'] + "\\" + var.settings['sound']['path'] + "\\" + var.settings['sound']['hybrid_limit']),
@@ -73,7 +77,7 @@ def play(notif):
                 status[notif] = True
                 audio[notif].set_volume(var.settings['local']['volume'])
                 audio[notif].play()
-                if 'hybrid' in notif: # only reset status of hybrid noises, upshift and downshift beeps are handled in interface.py
+                if 'hybrid' in notif or 'wj' in notif: # only reset status of hybrid noises and wj switch noises, upshift and downshift beeps are handled in interface.py
                     status[notif] = False
             else:
                 print(notif, " is not valid in sfx.play")
