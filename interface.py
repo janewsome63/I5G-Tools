@@ -2426,6 +2426,8 @@ class MainWindow(QMainWindow):
             if sound == "upshift_beep" or sound == "downshift_beep" or sound == "p2p_active_single":
                 sfx.play(sound)
                 sfx.status[sound] = False
+                if sound == "p2p_active_single":
+                    sfx.status["p2p_active"] = False #also need to clear the overall p2p_active status in addition to p2p_active_single status
             else:
                 fn.start_thread(sfx.play(sound))
         except Exception as e:
