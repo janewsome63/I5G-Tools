@@ -99,6 +99,8 @@ def set_axis(axis, pct):
         axis_busy[axis] = False
     except Exception as e:
         more_info = "j.rID is " + str(j.rID) + ", axis is " + str(axis) + ", axis_value is " + str(axis_values[axis]) + ", pct is " + str(pct) + ", raw is " + str(raw)
+        if local_number:
+            more_info += ", local_number is " + str(local_number) + ", number is " + str(number)
         fn.error_handling(e, "vjoy.set_axis()", more_info)
 
 def set_button(button, state):
