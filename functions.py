@@ -635,7 +635,7 @@ def check_audio_setting(sound): # returns true if the settings for this sound ar
     else:
         print("something went wrong in fn.check_aduio_setting", sound)
 
-def error_handling(e, loc):
+def error_handling(e, loc, info=None):
     error = traceback.format_exc()
     print("!!! An error has occured !!! :(")
     print(str(type(e)) + " " + loc)
@@ -645,8 +645,14 @@ def error_handling(e, loc):
         startup_time()
     sleep(0.001) # stupid hack to prevent the app from having time to write a log file when the user closes the app
     with open("I5G_Tools_err_" + var.backend['startup_time'] + ".log", "a") as f:
+        if var.backend['writing_log'] == False:
+            var.backend['writing_log'] = True
+            f.write(var.lang['version'])
+            f.write("vJoy rID during initialization was " + var.backend['rID'])
         f.write(now_pretty + "\n")
         f.write(error)
+        if info:
+            f.write(info)
         #f.write(f"{type(e)}: {str(e.args)}, {str(e)}\n" + loc + "\n\n")
     # sys.exit(0) # exit program to make it obvious an error occured. Otherwise, the app could continue partially functioning with only part of it in a broken state
 

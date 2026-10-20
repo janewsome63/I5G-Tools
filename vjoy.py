@@ -98,7 +98,8 @@ def set_axis(axis, pct):
             print("new primary: ", var.status[axis]['primary'])
         axis_busy[axis] = False
     except Exception as e:
-        fn.error_handling(e, "vjoy.set_axis()")
+        more_info = "j.rID is " + str(j.rID) + ", axis is " + str(axis) + ", axis_value is " + str(axis_values[axis]) + ", pct is " + str(pct) + ", raw is " + str(raw)
+        fn.error_handling(e, "vjoy.set_axis()", more_info)
 
 def set_button(button, state):
     try:
@@ -106,7 +107,8 @@ def set_button(button, state):
         print("try set using: ", button, button_ref[button], state)
         j.set_button(button_ref[button], state)
     except Exception as e:
-        fn.error_handling(e, "vjoy.set_button()")
+        more_info = "j.rID is " + str(j.rID) + ", button is " + str(button) + ", button_ref is " + str(button_ref[button]), ", state is " + str(state)
+        fn.error_handling(e, "vjoy.set_button()", more_info)
 
 def calibrate_axis(axis):
     try:
@@ -172,6 +174,7 @@ def intialize():
         # set("deploy_rate", 1.0)
         set_button("regen", False)
         set_button("deploy", False)
+        var.backend['rID'] = str(j.rID)
     except vjoy.vJoyNotEnabledException:
         ctypes.windll.user32.MessageBoxW(0, "vJoy is not enabled. Check to make sure vJoy is actually running.\n\nProgram closing", "I5G Tools  -  vJoy Setup Error 1", int("0x10", 16))
         sys.exit(0)

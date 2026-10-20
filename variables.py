@@ -1,5 +1,6 @@
 import copy
 import os
+import datetime
 
 single_input_settings = ['v0.6.0b', 'v0.6.1b', 'v0.6.1.1b', 'v0.6.1.2b', 'v0.6.2b', 'v0.6.3b', 'v0.6.4b', 'v0.7.0b',
                        'v0.7.1b', 'v0.7.1.1b', 'v0.8.0b', 'v0.8.1b', 'v0.8.2b', 'v0.8.3b', 'v0.8.4b', 'v0.8.5b']
@@ -752,7 +753,9 @@ event = {
 bind_event_list = []
 
 backend = {
-    "startup_time": None,
+    "startup_time": str(datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S')),
+    "writing_log": False,
+    "rID": "not set",
 }
 
 potential_bind = {}
