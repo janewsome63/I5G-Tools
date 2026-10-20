@@ -54,6 +54,7 @@ number = 0
 
 def set_axis(axis, pct):
     try:
+        pct_init = pct
         global j
         global number
         print("vjoy set check1")
@@ -98,7 +99,7 @@ def set_axis(axis, pct):
             print("new primary: ", var.status[axis]['primary'])
         axis_busy[axis] = False
     except Exception as e:
-        more_info = "j.rID is " + str(j.rID) + "vJoy status code is " + str(_sdk.GetVJDStatus(j.rID)) + ", axis is " + str(axis) + ", axis_value is " + str(axis_values[axis]) + ", pct is " + str(pct) + ", raw is " + str(raw)
+        more_info = "j.rID is " + str(j.rID) + "vJoy status code is " + str(_sdk.GetVJDStatus(j.rID)) + ", axis is " + str(axis) + ", axis_value is " + str(axis_values[axis]) + ", pct is " + str(pct) + ", pct_init is " + str(pct_init) + ", raw is " + str(raw)
         if local_number:
             more_info += ", local_number is " + str(local_number) + ", number is " + str(number)
         fn.error_handling(e, "vjoy.set_axis()", more_info)
